@@ -51,10 +51,17 @@ tocar em algo fora do escopo da Parte pedida, pare e explique antes de agir.
 - [ ] Mudança está limitada à Parte pedida, nada a mais
 - [ ] Mensagens de erro para o usuário estão em português e são compreensíveis
 
-## Commits
+## Commits e branches
 - Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`
 - Um commit por Parte concluída, não um commit gigante no final
 - Mensagem descreve o quê e, se não for óbvio, por quê
+- Branches de Parte nascem de `dev`, não de `main`. PR fecha em `dev`.
+  Detalhes completos em `CONTRIBUTING.md`.
+- **REGRA DE OURO: nunca execute `git commit` ou `git push` sem antes mostrar
+  um resumo do que foi alterado e receber uma confirmação explícita para
+  aquele commit especificamente.** Ter recebido a tarefa inicial não conta
+  como essa confirmação — são duas aprovações separadas: uma para
+  implementar, outra para commitar/enviar.
 
 ## Quando tiver dúvida
 Pare e pergunte em vez de assumir. Especialmente para: mudança de schema,
