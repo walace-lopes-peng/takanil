@@ -1,0 +1,277 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Finanças - Hub Takanil">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+    <div class="flex items-center justify-between mb-6">
+      <a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </a>
+      <h2 class="text-xl font-bold text-gray-800 text-center flex-1">Finanças</h2>
+      <div class="w-6"></div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <button id="btnEntrada" class="py-4 rounded-xl text-white font-bold text-lg bg-green-600 hover:bg-green-700 active:scale-95 transition-all shadow-sm">
+        Nova Entrada
+      </button>
+      <button id="btnSaida" class="py-4 rounded-xl text-white font-bold text-lg bg-red-600 hover:bg-red-700 active:scale-95 transition-all shadow-sm">
+        Nova Saída
+      </button>
+    </div>
+
+    <!-- Formulário (Escondido por padrão) -->
+    <form id="formFinancas" class="space-y-5 hidden bg-gray-50 p-4 rounded-xl border border-gray-200">
+      <div class="flex justify-between items-center mb-2">
+        <h3 id="formTitle" class="font-bold text-gray-800 text-lg">Nova Transação</h3>
+        <button type="button" id="btnCancelar" class="text-gray-400 hover:text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <input type="hidden" id="tipo" name="tipo" value="">
+
+      <!-- Valor -->
+      <div>
+        <label for="valor" class="block text-sm font-medium text-gray-700">Valor (R$)</label>
+        <input type="number" name="valor" id="valor" step="0.01" min="0.01" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-white" placeholder="Ex: 150.00">
+      </div>
+
+      <!-- Descrição -->
+      <div>
+        <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+        <input type="text" name="descricao" id="descricao" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-white" placeholder="Ex: Ração clínica">
+      </div>
+
+      <!-- Categoria (Toggle) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {
+            [
+              { label: 'Ração', value: 'racao' },
+              { label: 'Veterinário', value: 'veterinario' },
+              { label: 'Medicamento', value: 'medicamento' },
+              { label: 'Castração', value: 'castracao' },
+              { label: 'Doação', value: 'doacao' },
+              { label: 'Outro', value: 'outro' }
+            ].map((cat) => (
+              <label class="cursor-pointer">
+                <input type="radio" name="categoria" value={cat.value} class="peer sr-only" required>
+                <div class="text-center p-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-sm peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all">
+                  {cat.label}
+                </div>
+              </label>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Data -->
+      <div>
+        <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
+        <input type="date" name="data" id="data" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-white">
+      </div>
+
+      <!-- Submit -->
+      <div class="pt-4">
+        <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 active:scale-[0.98] transition-all disabled:opacity-70">
+          <span>Salvar Lançamento</span>
+          <svg id="loadingSpinner" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mensagem de erro/sucesso -->
+      <div id="statusMessage" class="hidden text-center text-sm font-medium p-3 rounded-xl mt-2"></div>
+    </form>
+  </div>
+
+  <!-- Lista de Lançamentos -->
+  <div>
+    <h3 class="text-lg font-bold text-gray-800 mb-4 px-1">Lançamentos Recentes</h3>
+    <div id="listaLancamentos" class="space-y-4 pb-20">
+      <div class="text-center py-8 text-gray-400 text-sm" id="loadingState">
+        <svg class="animate-spin mx-auto h-8 w-8 text-gray-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Carregando dados...
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { supabase } from '../../lib/supabaseClient';
+
+  const btnEntrada = document.getElementById('btnEntrada');
+  const btnSaida = document.getElementById('btnSaida');
+  const btnCancelar = document.getElementById('btnCancelar');
+  const form = document.getElementById('formFinancas') as HTMLFormElement;
+  const tipoInput = document.getElementById('tipo') as HTMLInputElement;
+  const formTitle = document.getElementById('formTitle');
+  const dataInput = document.getElementById('data') as HTMLInputElement;
+  
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+  const submitText = submitBtn.querySelector('span');
+  const spinner = document.getElementById('loadingSpinner');
+  const statusMessage = document.getElementById('statusMessage');
+  const listaLancamentos = document.getElementById('listaLancamentos');
+  const loadingState = document.getElementById('loadingState');
+
+  // Setar data padrão para hoje
+  const hoje = new Date().toISOString().split('T')[0];
+  if(dataInput) dataInput.value = hoje;
+
+  // Abrir form
+  function openForm(tipo: 'Entrada' | 'Saída') {
+    form.classList.remove('hidden');
+    tipoInput.value = tipo;
+    if(formTitle) {
+      formTitle.textContent = tipo === 'Entrada' ? 'Nova Entrada' : 'Nova Saída';
+      formTitle.className = tipo === 'Entrada' ? 'font-bold text-lg text-green-700' : 'font-bold text-lg text-red-700';
+    }
+    // Foco suave
+    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  btnEntrada?.addEventListener('click', () => openForm('Entrada'));
+  btnSaida?.addEventListener('click', () => openForm('Saída'));
+  btnCancelar?.addEventListener('click', () => {
+    form.classList.add('hidden');
+    form.reset();
+    dataInput.value = hoje;
+  });
+
+  const showStatus = (msg: string, type: 'success' | 'error') => {
+    if(!statusMessage) return;
+    statusMessage.textContent = msg;
+    statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
+    if (type === 'error') {
+      statusMessage.classList.add('bg-red-50', 'text-red-700');
+    } else {
+      statusMessage.classList.add('bg-green-50', 'text-green-700');
+    }
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusMessage?.classList.add('hidden');
+    
+    const formData = new FormData(form);
+    const tipo = formData.get('tipo') as string;
+    const valorStr = formData.get('valor') as string;
+    const valor = parseFloat(valorStr);
+    const descricao = formData.get('descricao') as string;
+    const categoria = formData.get('categoria') as string;
+    const data = formData.get('data') as string;
+
+    if (!tipo || isNaN(valor) || valor <= 0 || !descricao || !categoria || !data) {
+      showStatus('Por favor, preencha todos os campos corretamente.', 'error');
+      return;
+    }
+
+    try {
+      submitBtn.disabled = true;
+      if(submitText) submitText.textContent = 'Salvando...';
+      spinner?.classList.remove('hidden');
+
+      const { error: dbError } = await supabase
+        .from('financas')
+        .insert([{ tipo, valor, descricao, categoria, data }]);
+
+      if (dbError) throw new Error('Erro ao salvar no banco: ' + dbError.message);
+
+      showStatus('Lançamento cadastrado com sucesso!', 'success');
+      form.reset();
+      dataInput.value = hoje;
+      
+      setTimeout(() => {
+        form.classList.add('hidden');
+        statusMessage?.classList.add('hidden');
+        carregarDados();
+      }, 1500);
+
+    } catch (err: any) {
+      console.error(err);
+      showStatus(err.message || 'Ocorreu um erro inesperado.', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      if(submitText) submitText.textContent = 'Salvar Lançamento';
+      spinner?.classList.add('hidden');
+    }
+  });
+
+  function formatarMoeda(valor: number) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+  }
+
+  function formatarData(dataISO: string) {
+    // dataISO vem como YYYY-MM-DD
+    const partes = dataISO.split('-');
+    if(partes.length === 3) {
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    return dataISO;
+  }
+
+  async function carregarDados() {
+    const { data: lancamentos, error } = await supabase
+      .from('financas')
+      .select('*')
+      .order('data', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      if (loadingState) loadingState.innerHTML = '<span class="text-red-500">Erro ao carregar os dados.</span>';
+      return;
+    }
+
+    if (loadingState) loadingState.style.display = 'none';
+
+    if (!lancamentos || lancamentos.length === 0) {
+      if (listaLancamentos) {
+        listaLancamentos.innerHTML = `
+          <div class="text-center py-8 text-gray-500 bg-white rounded-xl border border-gray-100 shadow-sm">
+            Nenhum lançamento cadastrado.
+          </div>`;
+      }
+      return;
+    }
+
+    let html = '';
+    lancamentos.forEach((l) => {
+      const isEntrada = l.tipo === 'Entrada';
+      const colorText = isEntrada ? 'text-green-600' : 'text-red-600';
+      const sinal = isEntrada ? '+' : '-';
+      
+      const catLabel = l.categoria.charAt(0).toUpperCase() + l.categoria.slice(1);
+
+      html += `
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center mb-3">
+          <div class="flex-1 pr-4">
+            <h4 class="font-bold text-gray-800 truncate">${l.descricao}</h4>
+            <p class="text-xs text-gray-500 mt-1">${catLabel} • ${formatarData(l.data)}</p>
+          </div>
+          <div class="text-right">
+            <p class="font-bold ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
+          </div>
+        </div>
+      `;
+    });
+
+    if (listaLancamentos) listaLancamentos.innerHTML = html;
+  }
+
+  carregarDados();
+</script>
