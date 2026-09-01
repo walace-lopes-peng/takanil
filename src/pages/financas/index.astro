@@ -15,7 +15,7 @@ import Layout from '../../layouts/Layout.astro';
     </div>
 
     <!-- Botões de Ação -->
-    <div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="grid grid-cols-2 gap-4 mb-4">
       <button id="btnEntrada" class="py-4 rounded-xl text-white font-bold text-lg bg-green-600 hover:bg-green-700 active:scale-95 transition-all shadow-sm">
         Nova Entrada
       </button>
@@ -25,7 +25,7 @@ import Layout from '../../layouts/Layout.astro';
     </div>
 
     <!-- Formulário (Escondido por padrão) -->
-    <form id="formFinancas" class="space-y-5 hidden bg-gray-50 p-4 rounded-xl border border-gray-200">
+    <form id="formFinancas" class="space-y-5 hidden bg-gray-50 p-4 rounded-xl border border-gray-200 mt-4">
       <div class="flex justify-between items-center mb-2">
         <h3 id="formTitle" class="font-bold text-gray-800 text-lg">Nova Transação</h3>
         <button type="button" id="btnCancelar" class="text-gray-400 hover:text-gray-600">
@@ -95,10 +95,56 @@ import Layout from '../../layouts/Layout.astro';
     </form>
   </div>
 
+  <!-- Seção de Filtros de Período -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-bold text-gray-700">Filtrar por Período</h3>
+      <span id="labelPeriodoAtual" class="text-xs text-blue-600 font-medium"></span>
+    </div>
+
+    <!-- Chips / Atalhos de Data -->
+    <div class="flex flex-wrap gap-2" id="containerAtalhos">
+      <button type="button" data-atalho="este_mes" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-blue-500 bg-blue-50 text-blue-700 transition-all">
+        Este mês
+      </button>
+      <button type="button" data-atalho="hoje" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+        Hoje
+      </button>
+      <button type="button" data-atalho="esta_semana" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+        Esta semana
+      </button>
+      <button type="button" data-atalho="semana_passada" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+        Semana passada
+      </button>
+      <button type="button" data-atalho="mes_passado" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+        Mês passado
+      </button>
+      <button type="button" data-atalho="personalizado" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+        Personalizado
+      </button>
+    </div>
+
+    <!-- Campos de Data Personalizada -->
+    <div id="containerPersonalizado" class="hidden mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-3">
+      <div>
+        <label for="filtroDataInicio" class="block text-xs font-medium text-gray-600 mb-1">Data Inicial</label>
+        <input type="date" id="filtroDataInicio" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-gray-50 focus:border-blue-500 focus:bg-white transition-all">
+      </div>
+      <div>
+        <label for="filtroDataFim" class="block text-xs font-medium text-gray-600 mb-1">Data Final</label>
+        <input type="date" id="filtroDataFim" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-gray-50 focus:border-blue-500 focus:bg-white transition-all">
+      </div>
+    </div>
+  </div>
+
   <!-- Lista de Lançamentos -->
   <div>
-    <h3 class="text-lg font-bold text-gray-800 mb-4 px-1">Lançamentos Recentes</h3>
-    <div id="listaLancamentos" class="space-y-4 pb-20">
+    <div class="flex justify-between items-center mb-4 px-1">
+      <h3 class="text-lg font-bold text-gray-800">Lançamentos</h3>
+      <span id="totalRegistros" class="text-xs bg-gray-200 text-gray-700 font-bold px-2 py-0.5 rounded-full">0</span>
+    </div>
+    
+    <div id="listaLancamentos" class="space-y-3 pb-20">
       <div class="text-center py-8 text-gray-400 text-sm" id="loadingState">
         <svg class="animate-spin mx-auto h-8 w-8 text-gray-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -112,7 +158,9 @@ import Layout from '../../layouts/Layout.astro';
 
 <script>
   import { supabase } from '../../lib/supabaseClient';
+  import { obterIntervaloPorAtalho, type TipoAtalhoData } from '../../lib/filtrosData';
 
+  // Elementos do Formulário
   const btnEntrada = document.getElementById('btnEntrada');
   const btnSaida = document.getElementById('btnSaida');
   const btnCancelar = document.getElementById('btnCancelar');
@@ -125,22 +173,35 @@ import Layout from '../../layouts/Layout.astro';
   const submitText = submitBtn.querySelector('span');
   const spinner = document.getElementById('loadingSpinner');
   const statusMessage = document.getElementById('statusMessage');
+
+  // Elementos da Lista e Filtros
   const listaLancamentos = document.getElementById('listaLancamentos');
   const loadingState = document.getElementById('loadingState');
+  const totalRegistrosEl = document.getElementById('totalRegistros');
+  const labelPeriodoAtual = document.getElementById('labelPeriodoAtual');
+  const containerPersonalizado = document.getElementById('containerPersonalizado');
+  const filtroDataInicio = document.getElementById('filtroDataInicio') as HTMLInputElement;
+  const filtroDataFim = document.getElementById('filtroDataFim') as HTMLInputElement;
+  const botoesAtalho = document.querySelectorAll('.btn-atalho');
 
-  // Setar data padrão para hoje
+  // Estado atual do filtro
+  let atalhoAtivo: TipoAtalhoData = 'este_mes';
+  let periodoAtual = obterIntervaloPorAtalho('este_mes');
+
+  // Setar data padrão do formulário para hoje
   const hoje = new Date().toISOString().split('T')[0];
-  if(dataInput) dataInput.value = hoje;
+  if (dataInput) dataInput.value = hoje;
+  if (filtroDataInicio) filtroDataInicio.value = periodoAtual.inicio;
+  if (filtroDataFim) filtroDataFim.value = periodoAtual.fim;
 
-  // Abrir form
+  // Abrir / Fechar Formulário
   function openForm(tipo: 'Entrada' | 'Saída') {
     form.classList.remove('hidden');
     tipoInput.value = tipo;
-    if(formTitle) {
+    if (formTitle) {
       formTitle.textContent = tipo === 'Entrada' ? 'Nova Entrada' : 'Nova Saída';
       formTitle.className = tipo === 'Entrada' ? 'font-bold text-lg text-green-700' : 'font-bold text-lg text-red-700';
     }
-    // Foco suave
     form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -153,7 +214,7 @@ import Layout from '../../layouts/Layout.astro';
   });
 
   const showStatus = (msg: string, type: 'success' | 'error') => {
-    if(!statusMessage) return;
+    if (!statusMessage) return;
     statusMessage.textContent = msg;
     statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
     if (type === 'error') {
@@ -163,6 +224,7 @@ import Layout from '../../layouts/Layout.astro';
     }
   };
 
+  // Submit do Formulário
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     statusMessage?.classList.add('hidden');
@@ -182,7 +244,7 @@ import Layout from '../../layouts/Layout.astro';
 
     try {
       submitBtn.disabled = true;
-      if(submitText) submitText.textContent = 'Salvando...';
+      if (submitText) submitText.textContent = 'Salvando...';
       spinner?.classList.remove('hidden');
 
       const { error: dbError } = await supabase
@@ -206,44 +268,121 @@ import Layout from '../../layouts/Layout.astro';
       showStatus(err.message || 'Ocorreu um erro inesperado.', 'error');
     } finally {
       submitBtn.disabled = false;
-      if(submitText) submitText.textContent = 'Salvar Lançamento';
+      if (submitText) submitText.textContent = 'Salvar Lançamento';
       spinner?.classList.add('hidden');
     }
   });
 
+  // Utilitários de Formatação
   function formatarMoeda(valor: number) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   }
 
-  function formatarData(dataISO: string) {
-    // dataISO vem como YYYY-MM-DD
+  function formatarDataBR(dataISO: string) {
     const partes = dataISO.split('-');
-    if(partes.length === 3) {
+    if (partes.length === 3) {
       return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
     return dataISO;
   }
 
+  // Atualizar visual dos chips de atalho
+  function atualizarBotoesAtalho() {
+    botoesAtalho.forEach((btn) => {
+      const atalho = btn.getAttribute('data-atalho');
+      if (atalho === atalhoAtivo) {
+        btn.className = 'btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-blue-500 bg-blue-50 text-blue-700 transition-all';
+      } else {
+        btn.className = 'btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all';
+      }
+    });
+
+    if (atalhoAtivo === 'personalizado') {
+      containerPersonalizado?.classList.remove('hidden');
+    } else {
+      containerPersonalizado?.classList.add('hidden');
+    }
+
+    if (labelPeriodoAtual) {
+      labelPeriodoAtual.textContent = `${formatarDataBR(periodoAtual.inicio)} até ${formatarDataBR(periodoAtual.fim)}`;
+    }
+  }
+
+  // Eventos dos chips de atalho
+  botoesAtalho.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const atalho = btn.getAttribute('data-atalho') as TipoAtalhoData;
+      if (!atalho) return;
+
+      atalhoAtivo = atalho;
+      if (atalho !== 'personalizado') {
+        periodoAtual = obterIntervaloPorAtalho(atalho);
+        if (filtroDataInicio) filtroDataInicio.value = periodoAtual.inicio;
+        if (filtroDataFim) filtroDataFim.value = periodoAtual.fim;
+      } else {
+        if (filtroDataInicio && filtroDataFim) {
+          periodoAtual = {
+            inicio: filtroDataInicio.value || hoje,
+            fim: filtroDataFim.value || hoje,
+          };
+        }
+      }
+
+      atualizarBotoesAtalho();
+      carregarDados();
+    });
+  });
+
+  // Eventos para mudança manual das datas personalizadas
+  const onDataPersonalizadaChange = () => {
+    if (filtroDataInicio && filtroDataFim) {
+      if (filtroDataInicio.value && filtroDataFim.value) {
+        periodoAtual = {
+          inicio: filtroDataInicio.value,
+          fim: filtroDataFim.value,
+        };
+        atualizarBotoesAtalho();
+        carregarDados();
+      }
+    }
+  };
+
+  filtroDataInicio?.addEventListener('change', onDataPersonalizadaChange);
+  filtroDataFim?.addEventListener('change', onDataPersonalizadaChange);
+
+  // Carregar dados filtrados do Supabase
   async function carregarDados() {
+    if (loadingState) {
+      loadingState.style.display = 'block';
+    }
+
     const { data: lancamentos, error } = await supabase
       .from('financas')
       .select('*')
+      .gte('data', periodoAtual.inicio)
+      .lte('data', periodoAtual.fim)
       .order('data', { ascending: false })
       .order('created_at', { ascending: false });
 
+    if (loadingState) loadingState.style.display = 'none';
+
     if (error) {
       console.error(error);
-      if (loadingState) loadingState.innerHTML = '<span class="text-red-500">Erro ao carregar os dados.</span>';
+      if (listaLancamentos) {
+        listaLancamentos.innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Erro ao carregar os lançamentos.</div>';
+      }
       return;
     }
 
-    if (loadingState) loadingState.style.display = 'none';
+    if (totalRegistrosEl) {
+      totalRegistrosEl.textContent = (lancamentos?.length || 0).toString();
+    }
 
     if (!lancamentos || lancamentos.length === 0) {
       if (listaLancamentos) {
         listaLancamentos.innerHTML = `
-          <div class="text-center py-8 text-gray-500 bg-white rounded-xl border border-gray-100 shadow-sm">
-            Nenhum lançamento cadastrado.
+          <div class="text-center py-8 text-gray-500 bg-white rounded-xl border border-gray-100 shadow-sm text-sm">
+            Nenhum lançamento encontrado para este período.
           </div>`;
       }
       return;
@@ -258,13 +397,13 @@ import Layout from '../../layouts/Layout.astro';
       const catLabel = l.categoria.charAt(0).toUpperCase() + l.categoria.slice(1);
 
       html += `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center mb-3">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center">
           <div class="flex-1 pr-4">
-            <h4 class="font-bold text-gray-800 truncate">${l.descricao}</h4>
-            <p class="text-xs text-gray-500 mt-1">${catLabel} • ${formatarData(l.data)}</p>
+            <h4 class="font-bold text-gray-800 text-sm truncate">${l.descricao}</h4>
+            <p class="text-xs text-gray-500 mt-0.5">${catLabel} • ${formatarDataBR(l.data)}</p>
           </div>
-          <div class="text-right">
-            <p class="font-bold ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
+          <div class="text-right flex-shrink-0">
+            <p class="font-bold text-sm ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
           </div>
         </div>
       `;
@@ -273,5 +412,7 @@ import Layout from '../../layouts/Layout.astro';
     if (listaLancamentos) listaLancamentos.innerHTML = html;
   }
 
+  // Inicialização
+  atualizarBotoesAtalho();
   carregarDados();
 </script>
