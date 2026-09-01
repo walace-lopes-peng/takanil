@@ -14,6 +14,24 @@ import Layout from '../../layouts/Layout.astro';
       <div class="w-6"></div>
     </div>
 
+    <!-- Resumo Financeiro / Saldo -->
+    <div class="bg-gray-900 text-white rounded-2xl p-5 shadow-sm mb-6 transition-all duration-300">
+      <h2 class="text-sm font-medium text-gray-300 mb-1">Saldo do Período</h2>
+      <div class="flex items-baseline space-x-2">
+        <span class="text-3xl font-bold" id="resumoSaldo">R$ 0,00</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-700/50">
+        <div>
+          <p class="text-xs text-gray-400 mb-0.5">Entradas</p>
+          <p class="text-sm font-bold text-green-400" id="resumoEntradas">R$ 0,00</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400 mb-0.5">Saídas</p>
+          <p class="text-sm font-bold text-red-400" id="resumoSaidas">R$ 0,00</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Botões de Ação -->
     <div class="grid grid-cols-2 gap-4 mb-4">
       <button id="btnEntrada" class="py-4 rounded-xl text-white font-bold text-lg bg-green-600 hover:bg-green-700 active:scale-95 transition-all shadow-sm">
@@ -135,6 +153,14 @@ import Layout from '../../layouts/Layout.astro';
         <input type="date" id="filtroDataFim" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-gray-50 focus:border-blue-500 focus:bg-white transition-all">
       </div>
     </div>
+
+    <!-- Gráfico de Evolução SVG -->
+    <div id="containerGrafico" class="mt-5 pt-4 border-t border-gray-100">
+      <h4 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Evolução no Período</h4>
+      <div id="graficoSvgContainer" class="w-full">
+        <!-- SVG injetado via JS -->
+      </div>
+    </div>
   </div>
 
   <!-- Lista de Lançamentos -->
@@ -159,6 +185,7 @@ import Layout from '../../layouts/Layout.astro';
 <script>
   import { supabase } from '../../lib/supabaseClient';
   import { obterIntervaloPorAtalho, type TipoAtalhoData } from '../../lib/filtrosData';
+  import { agruparLancamentos, gerarSvgGrafico } from '../../lib/agrupamentoFinancas';
 
   // Elementos do Formulário
   const btnEntrada = document.getElementById('btnEntrada');
@@ -183,6 +210,12 @@ import Layout from '../../layouts/Layout.astro';
   const filtroDataInicio = document.getElementById('filtroDataInicio') as HTMLInputElement;
   const filtroDataFim = document.getElementById('filtroDataFim') as HTMLInputElement;
   const botoesAtalho = document.querySelectorAll('.btn-atalho');
+
+  // Elementos do Resumo e Gráfico
+  const resumoSaldo = document.getElementById('resumoSaldo');
+  const resumoEntradas = document.getElementById('resumoEntradas');
+  const resumoSaidas = document.getElementById('resumoSaidas');
+  const graficoSvgContainer = document.getElementById('graficoSvgContainer');
 
   // Estado atual do filtro
   let atalhoAtivo: TipoAtalhoData = 'este_mes';
@@ -385,15 +418,28 @@ import Layout from '../../layouts/Layout.astro';
             Nenhum lançamento encontrado para este período.
           </div>`;
       }
+      
+      // Zera o resumo e gráfico
+      if (resumoSaldo) { resumoSaldo.textContent = 'R$ 0,00'; resumoSaldo.className = 'text-3xl font-bold text-gray-300'; }
+      if (resumoEntradas) resumoEntradas.textContent = 'R$ 0,00';
+      if (resumoSaidas) resumoSaidas.textContent = 'R$ 0,00';
+      if (graficoSvgContainer) graficoSvgContainer.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">Sem dados para exibir no gráfico.</div>';
+      
       return;
     }
 
     let html = '';
+    let totalEntradas = 0;
+    let totalSaidas = 0;
+
     lancamentos.forEach((l) => {
       const isEntrada = l.tipo === 'Entrada';
       const colorText = isEntrada ? 'text-green-600' : 'text-red-600';
       const sinal = isEntrada ? '+' : '-';
       
+      if (isEntrada) totalEntradas += l.valor;
+      else totalSaidas += l.valor;
+
       const catLabel = l.categoria.charAt(0).toUpperCase() + l.categoria.slice(1);
 
       html += `
@@ -410,6 +456,23 @@ import Layout from '../../layouts/Layout.astro';
     });
 
     if (listaLancamentos) listaLancamentos.innerHTML = html;
+
+    // Atualizar Resumo
+    const saldo = totalEntradas - totalSaidas;
+    if (resumoEntradas) resumoEntradas.textContent = formatarMoeda(totalEntradas);
+    if (resumoSaidas) resumoSaidas.textContent = formatarMoeda(totalSaidas);
+    if (resumoSaldo) {
+      resumoSaldo.textContent = formatarMoeda(saldo);
+      if (saldo > 0) resumoSaldo.className = 'text-3xl font-bold text-green-400';
+      else if (saldo < 0) resumoSaldo.className = 'text-3xl font-bold text-red-400';
+      else resumoSaldo.className = 'text-3xl font-bold text-gray-300';
+    }
+    
+    // Atualizar Gráfico
+    if (graficoSvgContainer) {
+      const grupos = agruparLancamentos(lancamentos as any, periodoAtual.inicio, periodoAtual.fim);
+      graficoSvgContainer.innerHTML = gerarSvgGrafico(grupos);
+    }
   }
 
   // Inicialização
