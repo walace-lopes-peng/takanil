@@ -1,19 +1,25 @@
--- Comandos para corrigir o erro de RLS no Storage e atualizar a tabela animais
+-- ==============================================================================
+-- SCRIPT DE CORREÇÃO DEFINITIVO DE PERMISSÕES DO STORAGE NO SUPABASE
+-- ==============================================================================
 
--- 1. Liberar o Upload Público no Bucket 'animais' (corrige o erro de "new row violates row-level security policy")
-INSERT INTO storage.buckets (id, name, public) VALUES ('animais', 'animais', true) ON CONFLICT (id) DO UPDATE SET public = true;
+-- 1. Garante que o bucket 'animais' existe e está público
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('animais', 'animais', true) 
+ON CONFLICT (id) DO UPDATE SET public = true;
 
-CREATE POLICY "Permitir leitura pública no bucket animais" ON storage.objects
-FOR SELECT USING (bucket_id = 'animais');
+-- 2. Limpa qualquer política antiga com conflito
+DROP POLICY IF EXISTS "Permitir leitura pública no bucket animais" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir upload público no bucket animais" ON storage.objects;
+DROP POLICY IF EXISTS "Give anon full access to bucket animais" ON storage.objects;
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+DROP POLICY IF EXISTS "Public Insert" ON storage.objects;
+DROP POLICY IF EXISTS "Allow all for bucket animais" ON storage.objects;
 
-CREATE POLICY "Permitir upload público no bucket animais" ON storage.objects
-FOR INSERT WITH CHECK (bucket_id = 'animais');
-
--- 2. Adicionar o novo campo de "Localização/Situação" na tabela animais já existente
-ALTER TABLE public.animais 
-ADD COLUMN localizacao TEXT NOT NULL DEFAULT 'Abrigo Takanil' 
-CHECK (localizacao IN ('Abrigo Takanil', 'Lar Temporário / Terceiros', 'Desaparecido / Rua'));
-
--- 3. Atualizar a restrição de "status" (remover o desaparecido, deixando apenas Disponível e Adotado)
-ALTER TABLE public.animais DROP CONSTRAINT animais_status_check;
-ALTER TABLE public.animais ADD CONSTRAINT animais_status_check CHECK (status IN ('Disponível', 'Adotado'));
+-- 3. Cria uma política permissiva total para o bucket 'animais'
+-- Permite leitura, upload e remoção tanto para anon quanto autenticados
+CREATE POLICY "Allow all for bucket animais" 
+ON storage.objects
+FOR ALL 
+TO public
+USING (bucket_id = 'animais') 
+WITH CHECK (bucket_id = 'animais');
