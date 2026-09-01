@@ -55,6 +55,11 @@ tocar em algo fora do escopo da Parte pedida, pare e explique antes de agir.
 - Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`
 - Um commit por Parte concluída, não um commit gigante no final
 - Mensagem descreve o quê e, se não for óbvio, por quê
+- **NUNCA FAÇA COMMIT SEM PERGUNTAR ANTES.** Sempre mostre as alterações e peça autorização explícita do usuário antes de rodar qualquer comando de `git commit` ou `git push`.
+
+## Autonomia e CLI
+- O agente tem permissão para rodar comandos no terminal (CLI) de forma autônoma quando forem ações seguras, investigativas ou passos operacionais rotineiros (ex: iniciar o dev server, ler arquivos, instalar pacotes quando apropriado).
+- Para ações cruciais, destrutivas ou que afetem drasticamente o projeto (ex: apagar tabelas, reestruturar pastas, sobrescrever arquivos vitais), o agente deve sempre perguntar antes.
 
 ## Quando tiver dúvida
 Pare e pergunte em vez de assumir. Especialmente para: mudança de schema,
