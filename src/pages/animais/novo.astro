@@ -1,0 +1,256 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Novo Animal - Hub Takanil">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </a>
+      <h2 class="text-xl font-bold text-gray-800 text-center flex-1">Novo Animal</h2>
+      <div class="w-6"></div> <!-- Spacer for centering -->
+    </div>
+
+    <form id="novoAnimalForm" class="space-y-5">
+      <!-- Foto (Câmera Nativa) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Foto do Animal</label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-gray-400 transition-colors bg-gray-50 cursor-pointer" id="fotoContainer">
+          <div class="space-y-1 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="flex text-sm text-gray-600 justify-center">
+              <label for="fotoInput" class="relative cursor-pointer bg-transparent rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                <span>Tirar Foto ou Escolher</span>
+                <input id="fotoInput" name="foto" type="file" accept="image/*" capture="environment" class="sr-only" required>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div id="fotoPreviewContainer" class="hidden mt-2 relative rounded-xl overflow-hidden aspect-video bg-gray-100">
+           <img id="fotoPreview" class="object-cover w-full h-full" src="" alt="Preview da foto">
+           <button type="button" id="removerFoto" class="absolute top-2 right-2 bg-gray-900/70 text-white p-1.5 rounded-full backdrop-blur-sm">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+             </svg>
+           </button>
+        </div>
+      </div>
+
+      <!-- Nome -->
+      <div>
+        <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
+        <input type="text" name="nome" id="nome" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: Rabito">
+      </div>
+
+      <!-- Espécie (Toggle) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Espécie</label>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="cursor-pointer">
+            <input type="radio" name="especie" value="Cão" class="peer sr-only" required>
+            <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all">
+              🐶 Cão
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="especie" value="Gato" class="peer sr-only">
+            <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all">
+              🐱 Gato
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Fase de Vida (Toggle) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Fase de Vida</label>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="cursor-pointer">
+            <input type="radio" name="fase_vida" value="Filhote" class="peer sr-only" required>
+            <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">
+              Filhote
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="fase_vida" value="Adulto" class="peer sr-only">
+            <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">
+              Adulto
+            </div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="fase_vida" value="Idoso" class="peer sr-only">
+            <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">
+              Idoso
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Peso -->
+      <div>
+        <label for="peso" class="block text-sm font-medium text-gray-700">Peso Aproximado(kg)</label>
+        <input type="number" name="peso" id="peso" step="0.1" min="0.1" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: 4.5">
+      </div>
+
+      <!-- Localização / Situação -->
+      <div>
+        <label for="localizacao" class="block text-sm font-medium text-gray-700">Onde o animal está?</label>
+        <select name="localizacao" id="localizacao" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50">
+          <option value="Abrigo Takanil">Abrigo Takanil (Consome Ração)</option>
+          <option value="Lar Temporário / Terceiros">Lar Temporário / Terceiros</option>
+          <option value="Desaparecido / Rua">Desaparecido / Rua</option>
+        </select>
+      </div>
+
+      <!-- Submit -->
+      <div class="pt-4">
+        <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 active:scale-[0.98] transition-all disabled:opacity-70">
+          <span>Salvar Animal</span>
+          <svg id="loadingSpinner" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mensagem de erro/sucesso -->
+      <div id="statusMessage" class="hidden text-center text-sm font-medium p-3 rounded-xl mt-4"></div>
+    </form>
+  </div>
+</Layout>
+
+<script>
+  import { supabase } from '../../lib/supabaseClient';
+
+  const form = document.getElementById('novoAnimalForm') as HTMLFormElement;
+  const fotoInput = document.getElementById('fotoInput') as HTMLInputElement;
+  const fotoPreview = document.getElementById('fotoPreview') as HTMLImageElement;
+  const fotoContainer = document.getElementById('fotoContainer');
+  const fotoPreviewContainer = document.getElementById('fotoPreviewContainer');
+  const removerFotoBtn = document.getElementById('removerFoto');
+  
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+  const submitText = submitBtn.querySelector('span');
+  const spinner = document.getElementById('loadingSpinner');
+  const statusMessage = document.getElementById('statusMessage');
+
+  // Preview de foto
+  fotoInput.addEventListener('change', (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fotoPreview.src = e.target?.result as string;
+        fotoContainer?.classList.add('hidden');
+        fotoPreviewContainer?.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Remover foto
+  removerFotoBtn?.addEventListener('click', () => {
+    fotoInput.value = '';
+    fotoPreview.src = '';
+    fotoContainer?.classList.remove('hidden');
+    fotoPreviewContainer?.classList.add('hidden');
+  });
+
+  const showStatus = (msg: string, type: 'success' | 'error') => {
+    if(!statusMessage) return;
+    statusMessage.textContent = msg;
+    statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
+    if (type === 'error') {
+      statusMessage.classList.add('bg-red-50', 'text-red-700');
+    } else {
+      statusMessage.classList.add('bg-green-50', 'text-green-700');
+    }
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusMessage?.classList.add('hidden');
+    
+    const formData = new FormData(form);
+    const nome = formData.get('nome') as string;
+    const especie = formData.get('especie') as string;
+    const fase_vida = formData.get('fase_vida') as string;
+    const peso = parseFloat(formData.get('peso') as string);
+    const localizacao = formData.get('localizacao') as string;
+    const fotoFile = formData.get('foto') as File;
+
+    if (!nome || !especie || !fase_vida || isNaN(peso) || peso <= 0 || !localizacao || !fotoFile.size) {
+      showStatus('Por favor, preencha todos os campos e adicione uma foto.', 'error');
+      return;
+    }
+
+    try {
+      // UX: Loading
+      submitBtn.disabled = true;
+      if(submitText) submitText.textContent = 'Salvando...';
+      spinner?.classList.remove('hidden');
+
+      // 1. Upload da foto
+      const fileExt = fotoFile.name.split('.').pop() || 'jpg';
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `animais/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('animais')
+        .upload(filePath, fotoFile);
+
+      if (uploadError) throw new Error('Erro ao fazer upload da foto: ' + uploadError.message);
+
+      // 2. Pegar URL pública
+      const { data: publicUrlData } = supabase.storage
+        .from('animais')
+        .getPublicUrl(filePath);
+
+      const imagem_url = publicUrlData.publicUrl;
+
+      // 3. Salvar no banco
+      const { error: dbError } = await supabase
+        .from('animais')
+        .insert([
+          {
+            nome,
+            especie,
+            fase_vida,
+            peso,
+            localizacao,
+            imagem_url,
+          }
+        ]);
+
+      if (dbError) throw new Error('Erro ao salvar no banco: ' + dbError.message);
+
+      // Sucesso!
+      showStatus('Animal cadastrado com sucesso!', 'success');
+      form.reset();
+      
+      // Limpar preview
+      fotoPreview.src = '';
+      fotoContainer?.classList.remove('hidden');
+      fotoPreviewContainer?.classList.add('hidden');
+
+      // Voltar pra home após 1.5s
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
+
+    } catch (err: any) {
+      console.error(err);
+      showStatus(err.message || 'Ocorreu um erro inesperado.', 'error');
+    } finally {
+      // Restaurar botão
+      submitBtn.disabled = false;
+      if(submitText) submitText.textContent = 'Salvar Animal';
+      spinner?.classList.add('hidden');
+    }
+  });
+</script>

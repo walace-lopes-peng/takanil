@@ -1,0 +1,185 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Hub Takanil - Dashboard">
+  
+  <div class="space-y-6 pb-20">
+    
+    <!-- Header / Ração -->
+    <div class="bg-blue-600 text-white rounded-2xl p-6 shadow-sm">
+      <h2 class="text-sm font-medium text-blue-100 mb-1">Previsão de Ração (Mensal)</h2>
+      <div class="flex items-baseline space-x-2">
+        <span class="text-4xl font-bold" id="totalRacao">--</span>
+        <span class="text-blue-200">kg/mês</span>
+      </div>
+      <p class="text-xs text-blue-200 mt-2">*Apenas para animais no Abrigo Takanil (aprox. 1.5% peso/dia)</p>
+    </div>
+
+    <!-- Moderação / Alertas -->
+    <div id="alertasContainer" class="hidden">
+      <h3 class="text-sm font-bold text-red-600 mb-3 uppercase tracking-wider">⚠️ Revisão Necessária (10+ dias)</h3>
+      <div id="listaAlertas" class="space-y-3">
+        <!-- Inserido via JS -->
+      </div>
+    </div>
+
+    <!-- Todos os Animais -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-gray-800">Animais Cadastrados</h3>
+        <span class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded-full" id="totalAnimais">0</span>
+      </div>
+      <div id="listaAnimais" class="space-y-4">
+        <div class="text-center py-8 text-gray-400 text-sm" id="loadingState">
+          <svg class="animate-spin mx-auto h-8 w-8 text-gray-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Carregando dados...
+        </div>
+        <!-- Inserido via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão Flutuante (FAB) -->
+  <a href="/animais/novo" class="fixed bottom-6 right-6 w-14 h-14 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-95 transition-transform">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    </svg>
+  </a>
+
+</Layout>
+
+<script>
+  import { supabase } from '../lib/supabaseClient';
+
+  const listaAnimais = document.getElementById('listaAnimais');
+  const listaAlertas = document.getElementById('listaAlertas');
+  const alertasContainer = document.getElementById('alertasContainer');
+  const totalRacaoEl = document.getElementById('totalRacao');
+  const totalAnimaisEl = document.getElementById('totalAnimais');
+  const loadingState = document.getElementById('loadingState');
+
+  // Função para marcar animal como adotado/encontrado (preservando o histórico)
+  (window as any).marcarResolvido = async (id: string, novoStatus: string) => {
+    if (!confirm(`Confirmar que este animal foi ${novoStatus}?`)) return;
+    
+    try {
+      const { error } = await supabase.from('animais').update({ status: novoStatus }).eq('id', id);
+      if (error) throw error;
+
+      alert('Situação atualizada com sucesso!');
+      carregarDados(); // Recarrega a tela
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao atualizar o registro.');
+    }
+  };
+
+  async function carregarDados() {
+    const { data: animaisOriginais, error } = await supabase
+      .from('animais')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    // Filtrar localmente os que já estão resolvidos (Adotado) para não poluir o dashboard de alertas
+    const animais = animaisOriginais?.filter(a => a.status !== 'Adotado') || [];
+
+    if (error) {
+      console.error(error);
+      if (loadingState) loadingState.innerHTML = '<span class="text-red-500">Erro ao carregar os dados.</span>';
+      return;
+    }
+
+    if (loadingState) loadingState.style.display = 'none';
+
+    let htmlNormal = '';
+    let htmlAlertas = '';
+    let totalRacao = 0;
+    
+    const hoje = new Date();
+
+    if (!animais || animais.length === 0) {
+      if (listaAnimais) {
+        listaAnimais.innerHTML = `
+          <div class="text-center py-8 text-gray-500 bg-white rounded-xl border border-gray-100">
+            Nenhum animal cadastrado ainda.
+          </div>`;
+      }
+      if (totalRacaoEl) totalRacaoEl.textContent = '0';
+      if (totalAnimaisEl) totalAnimaisEl.textContent = '0';
+      return;
+    }
+
+    animais.forEach((animal) => {
+      // Cálculo de ração (apenas se estiver no abrigo)
+      if (animal.localizacao === 'Abrigo Takanil' && animal.peso) {
+        // 1.5% do peso por dia, durante 30 dias
+        totalRacao += (animal.peso * 0.015) * 30;
+      }
+
+      // Cálculo de dias cadastrado
+      const dataCadastro = new Date(animal.created_at);
+      const diffTime = Math.abs(hoje.getTime() - dataCadastro.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+      const cardBase = `
+        <div class="bg-white rounded-xl shadow-sm border p-4 flex gap-4 ${diffDays > 10 ? 'border-red-200' : 'border-gray-100'}">
+          <img src="${animal.imagem_url || ''}" class="w-20 h-20 rounded-lg object-cover bg-gray-100 flex-shrink-0" alt="${animal.nome}">
+          <div class="flex-1 min-w-0">
+            <h4 class="text-lg font-bold text-gray-800 truncate">${animal.nome}</h4>
+            <p class="text-sm text-gray-500 truncate">${animal.especie} • ${animal.fase_vida} • ${animal.peso}kg</p>
+            <p class="text-xs font-medium text-blue-600 mt-1 truncate">📍 ${animal.localizacao}</p>
+            <p class="text-xs text-gray-400 mt-0.5">Cadastrado há ${diffDays} dias</p>
+          </div>
+        </div>
+      `;
+
+      if (diffDays > 10) {
+        // Animal antigo: vai para a lista de alertas
+        const isDesaparecido = animal.status === 'Desaparecido' || animal.localizacao.includes('Desaparecido');
+        const statusPergunta = isDesaparecido ? 'Já foi encontrado?' : 'Já foi adotado?';
+        const novoStatusLabel = isDesaparecido ? 'Encontrado' : 'Adotado';
+          
+        htmlAlertas += `
+          <div class="bg-red-50 rounded-xl p-4 border border-red-100">
+            <div class="flex gap-4 mb-3">
+              <img src="${animal.imagem_url || ''}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" alt="${animal.nome}">
+              <div>
+                <h4 class="font-bold text-red-800">${animal.nome}</h4>
+                <p class="text-xs text-red-600">No sistema há ${diffDays} dias</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-2 pt-2 border-t border-red-200/50">
+              <span class="text-sm font-medium text-red-800">${statusPergunta}</span>
+              <button onclick="marcarResolvido('${animal.id}', 'Adotado')" class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg font-medium transition-colors">
+                Sim, ${novoStatusLabel}
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        htmlNormal += cardBase;
+      }
+    });
+
+    // Renderizar
+    if (listaAnimais) listaAnimais.innerHTML = htmlNormal || '<p class="text-gray-500 text-center">Nenhum animal recente.</p>';
+    
+    if (htmlAlertas) {
+      if (alertasContainer) alertasContainer.classList.remove('hidden');
+      if (listaAlertas) listaAlertas.innerHTML = htmlAlertas;
+    } else {
+      if (alertasContainer) alertasContainer.classList.add('hidden');
+      if (listaAlertas) listaAlertas.innerHTML = '';
+    }
+
+    if (totalRacaoEl) totalRacaoEl.textContent = totalRacao.toFixed(1);
+    if (totalAnimaisEl) totalAnimaisEl.textContent = animais.length.toString();
+  }
+
+  // Iniciar
+  carregarDados();
+</script>
