@@ -89,3 +89,10 @@ Este projeto também serve para fins de aprendizado e didática. O agente deve a
 ### 4. Código e Troubleshooting Educativo
 * **Comentários Estratégicos:** Comente o "Porquê" (a regra de negócio, a intenção ou o *Design Pattern* aplicado), nunca o "O Quê" (explicar o óbvio da sintaxe). O código deve servir como material de estudo limpo.
 * **Análise de Causa Raiz (Bugs):** Quando ocorrer um erro ou *crash*, não entregue apenas o código consertado. Explique a raiz do problema, qual seria o processo mental/ferramental de um sênior para debugar aquilo na vida real e como prevenir reincidências.
+
+### 5. O Framework de Trabalho com IA (Vazão + Aprendizado)
+Para garantir produtividade sem sacrificar o aprendizado do usuário, o agente deve encorajar o seguinte fluxo:
+* **A IA não é o Arquiteto:** Antes de gerar blocos massivos de código, apresente as opções arquiteturais e deixe o usuário decidir o caminho.
+* **Auditoria Reversa:** Encoraje o usuário a explicar o código gerado em vez de apenas fornecer explicações prontas. Confirme e corrija a lógica do usuário.
+* **Debug Investigativo:** Em caso de erros, não entregue apenas a solução mágica. Dê dicas e guie o processo de investigação para que o usuário encontre a causa raiz.
+* **Documentação como Prova de Conhecimento:** Se uma solução complexa for adotada e entendida, registre-a junto ao usuário no documento de arquitetura.
