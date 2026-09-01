@@ -117,7 +117,15 @@ import Layout from '../../layouts/Layout.astro';
   <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
     <div class="flex items-center justify-between mb-3">
       <h3 class="text-sm font-bold text-gray-700">Filtrar por Período</h3>
-      <span id="labelPeriodoAtual" class="text-xs text-blue-600 font-medium"></span>
+      <div class="flex items-center gap-3">
+        <span id="labelPeriodoAtual" class="text-xs text-blue-600 font-medium"></span>
+        <button id="btnExportar" class="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-1 rounded hover:bg-blue-200 flex items-center gap-1 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Excel
+        </button>
+      </div>
     </div>
 
     <!-- Chips / Atalhos de Data -->
@@ -186,6 +194,7 @@ import Layout from '../../layouts/Layout.astro';
   import { supabase } from '../../lib/supabaseClient';
   import { obterIntervaloPorAtalho, type TipoAtalhoData } from '../../lib/filtrosData';
   import { agruparLancamentos, gerarSvgGrafico } from '../../lib/agrupamentoFinancas';
+  import * as XLSX from 'xlsx';
 
   // Elementos do Formulário
   const btnEntrada = document.getElementById('btnEntrada');
@@ -220,6 +229,7 @@ import Layout from '../../layouts/Layout.astro';
   // Estado atual do filtro
   let atalhoAtivo: TipoAtalhoData = 'este_mes';
   let periodoAtual = obterIntervaloPorAtalho('este_mes');
+  let lancamentosAtuais: any[] = [];
 
   // Setar data padrão do formulário para hoje
   const hoje = new Date().toISOString().split('T')[0];
@@ -403,6 +413,8 @@ import Layout from '../../layouts/Layout.astro';
 
     if (loadingState) loadingState.style.display = 'none';
 
+    lancamentosAtuais = lancamentos || [];
+
     if (error) {
       console.error(error);
       if (listaLancamentos) {
@@ -478,6 +490,29 @@ import Layout from '../../layouts/Layout.astro';
       graficoSvgContainer.innerHTML = gerarSvgGrafico(grupos);
     }
   }
+
+  // Exportar Excel
+  const btnExportar = document.getElementById('btnExportar');
+  btnExportar?.addEventListener('click', () => {
+    if (lancamentosAtuais.length === 0) {
+      alert('Nenhum dado para exportar neste período.');
+      return;
+    }
+
+    const linhas = lancamentosAtuais.map(l => ({
+      Data: formatarDataBR(l.data),
+      Tipo: l.tipo,
+      Categoria: l.categoria.charAt(0).toUpperCase() + l.categoria.slice(1),
+      Descrição: l.descricao || 'Sem descrição',
+      Valor: formatarMoeda(l.valor)
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(linhas);
+    ws['!cols'] = [{wch: 12}, {wch: 10}, {wch: 15}, {wch: 30}, {wch: 15}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Financeiro');
+    XLSX.writeFile(wb, 'Takanil-Financeiro.xlsx');
+  });
 
   // Inicialização
   atualizarBotoesAtalho();
