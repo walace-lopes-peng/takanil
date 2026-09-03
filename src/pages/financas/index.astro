@@ -191,11 +191,16 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { supabase } from '../../lib/supabaseClient';
+  import { supabase, getUserRole } from '../../lib/supabaseClient';
 
   const { data: authData } = await supabase.auth.getSession();
   if (!authData.session) {
     window.location.replace('/login');
+  } else {
+    const role = await getUserRole();
+    if (role !== 'adm' && role !== 'dev') {
+      window.location.replace('/');
+    }
   }
   import { obterIntervaloPorAtalho, type TipoAtalhoData } from '../../lib/filtrosData';
   import { agruparLancamentos, gerarSvgGrafico } from '../../lib/agrupamentoFinancas';
