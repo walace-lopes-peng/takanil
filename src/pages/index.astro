@@ -69,7 +69,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { supabase } from '../lib/supabaseClient';
+  import { supabase, getUserRole } from '../lib/supabaseClient';
 
   const listaAnimais = document.getElementById('listaAnimais');
   const listaAlertas = document.getElementById('listaAlertas');
@@ -126,7 +126,15 @@ import Layout from '../layouts/Layout.astro';
 
     // Filtrar localmente os que já estão resolvidos e manter apenas os aprovados na lista principal
     const animais = animaisOriginais?.filter(a => a.status_moderacao === 'aprovado' && a.status !== 'Adotado') || [];
-    const pendentes = animaisOriginais?.filter(a => a.status_moderacao === 'pendente') || [];
+    let pendentes = animaisOriginais?.filter(a => a.status_moderacao === 'pendente') || [];
+
+    const role = await getUserRole();
+    const isAdmin = role === 'adm' || role === 'dev';
+
+    // Se não for admin, não mostra o banner de pendentes
+    if (!isAdmin) {
+      pendentes = [];
+    }
 
     if (error) {
       console.error(error);
@@ -182,6 +190,7 @@ import Layout from '../layouts/Layout.astro';
             <p class="text-xs font-medium text-blue-600 mt-1 truncate">📍 ${animal.localizacao}</p>
             <p class="text-xs text-gray-400 mt-0.5">Cadastrado há ${diffDays} dias</p>
           </div>
+          ${isAdmin ? `
           <!-- Botão Excluir Registro / Foto Ruim -->
           <button 
             onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${animal.nome}')" 
@@ -192,10 +201,11 @@ import Layout from '../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
+          ` : ''}
         </div>
       `;
 
-      if (diffDays > 10) {
+      if (diffDays > 10 && isAdmin) {
         // Animal antigo: vai para a lista de alertas
         const isDesaparecido = animal.status === 'Desaparecido' || animal.localizacao.includes('Desaparecido');
         const statusPergunta = isDesaparecido ? 'Já foi encontrado?' : 'Já foi adotado?';

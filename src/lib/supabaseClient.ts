@@ -4,3 +4,10 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export async function getUserRole() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return null;
+  const { data } = await supabase.from('perfis').select('papel').eq('id', session.user.id).single();
+  return data?.papel || null;
+}

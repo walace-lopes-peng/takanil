@@ -35,7 +35,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { supabase } from '../lib/supabaseClient';
+  import { supabase, getUserRole } from '../lib/supabaseClient';
 
   const listaPendentes = document.getElementById('listaPendentes');
   const totalPendentesEl = document.getElementById('totalPendentes');
@@ -46,6 +46,11 @@ import Layout from '../layouts/Layout.astro';
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       window.location.href = '/login';
+      return;
+    }
+    const role = await getUserRole();
+    if (role !== 'adm' && role !== 'dev') {
+      window.location.href = '/';
     }
   }
 
