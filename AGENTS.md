@@ -57,6 +57,7 @@ tocar em algo fora do escopo da Parte pedida, pare e explique antes de agir.
 - Mensagem descreve o quê e, se não for óbvio, por quê
 - Branches de Parte nascem de `dev`, não de `main`. PR fecha em `dev`.
   Detalhes completos em `CONTRIBUTING.md`.
+- **Sempre** verifique qual Issue o PR resolve e adicione a tag de fechamento (ex: `Closes #123`) na descrição ao abrir o PR via GitHub CLI.
 - **REGRA DE OURO: nunca execute `git commit` ou `git push` sem antes mostrar
   um resumo do que foi alterado e receber uma confirmação explícita para
   aquele commit especificamente.** Ter recebido a tarefa inicial não conta

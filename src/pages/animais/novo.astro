@@ -126,6 +126,11 @@ import Layout from '../../layouts/Layout.astro';
 <script>
   import { supabase } from '../../lib/supabaseClient';
 
+  const { data: authData } = await supabase.auth.getSession();
+  if (!authData.session) {
+    window.location.replace('/login');
+  }
+
   const form = document.getElementById('novoAnimalForm') as HTMLFormElement;
   const fotoInput = document.getElementById('fotoInput') as HTMLInputElement;
   const fotoPreview = document.getElementById('fotoPreview') as HTMLImageElement;
