@@ -270,7 +270,9 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
 
         const imagem_url = publicUrlData.publicUrl;
 
-        // 3. Salvar no banco (RLS vai forçar status_moderacao = 'pendente' de qualquer jeito)
+        // 3. Salvar no banco (Admins aprovam direto, Público fica pendente)
+        const status_moderacao = isPublic ? 'pendente' : 'aprovado';
+        
         const { error: dbError } = await supabase
           .from('animais')
           .insert([
@@ -281,6 +283,7 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
               peso,
               localizacao,
               imagem_url,
+              status_moderacao
             }
           ]);
 
@@ -289,7 +292,7 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
         // Sucesso!
         showStatus(
           isPublic 
-            ? 'Sugestão enviada! Ela será analisada pela equipe.' 
+            ? '💖 Muito obrigado por ajudar a Takanil! Sua sugestão foi enviada e será avaliada com carinho pela nossa equipe em breve.' 
             : 'Animal cadastrado com sucesso!', 
           'success'
         );
