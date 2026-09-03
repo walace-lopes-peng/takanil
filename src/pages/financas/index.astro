@@ -192,6 +192,11 @@ import Layout from '../../layouts/Layout.astro';
 
 <script>
   import { supabase } from '../../lib/supabaseClient';
+
+  const { data: authData } = await supabase.auth.getSession();
+  if (!authData.session) {
+    window.location.replace('/login');
+  }
   import { obterIntervaloPorAtalho, type TipoAtalhoData } from '../../lib/filtrosData';
   import { agruparLancamentos, gerarSvgGrafico } from '../../lib/agrupamentoFinancas';
   import * as XLSX from 'xlsx';
