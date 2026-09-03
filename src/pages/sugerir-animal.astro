@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FormularioAnimal from '../components/FormularioAnimal.astro';
+---
+
+<Layout title="Sugerir Animal - Hub Takanil">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-6 text-center">
+      <h1 class="text-2xl font-bold text-gray-900">Encontrou um animal?</h1>
+      <p class="mt-2 text-gray-600">
+        Preencha os dados abaixo. Nossa equipe vai analisar e, se aprovado, ele entrará para o nosso catálogo público de adoção!
+      </p>
+    </div>
+
+    <FormularioAnimal isPublic={true} />
+  </div>
+</Layout>
