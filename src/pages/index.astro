@@ -60,10 +60,9 @@ import Layout from '../layouts/Layout.astro';
   </div>
 
   <!-- Botão Flutuante (FAB) -->
-  <a href="/animais/novo" class="fixed bottom-24 right-6 w-14 h-14 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-95 transition-transform z-30">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-    </svg>
+  <a href="/sugerir-animal" id="fabAddAnimal" class="fixed bottom-24 right-6 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 active:scale-95 transition-all z-30 px-5 h-14 gap-2">
+    <span id="fabIcon" class="text-xl">📣</span>
+    <span id="fabText" class="font-bold text-sm whitespace-nowrap">Sugerir</span>
   </a>
 
 </Layout>
@@ -134,6 +133,22 @@ import Layout from '../layouts/Layout.astro';
     // Se não for admin, não mostra o banner de pendentes
     if (!isAdmin) {
       pendentes = [];
+    }
+
+    // Lógica do FAB Inteligente
+    const { data: { session } } = await supabase.auth.getSession();
+    const fab = document.getElementById('fabAddAnimal') as HTMLAnchorElement;
+    const fabIcon = document.getElementById('fabIcon');
+    const fabText = document.getElementById('fabText');
+
+    if (session) {
+      if (fab) {
+        fab.href = '/animais/novo';
+        fab.className = 'fixed bottom-24 right-6 w-14 h-14 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-95 transition-all z-30';
+      }
+      if (fabIcon) fabIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
+      if (fabIcon) fabIcon.className = ''; // Remove custom text classes
+      if (fabText) fabText.style.display = 'none';
     }
 
     if (error) {
