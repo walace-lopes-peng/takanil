@@ -3,7 +3,21 @@
 -- Habilitar a extensão UUID (caso ainda não esteja habilitada por padrão)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 1. Tabela: animais
+-- 1. Tabela: perfis
+CREATE TABLE public.perfis (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    papel TEXT NOT NULL CHECK (papel IN ('dev', 'adm', 'voluntaria')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Habilitar Row Level Security (RLS) para a tabela perfis
+ALTER TABLE public.perfis ENABLE ROW LEVEL SECURITY;
+
+-- Usuário só pode ler o próprio perfil
+CREATE POLICY "Permitir leitura do próprio perfil" ON public.perfis
+    FOR SELECT USING (auth.uid() = id);
+
+-- 2. Tabela: animais
 CREATE TABLE public.animais (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome TEXT NOT NULL,
@@ -13,6 +27,8 @@ CREATE TABLE public.animais (
     imagem_url TEXT,
     localizacao TEXT NOT NULL DEFAULT 'Abrigo Takanil' CHECK (localizacao IN ('Abrigo Takanil', 'Lar Temporário / Terceiros', 'Desaparecido / Rua')),
     status TEXT NOT NULL DEFAULT 'Disponível' CHECK (status IN ('Disponível', 'Adotado')),
+    criado_por UUID REFERENCES public.perfis(id),
+    status_moderacao TEXT NOT NULL DEFAULT 'pendente' CHECK (status_moderacao IN ('pendente', 'aprovado', 'rejeitado')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -20,17 +36,23 @@ CREATE TABLE public.animais (
 ALTER TABLE public.animais ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de acesso para 'animais'
--- (Para esta fase inicial do MVP, permitiremos leitura pública e inserção pública/autenticada)
-CREATE POLICY "Permitir leitura pública de animais" ON public.animais
-    FOR SELECT USING (true);
 
+-- Leitura pública: apenas animais aprovados
+CREATE POLICY "Leitura pública de animais aprovados" ON public.animais
+    FOR SELECT USING (status_moderacao = 'aprovado');
+
+-- Leitura autenticada (adm/dev): enxergam tudo
+CREATE POLICY "Leitura autenticada total" ON public.animais
+    FOR SELECT USING (auth.role() = 'authenticated');
+
+-- Inserção: qualquer um pode inserir, mas o status TEM que ser pendente
 CREATE POLICY "Permitir inserção de animais" ON public.animais
-    FOR INSERT WITH CHECK (true);
+    FOR INSERT WITH CHECK (status_moderacao = 'pendente');
     
 CREATE POLICY "Permitir atualização de animais" ON public.animais
     FOR UPDATE USING (true);
 
--- 2. Tabela: financas (Criada vazia para a Fase 2)
+-- 3. Tabela: financas (Criada vazia para a Fase 2)
 CREATE TABLE public.financas (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     tipo TEXT NOT NULL CHECK (tipo IN ('Entrada', 'Saída')),
@@ -53,7 +75,3 @@ CREATE POLICY "Permitir inserção de finanças" ON public.financas
     
 CREATE POLICY "Permitir atualização de finanças" ON public.financas
     FOR UPDATE USING (true);
-
--- Nota: Como ainda não configuramos a Autenticação no painel,
--- estamos permitindo inserções de forma genérica. Na versão final para produção,
--- devemos restringir INSERT/UPDATE apenas para usuários logados (auth.role() = 'authenticated').
