@@ -41,16 +41,23 @@ import Layout from '../layouts/Layout.astro';
     </div>
 
     <!-- Filtros por Urgência (Chips) -->
-    <div class="relative flex items-center">
-      <div class="flex overflow-x-auto pb-3 pt-1 gap-2 w-full" style="scrollbar-width: none;" id="botoesFiltro">
+    <div class="relative flex items-center group">
+      <!-- Seta Esquerda -->
+      <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur shadow-sm p-1.5 rounded-full hidden md:flex items-center justify-center text-gray-600 hover:text-gray-900 border border-gray-200 z-10 cursor-pointer -ml-2" title="Rolar para esquerda">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <div class="flex overflow-x-auto pb-3 pt-1 px-2 gap-2 w-full" style="scrollbar-width: none;" id="botoesFiltro">
         <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-900 text-white" data-filtro="Todos">Todos</button>
         <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Urgências">🚨 Machucados</button>
         <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Desaparecidos">🔍 Desaparecidos</button>
         <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Abrigo">🏡 No Abrigo</button>
       </div>
       
-      <!-- Seta de Scroll Desktop -->
-      <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-[100%] bg-white/90 backdrop-blur shadow-sm p-1.5 rounded-full hidden md:flex items-center justify-center text-gray-600 hover:text-gray-900 border border-gray-200 z-10 cursor-pointer" title="Rolar para ver mais">
+      <!-- Seta Direita -->
+      <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur shadow-sm p-1.5 rounded-full hidden md:flex items-center justify-center text-gray-600 hover:text-gray-900 border border-gray-200 z-10 cursor-pointer -mr-2" title="Rolar para direita">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
@@ -119,6 +126,7 @@ import Layout from '../layouts/Layout.astro';
   // Scroll horizontal com mouse wheel e seta no desktop
   const filtrosContainer = document.getElementById('botoesFiltro');
   const scrollRightBtn = document.getElementById('scrollRightBtn');
+  const scrollLeftBtn = document.getElementById('scrollLeftBtn');
   
   if (filtrosContainer) {
     filtrosContainer.addEventListener('wheel', (e) => {
@@ -131,6 +139,10 @@ import Layout from '../layouts/Layout.astro';
 
     scrollRightBtn?.addEventListener('click', () => {
       filtrosContainer.scrollBy({ left: 150, behavior: 'smooth' });
+    });
+
+    scrollLeftBtn?.addEventListener('click', () => {
+      filtrosContainer.scrollBy({ left: -150, behavior: 'smooth' });
     });
   }
 
