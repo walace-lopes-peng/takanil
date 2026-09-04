@@ -46,10 +46,11 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       </div>
     </div>
 
-    <!-- Nome -->
-    <div>
-      <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
-      <input type="text" name="nome" id="nome" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: Rabito">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Animal <span class="text-gray-400 font-normal">(Opcional)</span></label>
+        <input type="text" name="nome" id="nome" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: Rex (deixe em branco se não souber)">
+      </div>
     </div>
 
     <!-- Espécie (Toggle) -->
@@ -304,7 +305,8 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       statusMessage?.classList.add('hidden');
       
       const formData = new FormData(form);
-      const nome = formData.get('nome') as string;
+      const nome_raw = formData.get('nome') as string;
+      const nome = nome_raw.trim() !== '' ? nome_raw : 'Desconhecido';
       const especie = formData.get('especie') as string;
       const fase_vida = formData.get('fase_vida') as string;
       const peso = parseFloat(formData.get('peso') as string);
@@ -316,8 +318,8 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       const temperamento = formData.get('temperamento') as string || 'Não informado';
       const fotoFile = formData.get('foto') as File;
 
-      if (!nome || !especie || !fase_vida || isNaN(peso) || peso <= 0 || !localizacao || !fotoFile.size) {
-        showStatus('Por favor, preencha todos os campos e adicione uma foto.', 'error');
+      if (!especie || !fase_vida || isNaN(peso) || peso <= 0 || !localizacao || !fotoFile.size) {
+        showStatus('Por favor, preencha os campos obrigatórios e adicione uma foto.', 'error');
         return;
       }
 
