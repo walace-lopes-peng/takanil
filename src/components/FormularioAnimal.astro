@@ -34,7 +34,7 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
         <span class="text-xs text-gray-400 mt-1 pointer-events-none">
           PNG, JPG ou WEBP (Comprimido automaticamente)
         </span>
-        <input id="fotoInput" name="foto" type="file" accept="image/*" capture="environment" class="sr-only" required>
+        <input id="fotoInput" name="foto" type="file" accept="image/*" class="sr-only" required>
       </label>
       <div id="fotoPreviewContainer" class="hidden mt-2 relative rounded-xl overflow-hidden aspect-video bg-gray-100">
           <img id="fotoPreview" class="object-cover w-full h-full" src="" alt="Preview da foto">
@@ -46,26 +46,33 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       </div>
     </div>
 
-    <!-- Nome -->
-    <div>
-      <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
-      <input type="text" name="nome" id="nome" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: Rabito">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Animal <span class="text-gray-400 font-normal">(Opcional)</span></label>
+        <input type="text" name="nome" id="nome" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: Rex (deixe em branco se não souber)">
+      </div>
     </div>
 
     <!-- Espécie (Toggle) -->
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-2">Espécie</label>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-3 gap-2">
         <label class="cursor-pointer">
           <input type="radio" name="especie" value="Cão" class="peer sr-only" required>
-          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all text-sm">
             🐶 Cão
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="especie" value="Gato" class="peer sr-only">
-          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all text-sm">
             🐱 Gato
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="especie" value="Ambos/Múltiplos" class="peer sr-only">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all text-sm">
+            🐶🐱 Ambos
           </div>
         </label>
       </div>
@@ -96,6 +103,37 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       </div>
     </div>
 
+    <!-- Sexo (Toggle) -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Sexo</label>
+      <div class="grid grid-cols-4 gap-2">
+        <label class="cursor-pointer">
+          <input type="radio" name="sexo" value="Macho" class="peer sr-only" required>
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all">
+            ♂ Macho
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="sexo" value="Fêmea" class="peer sr-only">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-pink-500 peer-checked:bg-pink-50 peer-checked:text-pink-700 peer-checked:font-medium transition-all">
+            ♀ Fêmea
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="sexo" value="Não sei" class="peer sr-only">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-gray-500 peer-checked:bg-gray-100 peer-checked:text-gray-700 peer-checked:font-medium transition-all">
+            Não sei
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="sexo" value="Misto (Ninhada)" class="peer sr-only">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs flex items-center justify-center peer-checked:border-purple-500 peer-checked:bg-purple-50 peer-checked:text-purple-700 peer-checked:font-medium transition-all">
+            Misto
+          </div>
+        </label>
+      </div>
+    </div>
+
     <!-- Peso -->
     <div>
       <label for="peso" class="block text-sm font-medium text-gray-700">Peso Aproximado(kg)</label>
@@ -107,9 +145,76 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       <label for="localizacao" class="block text-sm font-medium text-gray-700">Onde o animal está?</label>
       <select name="localizacao" id="localizacao" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50">
         <option value="Abrigo Takanil">Abrigo Takanil (Consome Ração)</option>
-        <option value="Lar Temporário / Terceiros">Lar Temporário / Terceiros</option>
-        <option value="Desaparecido / Rua">Desaparecido / Rua</option>
+        <option value="Na rua">Na rua (sem abrigo)</option>
+        <option value="Lar Temporário">Lar Temporário</option>
+        <option value="Casa de terceiros">Casa de terceiros</option>
+        <option value="Desaparecido">Desaparecido</option>
       </select>
+    </div>
+
+    <!-- Situação de Urgência -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Situação de Urgência</label>
+      <div class="grid grid-cols-3 gap-2">
+        <label class="cursor-pointer">
+          <input type="radio" name="situacao_urgencia" value="Nenhuma" class="peer sr-only" required checked>
+          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-gray-500 peer-checked:bg-gray-100 peer-checked:text-gray-800 peer-checked:font-medium transition-all">
+            Nenhuma
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="situacao_urgencia" value="Machucado/Risco" class="peer sr-only">
+          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 peer-checked:font-medium transition-all">
+            🚨 Machucado
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="situacao_urgencia" value="Desaparecido" class="peer sr-only">
+          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-yellow-500 peer-checked:bg-yellow-50 peer-checked:text-yellow-700 peer-checked:font-medium transition-all">
+            🔍 Sumiu
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <!-- Quantidade -->
+      <div>
+        <label for="quantidade" class="block text-sm font-medium text-gray-700">Quantidade</label>
+        <input type="number" name="quantidade" id="quantidade" min="1" value="1" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50">
+      </div>
+      <!-- Temperamento -->
+      <div>
+        <label for="temperamento" class="block text-sm font-medium text-gray-700">Temperamento</label>
+        <select name="temperamento" id="temperamento" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50">
+          <option value="Não informado">Não informado</option>
+          <option value="Dócil">Dócil</option>
+          <option value="Brincalhão">Brincalhão</option>
+          <option value="Assustado">Assustado</option>
+          <option value="Bravo">Bravo</option>
+          <option value="Protetor">Protetor</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Vacinado / Castrado -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Vacinado?</label>
+        <div class="grid grid-cols-3 gap-1">
+          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Sim" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">Sim</div></label>
+          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">Não</div></label>
+          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não sei" class="peer sr-only" checked><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">?</div></label>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Castrado?</label>
+        <div class="grid grid-cols-3 gap-1">
+          <label class="cursor-pointer"><input type="radio" name="castrado" value="Sim" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">Sim</div></label>
+          <label class="cursor-pointer"><input type="radio" name="castrado" value="Não" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">Não</div></label>
+          <label class="cursor-pointer"><input type="radio" name="castrado" value="Não sei" class="peer sr-only" checked><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">?</div></label>
+        </div>
+      </div>
     </div>
 
     <!-- Submit -->
@@ -231,15 +336,22 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       statusMessage?.classList.add('hidden');
       
       const formData = new FormData(form);
-      const nome = formData.get('nome') as string;
+      const nome_raw = formData.get('nome') as string;
+      const nome = nome_raw.trim() !== '' ? nome_raw : 'Desconhecido';
       const especie = formData.get('especie') as string;
       const fase_vida = formData.get('fase_vida') as string;
+      const sexo = formData.get('sexo') as string;
       const peso = parseFloat(formData.get('peso') as string);
       const localizacao = formData.get('localizacao') as string;
+      const quantidade = parseInt(formData.get('quantidade') as string) || 1;
+      const situacao_urgencia = formData.get('situacao_urgencia') as string || 'Nenhuma';
+      const vacinado = formData.get('vacinado') as string || 'Não sei';
+      const castrado = formData.get('castrado') as string || 'Não sei';
+      const temperamento = formData.get('temperamento') as string || 'Não informado';
       const fotoFile = formData.get('foto') as File;
 
-      if (!nome || !especie || !fase_vida || isNaN(peso) || peso <= 0 || !localizacao || !fotoFile.size) {
-        showStatus('Por favor, preencha todos os campos e adicione uma foto.', 'error');
+      if (!especie || !fase_vida || !sexo || isNaN(peso) || peso <= 0 || !localizacao || !fotoFile.size) {
+        showStatus('Por favor, preencha os campos obrigatórios e adicione uma foto.', 'error');
         return;
       }
 
@@ -280,8 +392,14 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
               nome,
               especie,
               fase_vida,
+              sexo,
               peso,
               localizacao,
+              quantidade,
+              situacao_urgencia,
+              vacinado,
+              castrado,
+              temperamento,
               imagem_url,
               status_moderacao
             }

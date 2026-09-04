@@ -58,11 +58,8 @@ tocar em algo fora do escopo da Parte pedida, pare e explique antes de agir.
 - Branches de Parte nascem de `dev`, não de `main`. PR fecha em `dev`.
   Detalhes completos em `CONTRIBUTING.md`.
 - **Sempre** verifique qual Issue o PR resolve e adicione a tag de fechamento (ex: `Closes #123`) na descrição ao abrir o PR via GitHub CLI.
-- **REGRA DE OURO: nunca execute `git commit` ou `git push` sem antes mostrar
-  um resumo do que foi alterado e receber uma confirmação explícita para
-  aquele commit especificamente.** Ter recebido a tarefa inicial não conta
-  como essa confirmação — são duas aprovações separadas: uma para
-  implementar, outra para commitar/enviar.
+- **Sempre** inclua uma seção `## Como testar?` com um checklist prático no corpo (body) de todo PR aberto.
+- **REGRA DE OURO: nunca execute `git commit`, `git push`, criação de `Pull Requests` ou `Merge` sem antes mostrar um resumo do que foi alterado e receber uma confirmação explícita para aquele ato especificamente.** Ter recebido a tarefa inicial não conta como essa confirmação — são duas aprovações separadas: uma para implementar, outra para commitar/enviar/mergear.
 
 ## Quando tiver dúvida
 Pare e pergunte em vez de assumir. Especialmente para: mudança de schema,
