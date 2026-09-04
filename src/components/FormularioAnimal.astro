@@ -103,6 +103,37 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       </div>
     </div>
 
+    <!-- Sexo (Toggle) -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Sexo</label>
+      <div class="grid grid-cols-4 gap-2">
+        <label class="cursor-pointer">
+          <input type="radio" name="sexo" value="Macho" class="peer sr-only" required>
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all">
+            ♂ Macho
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="sexo" value="Fêmea" class="peer sr-only">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-pink-500 peer-checked:bg-pink-50 peer-checked:text-pink-700 peer-checked:font-medium transition-all">
+            ♀ Fêmea
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="sexo" value="Não sei" class="peer sr-only">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-gray-500 peer-checked:bg-gray-100 peer-checked:text-gray-700 peer-checked:font-medium transition-all">
+            Não sei
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="sexo" value="Misto (Ninhada)" class="peer sr-only">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs flex items-center justify-center peer-checked:border-purple-500 peer-checked:bg-purple-50 peer-checked:text-purple-700 peer-checked:font-medium transition-all">
+            Misto
+          </div>
+        </label>
+      </div>
+    </div>
+
     <!-- Peso -->
     <div>
       <label for="peso" class="block text-sm font-medium text-gray-700">Peso Aproximado(kg)</label>
@@ -309,6 +340,7 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       const nome = nome_raw.trim() !== '' ? nome_raw : 'Desconhecido';
       const especie = formData.get('especie') as string;
       const fase_vida = formData.get('fase_vida') as string;
+      const sexo = formData.get('sexo') as string;
       const peso = parseFloat(formData.get('peso') as string);
       const localizacao = formData.get('localizacao') as string;
       const quantidade = parseInt(formData.get('quantidade') as string) || 1;
@@ -318,7 +350,7 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
       const temperamento = formData.get('temperamento') as string || 'Não informado';
       const fotoFile = formData.get('foto') as File;
 
-      if (!especie || !fase_vida || isNaN(peso) || peso <= 0 || !localizacao || !fotoFile.size) {
+      if (!especie || !fase_vida || !sexo || isNaN(peso) || peso <= 0 || !localizacao || !fotoFile.size) {
         showStatus('Por favor, preencha os campos obrigatórios e adicione uma foto.', 'error');
         return;
       }
@@ -360,6 +392,7 @@ const formTitle = isPublic ? 'Sugerir Animal' : 'Novo Animal';
               nome,
               especie,
               fase_vida,
+              sexo,
               peso,
               localizacao,
               quantidade,
