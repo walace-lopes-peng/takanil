@@ -170,7 +170,6 @@ import Layout from '../layouts/Layout.astro';
       let imgStyle = '';
       if (animal.situacao_urgencia === 'Machucado/Risco') {
         badgeUrgencia = `<span class="inline-block bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1">🚨 Urgência Médica</span>`;
-        imgStyle = 'ring-2 ring-red-400 ring-offset-2';
       } else if (animal.situacao_urgencia === 'Desaparecido' || animal.localizacao.includes('Desaparecido')) {
         badgeUrgencia = `<span class="inline-block bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1">🔍 Desaparecido</span>`;
       }
