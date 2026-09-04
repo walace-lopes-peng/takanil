@@ -206,10 +206,8 @@ import Layout from '../layouts/Layout.astro';
             <div class="mt-1.5 flex flex-wrap gap-1">
               ${tags}
             </div>
-            <div class="flex justify-between items-center mt-1.5">
-              <p class="text-[10px] font-medium text-blue-600 truncate">📍 ${animal.localizacao}</p>
-              <p class="text-[10px] text-gray-400">Cadastrado em ${dataFormatada}</p>
-            </div>
+            <p class="text-[10px] font-medium text-blue-600 mt-1.5 truncate">📍 ${animal.localizacao}</p>
+            <p class="text-[9px] text-gray-400 mt-0.5">Cadastrado em ${dataFormatada}</p>
           </div>
           ${isAdminGlob ? `
           <!-- Botão Excluir Registro -->
