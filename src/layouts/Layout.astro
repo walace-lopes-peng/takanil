@@ -46,17 +46,31 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
       <div class="max-w-md mx-auto h-16 flex justify-around items-center">
         <!-- Tab: Animais (Home) -->
         <a href="/" class={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${currentPath === '/' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill={currentPath === '/' ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" stroke-width={currentPath === '/' ? "1.5" : "2"}>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
+          {currentPath === '/' ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+              <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+              <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          )}
           <span class="text-[10px] font-medium">Animais</span>
         </a>
 
         <!-- Tab: Finanças -->
         <a href="/financas" id="financasTab" style="display: none;" class={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${currentPath.startsWith('/financas') ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill={currentPath.startsWith('/financas') ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" stroke-width={currentPath.startsWith('/financas') ? "1.5" : "2"}>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          {currentPath.startsWith('/financas') ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+              <path d="M12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
+              <path fill-rule="evenodd" d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v14.25c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 19.125V4.875zm11.25 1.125a.75.75 0 00-1.5 0v.752c-.524.085-1.006.297-1.408.6A2.25 2.25 0 009.75 11.25c0 1.285 1.01 2.25 2.25 2.25h1.5a.75.75 0 010 1.5H12a.75.75 0 01-.75-.75v-.75a.75.75 0 00-1.5 0v.75c0 .543.216 1.05.586 1.436.37.385.875.602 1.414.664v.752a.75.75 0 001.5 0v-.752c.524-.085 1.006-.297 1.408-.6A2.25 2.25 0 0014.25 12.75c0-1.285-1.01-2.25-2.25-2.25h-1.5a.75.75 0 010-1.5H12a.75.75 0 01.75.75v.75a.75.75 0 001.5 0v-.75c0-.543-.216-1.05-.586-1.436a2.247 2.247 0 00-1.414-.664v-.752z" clip-rule="evenodd" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
           <span class="text-[10px] font-medium">Finanças</span>
         </a>
       </div>
