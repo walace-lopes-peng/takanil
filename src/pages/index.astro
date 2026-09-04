@@ -177,6 +177,8 @@ import Layout from '../layouts/Layout.astro';
       const diffTime = Math.abs(hoje.getTime() - dataCadastro.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
+      const dataFormatada = dataCadastro.toLocaleDateString('pt-BR');
+
       // Badge de Urgência
       let badgeUrgencia = '';
       let imgStyle = '';
@@ -204,7 +206,10 @@ import Layout from '../layouts/Layout.astro';
             <div class="mt-1.5 flex flex-wrap gap-1">
               ${tags}
             </div>
-            <p class="text-[10px] font-medium text-blue-600 mt-1.5 truncate">📍 ${animal.localizacao}</p>
+            <div class="flex justify-between items-center mt-1.5">
+              <p class="text-[10px] font-medium text-blue-600 truncate">📍 ${animal.localizacao}</p>
+              <p class="text-[10px] text-gray-400">Cadastrado em ${dataFormatada}</p>
+            </div>
           </div>
           ${isAdminGlob ? `
           <!-- Botão Excluir Registro -->
