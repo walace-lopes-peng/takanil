@@ -1,4 +1,6 @@
 ---
+import BannerInstalar from '../components/BannerInstalar.astro';
+
 interface Props {
   title: string;
 }
@@ -35,6 +37,9 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
         </div>
       </div>
     </header>
+
+    <!-- Banner de instalacao PWA (aparece apenas em mobile nao instalado) -->
+    <BannerInstalar />
 
     <!-- Conteúdo principal -->
     <main class="flex-1 w-full max-w-md mx-auto p-4 flex flex-col pb-24">

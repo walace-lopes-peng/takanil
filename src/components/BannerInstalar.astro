@@ -1,0 +1,175 @@
+---
+// BannerInstalar.astro
+// Exibe um prompt de instalacao PWA para dispositivos moveis.
+// Android: usa o evento nativo `beforeinstallprompt` do browser.
+// iOS: exibe instrucao manual (Safari nao dispara o evento nativo).
+---
+
+<div id="bannerInstalar" class="hidden">
+  <!-- Banner principal -->
+  <div
+    id="bannerConteudo"
+    class="fixed top-14 left-0 right-0 z-50 mx-auto max-w-md px-3 pt-2"
+  >
+    <div class="flex items-center gap-3 rounded-2xl bg-blue-600 px-4 py-3 shadow-lg text-white">
+      <!-- Icone do app -->
+      <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+      </div>
+
+      <!-- Texto -->
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold leading-tight">Instale o Hub Takanil</p>
+        <p class="text-xs text-blue-100 leading-tight mt-0.5">Acesse mais rapido, sem precisar do navegador</p>
+      </div>
+
+      <!-- Botao instalar -->
+      <button
+        id="btnInstalar"
+        class="flex-shrink-0 bg-white text-blue-600 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
+      >
+        Instalar
+      </button>
+
+      <!-- Fechar -->
+      <button
+        id="btnFecharBanner"
+        aria-label="Fechar banner"
+        class="flex-shrink-0 text-blue-200 hover:text-white transition-colors ml-1"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Instrucao iOS (overlay deslizavel) -->
+  <div
+    id="instrucaoIOS"
+    class="hidden fixed inset-0 z-50 flex items-end"
+  >
+    <div id="overlayIOS" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+    <div class="relative w-full max-w-md mx-auto bg-white rounded-t-3xl p-6 pb-10 shadow-2xl">
+      <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-5"></div>
+
+      <h2 class="text-base font-bold text-gray-900 text-center mb-4">
+        Adicionar a Tela Inicial
+      </h2>
+
+      <ol class="space-y-4">
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 text-blue-600 text-sm font-bold flex items-center justify-center">1</span>
+          <p class="text-sm text-gray-700 pt-0.5">
+            Toque no botao <strong>Compartilhar</strong>
+            <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-500 rounded-md mx-1 align-middle">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+            </span>
+            na barra do Safari
+          </p>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 text-blue-600 text-sm font-bold flex items-center justify-center">2</span>
+          <p class="text-sm text-gray-700 pt-0.5">
+            Role para baixo e toque em <strong>"Adicionar a Tela Inicial"</strong>
+          </p>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 text-blue-600 text-sm font-bold flex items-center justify-center">3</span>
+          <p class="text-sm text-gray-700 pt-0.5">
+            Toque em <strong>"Adicionar"</strong> no canto superior direito
+          </p>
+        </li>
+      </ol>
+
+      <button
+        id="btnFecharIOS"
+        class="mt-6 w-full bg-blue-600 text-white font-semibold py-3 rounded-xl hover:bg-blue-700 transition-colors"
+      >
+        Entendi
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CHAVE_STORAGE = 'takanil_banner_install_dispensado_ate';
+  const DIAS_SUPRIMIR = 7;
+
+  // 1. Nao exibe se ja instalado (modo standalone)
+  // navigator.standalone e propriedade nao padronizada do iOS — cast necessario
+  const jaInstalado =
+    (window.navigator as any).standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+
+  // 2. Nao exibe se dispensado recentemente
+  const dispensadoAte = localStorage.getItem(CHAVE_STORAGE);
+  const dispensado = dispensadoAte && Date.now() < Number(dispensadoAte);
+
+  // 3. Apenas em mobile
+  const ehMobile = window.innerWidth < 768;
+
+  if (!jaInstalado && !dispensado && ehMobile) {
+    const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    const banner = document.getElementById('bannerInstalar');
+    const btnInstalar = document.getElementById('btnInstalar');
+    const btnFechar = document.getElementById('btnFecharBanner');
+    const instrucaoIOS = document.getElementById('instrucaoIOS');
+    const overlayIOS = document.getElementById('overlayIOS');
+    const btnFecharIOS = document.getElementById('btnFecharIOS');
+
+    // Guarda o evento nativo do Android (BeforeInstallPromptEvent nao e padrao no TS)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let eventoInstalacao: any = null;
+
+    function exibirBanner() {
+      banner?.classList.remove('hidden');
+    }
+
+    function fecharBanner() {
+      banner?.classList.add('hidden');
+      const ate = Date.now() + DIAS_SUPRIMIR * 24 * 60 * 60 * 1000;
+      localStorage.setItem(CHAVE_STORAGE, String(ate));
+    }
+
+    function abrirInstrucaoIOS() {
+      instrucaoIOS?.classList.remove('hidden');
+    }
+
+    function fecharInstrucaoIOS() {
+      instrucaoIOS?.classList.add('hidden');
+    }
+
+    // Android: intercepta o evento nativo e exibe nosso banner
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      eventoInstalacao = e;
+      exibirBanner();
+    });
+
+    if (ehIOS) {
+      exibirBanner();
+      btnInstalar?.addEventListener('click', abrirInstrucaoIOS);
+      btnFecharIOS?.addEventListener('click', fecharInstrucaoIOS);
+      overlayIOS?.addEventListener('click', fecharInstrucaoIOS);
+    } else {
+      // Android/Chrome: aciona o prompt nativo
+      btnInstalar?.addEventListener('click', async () => {
+        if (!eventoInstalacao) return;
+        eventoInstalacao.prompt();
+        const { outcome } = await eventoInstalacao.userChoice;
+        if (outcome === 'accepted') fecharBanner();
+        eventoInstalacao = null;
+      });
+    }
+
+    btnFechar?.addEventListener('click', fecharBanner);
+    window.addEventListener('appinstalled', fecharBanner);
+  }
+</script>
