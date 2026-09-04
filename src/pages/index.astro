@@ -83,6 +83,48 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </div>
 
+  <!-- Modal de Edição Rápida (Status/Localização) -->
+  <div id="modalEdicao" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+      <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h3 class="font-bold text-gray-800" id="modalEdicaoTitulo">Editar Status</h3>
+        <button onclick="fecharModalEdicao()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="p-5 space-y-4">
+        <input type="hidden" id="editAnimalId">
+        
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Localização</label>
+          <select id="editLocalizacao" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-3 border bg-white">
+            <option value="Abrigo Takanil">Abrigo Takanil</option>
+            <option value="Na rua">Na rua</option>
+            <option value="Lar Temporário">Lar Temporário</option>
+            <option value="Casa de terceiros">Casa de terceiros</option>
+            <option value="Desaparecido">Desaparecido</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Situação / Resolução</label>
+          <select id="editUrgencia" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-3 border bg-white">
+            <option value="Nenhuma">Normal (Nenhuma)</option>
+            <option value="Machucado/Risco">🚨 Machucado / Risco</option>
+            <option value="Desaparecido">🔍 Desaparecido</option>
+            <option value="Adotado">✅ Adotado</option>
+            <option value="Tutor Encontrado">🏠 Tutor Encontrado</option>
+            <option value="Óbito">✝️ Óbito</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+        <button onclick="fecharModalEdicao()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+        <button onclick="salvarEdicao()" id="btnSalvarEdicao" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Botão Flutuante (FAB) -->
   <a href="/sugerir-animal" id="fabAddAnimal" class="fixed bottom-24 right-6 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 active:scale-95 transition-all z-30 px-5 h-14 gap-2">
     <span id="fabIcon" class="text-xl">📣</span>
@@ -211,16 +253,27 @@ import Layout from '../layouts/Layout.astro';
             <p class="text-[9px] text-gray-400 mt-0.5">Cadastrado em ${dataFormatada}</p>
           </div>
           ${isAdminGlob ? `
-          <!-- Botão Excluir Registro -->
-          <button 
-            onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${animal.nome}')" 
-            title="Excluir cadastro" 
-            class="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+          <!-- Botões Admin -->
+          <div class="absolute top-4 right-4 flex gap-1">
+            <button 
+              onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${animal.nome}')" 
+              title="Editar Status" 
+              class="p-2 text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
+            <button 
+              onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${animal.nome}')" 
+              title="Excluir cadastro" 
+              class="p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
           ` : ''}
         </div>
       `;
@@ -250,6 +303,47 @@ import Layout from '../layouts/Layout.astro';
     } catch (err) {
       console.error(err);
       alert('Erro ao excluir o registro.');
+    }
+  };
+
+  // Funções do Modal de Edição
+  (window as any).abrirModalEdicao = (id: string, localizacao: string, urgencia: string, nome: string) => {
+    (document.getElementById('editAnimalId') as HTMLInputElement).value = id;
+    (document.getElementById('editLocalizacao') as HTMLSelectElement).value = localizacao;
+    (document.getElementById('editUrgencia') as HTMLSelectElement).value = urgencia;
+    document.getElementById('modalEdicaoTitulo')!.innerText = `Editar: ${nome}`;
+    document.getElementById('modalEdicao')!.classList.remove('hidden');
+  };
+
+  (window as any).fecharModalEdicao = () => {
+    document.getElementById('modalEdicao')!.classList.add('hidden');
+  };
+
+  (window as any).salvarEdicao = async () => {
+    const id = (document.getElementById('editAnimalId') as HTMLInputElement).value;
+    const localizacao = (document.getElementById('editLocalizacao') as HTMLSelectElement).value;
+    const situacao_urgencia = (document.getElementById('editUrgencia') as HTMLSelectElement).value;
+    const btn = document.getElementById('btnSalvarEdicao')!;
+    
+    btn.innerHTML = 'Salvando...';
+    btn.setAttribute('disabled', 'true');
+
+    try {
+      const { error } = await supabase
+        .from('animais')
+        .update({ localizacao, situacao_urgencia })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      fecharModalEdicao();
+      carregarDados(); // Recarrega os cards
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao atualizar o status do animal.');
+    } finally {
+      btn.innerHTML = 'Salvar Alterações';
+      btn.removeAttribute('disabled');
     }
   };
 
