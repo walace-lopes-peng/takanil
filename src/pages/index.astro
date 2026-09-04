@@ -405,7 +405,7 @@ import Layout from '../layouts/Layout.astro';
 
       if (error) throw error;
       
-      fecharModalEdicao();
+      (window as any).fecharModalEdicao();
       carregarDados(); // Recarrega os cards
     } catch (err) {
       console.error(err);
