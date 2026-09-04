@@ -67,8 +67,15 @@ import Layout from '../layouts/Layout.astro';
     <!-- Todos os Animais -->
     <div>
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-gray-800">Animais Cadastrados</h3>
-        <span class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded-full" id="totalAnimais">0</span>
+        <div class="flex items-center gap-2">
+          <h3 class="text-lg font-bold text-gray-800" id="tituloSecao">Animais Cadastrados</h3>
+          <span class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded-full" id="totalAnimais">0</span>
+        </div>
+        <button onclick="alternarFinaisFelizes()" title="Ver finais felizes" class="text-gray-400 hover:text-pink-500 transition-colors p-1" id="btnFinaisFelizes">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+          </svg>
+        </button>
       </div>
       <div id="listaAnimais" class="space-y-4">
         <div class="text-center py-8 text-gray-400 text-sm" id="loadingState">
@@ -79,6 +86,48 @@ import Layout from '../layouts/Layout.astro';
           Carregando dados...
         </div>
         <!-- Inserido via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Edição Rápida (Status/Localização) -->
+  <div id="modalEdicao" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+      <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h3 class="font-bold text-gray-800" id="modalEdicaoTitulo">Editar Status</h3>
+        <button onclick="fecharModalEdicao()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="p-5 space-y-4">
+        <input type="hidden" id="editAnimalId">
+        
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Localização</label>
+          <select id="editLocalizacao" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-3 border bg-white">
+            <option value="Abrigo Takanil">Abrigo Takanil</option>
+            <option value="Na rua">Na rua</option>
+            <option value="Lar Temporário">Lar Temporário</option>
+            <option value="Casa de terceiros">Casa de terceiros</option>
+            <option value="Desaparecido">Desaparecido</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Situação / Resolução</label>
+          <select id="editUrgencia" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-3 border bg-white">
+            <option value="Nenhuma">Normal (Nenhuma)</option>
+            <option value="Machucado/Risco">🚨 Machucado / Risco</option>
+            <option value="Desaparecido">🔍 Desaparecido</option>
+            <option value="Adotado">✅ Adotado</option>
+            <option value="Tutor Encontrado">🏠 Tutor Encontrado</option>
+            <option value="Óbito">✝️ Óbito</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+        <button onclick="fecharModalEdicao()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
+        <button onclick="salvarEdicao()" id="btnSalvarEdicao" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm">Salvar Alterações</button>
       </div>
     </div>
   </div>
@@ -103,11 +152,13 @@ import Layout from '../layouts/Layout.astro';
   const bannerPendentes = document.getElementById('bannerPendentes');
   const qtdPendentes = document.getElementById('qtdPendentes');
 
+  // Estado local
   let animaisGlobais: any[] = [];
   let isAdminGlob = false;
   let filtroAtual = 'Todos';
+  let mostrarFinaisFelizes = false;
 
-  // Configurar botões de filtro
+  // Lógica dos Filtros (Chips) de filtro
   document.getElementById('botoesFiltro')?.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('.filtro-btn');
     if (!btn) return;
@@ -119,7 +170,15 @@ import Layout from '../layouts/Layout.astro';
     btn.classList.remove('bg-gray-100', 'text-gray-600');
     btn.classList.add('bg-gray-900', 'text-white');
 
-    filtroAtual = btn.getAttribute('data-filtro') || 'Todos';
+    // Resetar Finais Felizes se clicar num pill normal
+    if (mostrarFinaisFelizes) {
+      mostrarFinaisFelizes = false;
+      document.getElementById('btnFinaisFelizes')!.classList.remove('text-pink-500');
+      document.getElementById('btnFinaisFelizes')!.classList.add('text-gray-400');
+      document.getElementById('tituloSecao')!.innerText = 'Animais Cadastrados';
+    }
+
+    filtroAtual = (btn as HTMLElement).getAttribute('data-filtro') || 'Todos';
     renderLista(animaisGlobais);
   });
 
@@ -148,14 +207,27 @@ import Layout from '../layouts/Layout.astro';
 
   function renderLista(animais: any[]) {
     let htmlNormal = '';
-    let filtrados = animais;
+    
+    // Filtro base: Remover óbitos de todas as views públicas
+    let baseAnimais = animais.filter(a => a.situacao_urgencia !== 'Óbito');
+    let filtrados = baseAnimais;
+    const statusFinais = ['Adotado', 'Tutor Encontrado'];
 
-    if (filtroAtual === 'Urgências') {
-      filtrados = animais.filter(a => a.situacao_urgencia === 'Machucado/Risco');
-    } else if (filtroAtual === 'Desaparecidos') {
-      filtrados = animais.filter(a => a.situacao_urgencia === 'Desaparecido' || a.localizacao.includes('Desaparecido'));
-    } else if (filtroAtual === 'Abrigo') {
-      filtrados = animais.filter(a => a.localizacao === 'Abrigo Takanil');
+    if (mostrarFinaisFelizes) {
+      filtrados = baseAnimais.filter(a => statusFinais.includes(a.situacao_urgencia));
+    } else {
+      // Normal filters on active animals
+      const ativos = baseAnimais.filter(a => !statusFinais.includes(a.situacao_urgencia));
+      
+      if (filtroAtual === 'Todos') {
+        filtrados = ativos;
+      } else if (filtroAtual === 'Urgências') {
+        filtrados = ativos.filter(a => a.situacao_urgencia === 'Machucado/Risco');
+      } else if (filtroAtual === 'Desaparecidos') {
+        filtrados = ativos.filter(a => a.situacao_urgencia === 'Desaparecido' || a.localizacao.includes('Desaparecido'));
+      } else if (filtroAtual === 'Abrigo') {
+        filtrados = ativos.filter(a => a.localizacao === 'Abrigo Takanil');
+      }
     }
 
     if (!filtrados || filtrados.length === 0) {
@@ -179,13 +251,20 @@ import Layout from '../layouts/Layout.astro';
 
       const dataFormatada = dataCadastro.toLocaleDateString('pt-BR');
 
-      // Badge de Urgência
+      // Badges
       let badgeUrgencia = '';
-      let imgStyle = '';
+      let isResolvido = false;
+
       if (animal.situacao_urgencia === 'Machucado/Risco') {
         badgeUrgencia = `<span class="inline-block bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1">🚨 Urgência Médica</span>`;
       } else if (animal.situacao_urgencia === 'Desaparecido' || animal.localizacao.includes('Desaparecido')) {
         badgeUrgencia = `<span class="inline-block bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1">🔍 Desaparecido</span>`;
+      } else if (animal.situacao_urgencia === 'Adotado') {
+        badgeUrgencia = `<span class="inline-block bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-sm border border-green-200">✅ Adotado</span>`;
+        isResolvido = true;
+      } else if (animal.situacao_urgencia === 'Tutor Encontrado') {
+        badgeUrgencia = `<span class="inline-block bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-sm border border-blue-200">🏠 Voltou pro Tutor</span>`;
+        isResolvido = true;
       }
 
       // Badges Secundárias (Tags)
@@ -198,29 +277,40 @@ import Layout from '../layouts/Layout.astro';
       if (animal.castrado === 'Sim') tags += `<span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">✂️ Castrado</span> `;
 
       htmlNormal += `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex gap-4 items-center group relative ${diffDays > 10 ? 'border-l-4 border-l-gray-300' : ''}">
-          <img src="${animal.imagem_url || ''}" class="w-20 h-20 rounded-lg object-cover bg-gray-100 flex-shrink-0 ${imgStyle}" alt="${animal.nome}">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex gap-4 items-center group relative ${isResolvido ? 'bg-gray-50 border-gray-200' : (diffDays > 10 ? 'border-l-4 border-l-gray-300' : '')}">
+          <img src="${animal.imagem_url || ''}" class="w-20 h-20 rounded-lg object-cover bg-gray-100 flex-shrink-0" alt="${animal.nome}">
           <div class="flex-1 min-w-0 pr-8">
             ${badgeUrgencia}
-            <h4 class="text-lg font-bold text-gray-800 truncate">${animal.nome}</h4>
+            <h4 class="text-lg font-bold text-gray-800 truncate ${isResolvido ? 'line-through text-gray-400' : ''}">${animal.nome}</h4>
             <p class="text-xs text-gray-500 truncate mt-0.5">${animal.fase_vida} • ${animal.peso}kg</p>
             <div class="mt-1.5 flex flex-wrap gap-1">
               ${tags}
             </div>
-            <p class="text-[10px] font-medium text-blue-600 mt-1.5 truncate">📍 ${animal.localizacao}</p>
+            ${!isResolvido ? `<p class="text-[10px] font-medium text-blue-600 mt-1.5 truncate">📍 ${animal.localizacao}</p>` : ''}
             <p class="text-[9px] text-gray-400 mt-0.5">Cadastrado em ${dataFormatada}</p>
           </div>
           ${isAdminGlob ? `
-          <!-- Botão Excluir Registro -->
-          <button 
-            onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${animal.nome}')" 
-            title="Excluir cadastro" 
-            class="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+          <!-- Botões Admin -->
+          <div class="absolute top-4 right-4 flex gap-1">
+            <button 
+              onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${animal.nome}')" 
+              title="Editar Status" 
+              class="p-2 text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
+            <button 
+              onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${animal.nome}')" 
+              title="Excluir cadastro" 
+              class="p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
           ` : ''}
         </div>
       `;
@@ -250,6 +340,79 @@ import Layout from '../layouts/Layout.astro';
     } catch (err) {
       console.error(err);
       alert('Erro ao excluir o registro.');
+    }
+  };
+
+  // Botão Finais Felizes
+  (window as any).alternarFinaisFelizes = () => {
+    mostrarFinaisFelizes = !mostrarFinaisFelizes;
+    const btn = document.getElementById('btnFinaisFelizes')!;
+    const titulo = document.getElementById('tituloSecao')!;
+    
+    if (mostrarFinaisFelizes) {
+      btn.classList.add('text-pink-500');
+      btn.classList.remove('text-gray-400');
+      titulo.innerText = 'Finais Felizes';
+      
+      // Apaga pílulas
+      document.querySelectorAll('.filtro-btn').forEach(b => {
+        b.classList.remove('bg-gray-900', 'text-white');
+        b.classList.add('bg-gray-100', 'text-gray-600');
+      });
+    } else {
+      btn.classList.remove('text-pink-500');
+      btn.classList.add('text-gray-400');
+      titulo.innerText = 'Animais Cadastrados';
+      
+      // Restaura o filtro "Todos" ativo
+      filtroAtual = 'Todos';
+      const btnTodos = document.querySelector('.filtro-btn[data-filtro="Todos"]');
+      if (btnTodos) {
+        btnTodos.classList.add('bg-gray-900', 'text-white');
+        btnTodos.classList.remove('bg-gray-100', 'text-gray-600');
+      }
+    }
+    carregarDados();
+  };
+
+  // Funções do Modal de Edição
+  (window as any).abrirModalEdicao = (id: string, localizacao: string, urgencia: string, nome: string) => {
+    (document.getElementById('editAnimalId') as HTMLInputElement).value = id;
+    (document.getElementById('editLocalizacao') as HTMLSelectElement).value = localizacao;
+    (document.getElementById('editUrgencia') as HTMLSelectElement).value = urgencia;
+    document.getElementById('modalEdicaoTitulo')!.innerText = `Editar: ${nome}`;
+    document.getElementById('modalEdicao')!.classList.remove('hidden');
+  };
+
+  (window as any).fecharModalEdicao = () => {
+    document.getElementById('modalEdicao')!.classList.add('hidden');
+  };
+
+  (window as any).salvarEdicao = async () => {
+    const id = (document.getElementById('editAnimalId') as HTMLInputElement).value;
+    const localizacao = (document.getElementById('editLocalizacao') as HTMLSelectElement).value;
+    const situacao_urgencia = (document.getElementById('editUrgencia') as HTMLSelectElement).value;
+    const btn = document.getElementById('btnSalvarEdicao')!;
+    
+    btn.innerHTML = 'Salvando...';
+    btn.setAttribute('disabled', 'true');
+
+    try {
+      const { error } = await supabase
+        .from('animais')
+        .update({ localizacao, situacao_urgencia })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      (window as any).fecharModalEdicao();
+      carregarDados(); // Recarrega os cards
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao atualizar o status do animal.');
+    } finally {
+      btn.innerHTML = 'Salvar Alterações';
+      btn.removeAttribute('disabled');
     }
   };
 
