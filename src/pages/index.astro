@@ -40,6 +40,16 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
 
+    <!-- Filtros por Urgência (Chips) -->
+    <div>
+      <div class="flex overflow-x-auto pb-3 pt-1 gap-2 w-full" style="scrollbar-width: none;" id="botoesFiltro">
+        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-900 text-white" data-filtro="Todos">Todos</button>
+        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Urgências">🚨 Machucados</button>
+        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Desaparecidos">🔍 Desaparecidos</button>
+        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Abrigo">🏡 No Abrigo</button>
+      </div>
+    </div>
+
     <!-- Todos os Animais -->
     <div>
       <div class="flex justify-between items-center mb-4">
@@ -78,6 +88,105 @@ import Layout from '../layouts/Layout.astro';
   const loadingState = document.getElementById('loadingState');
   const bannerPendentes = document.getElementById('bannerPendentes');
   const qtdPendentes = document.getElementById('qtdPendentes');
+
+  let animaisGlobais: any[] = [];
+  let isAdminGlob = false;
+  let filtroAtual = 'Todos';
+
+  // Configurar botões de filtro
+  document.getElementById('botoesFiltro')?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.filtro-btn');
+    if (!btn) return;
+    
+    document.querySelectorAll('.filtro-btn').forEach(b => {
+      b.classList.remove('bg-gray-900', 'text-white');
+      b.classList.add('bg-gray-100', 'text-gray-600');
+    });
+    btn.classList.remove('bg-gray-100', 'text-gray-600');
+    btn.classList.add('bg-gray-900', 'text-white');
+
+    filtroAtual = btn.getAttribute('data-filtro') || 'Todos';
+    renderLista(animaisGlobais);
+  });
+
+  function renderLista(animais: any[]) {
+    let htmlNormal = '';
+    let filtrados = animais;
+
+    if (filtroAtual === 'Urgências') {
+      filtrados = animais.filter(a => a.situacao_urgencia === 'Machucado/Risco');
+    } else if (filtroAtual === 'Desaparecidos') {
+      filtrados = animais.filter(a => a.situacao_urgencia === 'Desaparecido' || a.localizacao.includes('Desaparecido'));
+    } else if (filtroAtual === 'Abrigo') {
+      filtrados = animais.filter(a => a.localizacao === 'Abrigo Takanil');
+    }
+
+    if (!filtrados || filtrados.length === 0) {
+      if (listaAnimais) {
+        listaAnimais.innerHTML = `
+          <div class="text-center py-10 px-4 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+            <span class="text-3xl mb-2 block">🐾</span>
+            <p class="text-gray-500 text-sm">Nenhum animal encontrado para este filtro.</p>
+          </div>`;
+      }
+      if (totalAnimaisEl) totalAnimaisEl.textContent = '0';
+      return;
+    }
+
+    const hoje = new Date();
+
+    filtrados.forEach((animal) => {
+      const dataCadastro = new Date(animal.created_at);
+      const diffTime = Math.abs(hoje.getTime() - dataCadastro.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+      // Badge de Urgência
+      let badgeUrgencia = '';
+      let imgStyle = '';
+      if (animal.situacao_urgencia === 'Machucado/Risco') {
+        badgeUrgencia = `<span class="inline-block bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1">🚨 Urgência Médica</span>`;
+        imgStyle = 'ring-2 ring-red-400 ring-offset-2';
+      } else if (animal.situacao_urgencia === 'Desaparecido' || animal.localizacao.includes('Desaparecido')) {
+        badgeUrgencia = `<span class="inline-block bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1">🔍 Desaparecido</span>`;
+      }
+
+      // Badges Secundárias (Tags)
+      let tags = '';
+      if (animal.quantidade > 1) tags += `<span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">📦 ${animal.quantidade} animais</span> `;
+      if (animal.vacinado === 'Sim') tags += `<span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded">💉 Vacinado</span> `;
+      if (animal.castrado === 'Sim') tags += `<span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">✂️ Castrado</span> `;
+
+      htmlNormal += `
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex gap-4 items-center group relative ${diffDays > 10 ? 'border-l-4 border-l-gray-300' : ''}">
+          <img src="${animal.imagem_url || ''}" class="w-20 h-20 rounded-lg object-cover bg-gray-100 flex-shrink-0 ${imgStyle}" alt="${animal.nome}">
+          <div class="flex-1 min-w-0 pr-8">
+            ${badgeUrgencia}
+            <h4 class="text-lg font-bold text-gray-800 truncate">${animal.nome}</h4>
+            <p class="text-xs text-gray-500 truncate mt-0.5">${animal.especie} • ${animal.fase_vida} • ${animal.peso}kg</p>
+            <div class="mt-1.5 flex flex-wrap gap-1">
+              ${tags}
+            </div>
+            <p class="text-[10px] font-medium text-blue-600 mt-1.5 truncate">📍 ${animal.localizacao}</p>
+          </div>
+          ${isAdminGlob ? `
+          <!-- Botão Excluir Registro -->
+          <button 
+            onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${animal.nome}')" 
+            title="Excluir cadastro" 
+            class="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+          ` : ''}
+        </div>
+      `;
+    });
+
+    if (listaAnimais) listaAnimais.innerHTML = htmlNormal;
+    if (totalAnimaisEl) totalAnimaisEl.textContent = filtrados.length.toString();
+  }
 
   // Função para deletar animal e imagem associada
   (window as any).deletarAnimal = async (id: string, imagem_url: string, nome: string) => {
@@ -128,7 +237,8 @@ import Layout from '../layouts/Layout.astro';
     let pendentes = animaisOriginais?.filter(a => a.status_moderacao === 'pendente') || [];
 
     const role = await getUserRole();
-    const isAdmin = role === 'adm' || role === 'dev';
+    isAdminGlob = role === 'adm' || role === 'dev';
+    const isAdmin = isAdminGlob;
 
     // Se não for admin, não mostra o banner de pendentes
     if (!isAdmin) {
@@ -166,63 +276,23 @@ import Layout from '../layouts/Layout.astro';
       if (bannerPendentes) bannerPendentes.classList.add('hidden');
     }
 
-    let htmlNormal = '';
-    let htmlAlertas = '';
-    let totalRacao = 0;
+    animaisGlobais = animais;
     
+    let totalRacao = 0;
+    let htmlAlertas = '';
     const hoje = new Date();
 
-    if (!animais || animais.length === 0) {
-      if (listaAnimais) {
-        listaAnimais.innerHTML = `
-          <div class="text-center py-8 text-gray-500 bg-white rounded-xl border border-gray-100">
-            Nenhum animal cadastrado ainda.
-          </div>`;
-      }
-      if (totalRacaoEl) totalRacaoEl.textContent = '0';
-      if (totalAnimaisEl) totalAnimaisEl.textContent = '0';
-      return;
-    }
-
     animais.forEach((animal) => {
-      // Cálculo de ração (apenas se estiver no abrigo)
       if (animal.localizacao === 'Abrigo Takanil' && animal.peso) {
-        // 1.5% do peso por dia, durante 30 dias
         totalRacao += (animal.peso * 0.015) * 30;
       }
 
-      // Cálculo de dias cadastrado
       const dataCadastro = new Date(animal.created_at);
       const diffTime = Math.abs(hoje.getTime() - dataCadastro.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-      const cardBase = `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex gap-4 items-center group relative ${diffDays > 10 ? 'border-l-4 border-l-red-500' : ''}">
-          <img src="${animal.imagem_url || ''}" class="w-20 h-20 rounded-lg object-cover bg-gray-100 flex-shrink-0" alt="${animal.nome}">
-          <div class="flex-1 min-w-0 pr-8">
-            <h4 class="text-lg font-bold text-gray-800 truncate">${animal.nome}</h4>
-            <p class="text-sm text-gray-500 truncate">${animal.especie} • ${animal.fase_vida} • ${animal.peso}kg</p>
-            <p class="text-xs font-medium text-blue-600 mt-1 truncate">📍 ${animal.localizacao}</p>
-            <p class="text-xs text-gray-400 mt-0.5">Cadastrado há ${diffDays} dias</p>
-          </div>
-          ${isAdmin ? `
-          <!-- Botão Excluir Registro / Foto Ruim -->
-          <button 
-            onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${animal.nome}')" 
-            title="Excluir cadastro" 
-            class="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
-          ` : ''}
-        </div>
-      `;
-
       if (diffDays > 10 && isAdmin) {
-        // Animal antigo: vai para a lista de alertas
-        const isDesaparecido = animal.status === 'Desaparecido' || animal.localizacao.includes('Desaparecido');
+        const isDesaparecido = animal.situacao_urgencia === 'Desaparecido' || animal.localizacao.includes('Desaparecido');
         const statusPergunta = isDesaparecido ? 'Já foi encontrado?' : 'Já foi adotado?';
         const novoStatusLabel = isDesaparecido ? 'Encontrado' : 'Adotado';
           
@@ -243,14 +313,9 @@ import Layout from '../layouts/Layout.astro';
             </div>
           </div>
         `;
-      } else {
-        htmlNormal += cardBase;
       }
     });
 
-    // Renderizar
-    if (listaAnimais) listaAnimais.innerHTML = htmlNormal || '<p class="text-gray-500 text-center">Nenhum animal recente.</p>';
-    
     if (htmlAlertas) {
       if (alertasContainer) alertasContainer.classList.remove('hidden');
       if (listaAlertas) listaAlertas.innerHTML = htmlAlertas;
@@ -260,7 +325,9 @@ import Layout from '../layouts/Layout.astro';
     }
 
     if (totalRacaoEl) totalRacaoEl.textContent = totalRacao.toFixed(1);
-    if (totalAnimaisEl) totalAnimaisEl.textContent = animais.length.toString();
+
+    // Primeira renderização da vitrine normal
+    renderLista(animaisGlobais);
   }
 
   // Iniciar
