@@ -192,6 +192,7 @@ import Layout from '../layouts/Layout.astro';
       let tags = '';
       if (animal.sexo === 'Macho') tags += `<span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded">♂ Macho</span> `;
       if (animal.sexo === 'Fêmea') tags += `<span class="bg-pink-50 text-pink-600 text-[10px] px-1.5 py-0.5 rounded">♀ Fêmea</span> `;
+      if (animal.sexo === 'Misto (Ninhada)') tags += `<span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">♂♀ Misto</span> `;
       if (animal.quantidade > 1) tags += `<span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">📦 ${animal.quantidade} animais</span> `;
       if (animal.vacinado === 'Sim') tags += `<span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded">💉 Vacinado</span> `;
       if (animal.castrado === 'Sim') tags += `<span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">✂️ Castrado</span> `;
