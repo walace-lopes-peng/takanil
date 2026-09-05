@@ -94,3 +94,39 @@ Para garantir produtividade sem sacrificar o aprendizado do usuário, o agente d
 * **Auditoria Reversa:** Encoraje o usuário a explicar o código gerado em vez de apenas fornecer explicações prontas. Confirme e corrija a lógica do usuário.
 * **Debug Investigativo:** Em caso de erros, não entregue apenas a solução mágica. Dê dicas e guie o processo de investigação para que o usuário encontre a causa raiz.
 * **Documentação como Prova de Conhecimento:** Se uma solução complexa for adotada e entendida, registre-a junto ao usuário no documento de arquitetura.
+
+## Regra: Mockup visual antes de qualquer implementação de UI
+
+Sempre que você sugerir, propor ou descrever uma implementação que envolva interface visual (um card, tela, componente, botão, formulário, modal, badge de status, notificação etc.), você DEVE mostrar um mockup ilustrativo em texto/ASCII de como ficaria na prática — antes de escrever código e antes de abrir o ticket. Não pule essa etapa mesmo que a mudança pareça simples.
+
+### Como montar o mockup
+
+1. Use barras verticais e traços ("|", "-") ou caracteres de desenho de caixa (┌ ─ ┐ │ └ ┘) para representar os limites do componente.
+2. Preencha com dados de exemplo REALISTAS do domínio do projeto (nomes, valores, status reais) — nunca "Lorem ipsum" ou texto genérico.
+3. Represente elementos interativos entre colchetes, indicando o tipo:
+   - Botões: [Adotado!]
+   - Ícones: [🖊️] [🏠] [✅]
+   - Campos de texto: [_________]
+4. Se a mudança tiver mais de um estado (antes/depois de um clique, sucesso/erro, vazio/preenchido), mostre os estados relevantes em sequência, cada um com um título curto ("Antes:" / "Depois:").
+5. Use uma seta (←) com um comentário curto para destacar qualquer elemento que precise de atenção (cor, novo comportamento, algo não óbvio).
+
+### Exemplo de referência (siga este padrão)
+
+    [foto]  Rex                              [🖊️]
+            Abrigo • 12kg
+            [🏠 Abrigo]
+
+            [✅ Adotado!] ← botão verde
+
+    Ao clicar: confirm() em português "Confirmar que Rex foi adotado?".
+    Se OK → atualiza e o card some da lista principal.
+
+### Depois do mockup
+
+- Escreva, em 1 a 3 linhas, o comportamento da interação principal (o que acontece ao clicar, o que é validado, se há confirmação, o que muda na tela).
+- Se ao desenhar o mockup você perceber uma regra de negócio ambígua ou não especificada (ex.: "o que acontece com o status quando X acontece"), PARE e pergunte antes de continuar. Não assuma o comportamento e não abra o ticket ainda.
+- Só depois de o mockup ser validado (ou a dúvida ser respondida), siga para o código ou para a criação do ticket usando os templates padrão do repositório (bug_report.yml / feature_request.yml / task.yml).
+
+### Quando NÃO aplicar
+
+Mudanças sem componente visual (refatoração de backend, ajuste de performance, correção de tipagem, migração de banco) não precisam de mockup — mas ainda devem seguir os templates de ticket normalmente.
