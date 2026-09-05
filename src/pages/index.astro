@@ -133,19 +133,19 @@ import Layout from '../layouts/Layout.astro';
   </div>
 
   <!-- Botões Flutuantes (FABs) -->
-  <div class="fixed bottom-24 right-6 flex flex-col items-center gap-4 z-30" id="fabsContainer">
+  <div class="fixed bottom-24 right-6 flex flex-col items-center gap-2 z-30" id="fabsContainer">
     <!-- FAB Associar -->
     <div class="flex flex-col items-center gap-1" id="fabAssociarWrapper">
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" id="fabAssociar" target="_blank" rel="noopener noreferrer" class="bg-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-pink-700 active:scale-95 transition-all w-16 h-16">
-        <span class="text-2xl">💖</span>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" id="fabAssociar" target="_blank" rel="noopener noreferrer" class="bg-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-pink-700 active:scale-95 transition-all w-12 h-12">
+        <span class="text-xl">💖</span>
       </a>
       <span id="fabAssociarText" class="font-bold text-[10px] uppercase tracking-wider text-gray-800 drop-shadow-sm transition-opacity duration-300">ASSOCIAR</span>
     </div>
     
     <!-- FAB Sugerir/Novo Animal -->
     <div class="flex flex-col items-center gap-1" id="fabAddAnimalWrapper">
-      <a href="/sugerir-animal" id="fabAddAnimal" class="bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 active:scale-95 transition-all w-16 h-16">
-        <span id="fabIcon" class="text-2xl">🐾</span>
+      <a href="/sugerir-animal" id="fabAddAnimal" class="bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 active:scale-95 transition-all w-12 h-12">
+        <span id="fabIcon" class="text-xl">🐾</span>
       </a>
       <span id="fabText" class="font-bold text-[10px] uppercase tracking-wider text-gray-800 drop-shadow-sm transition-opacity duration-300">SUGERIR</span>
     </div>
@@ -476,7 +476,7 @@ import Layout from '../layouts/Layout.astro';
       
       if (fab) {
         fab.href = '/animais/novo';
-        fab.className = 'w-16 h-16 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-95 transition-all';
+        fab.className = 'w-12 h-12 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-95 transition-all';
       }
       if (fabIcon) fabIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
       if (fabIcon) fabIcon.className = ''; // Remove custom text classes
