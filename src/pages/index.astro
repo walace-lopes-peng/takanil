@@ -132,11 +132,20 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </div>
 
-  <!-- Botão Flutuante (FAB) -->
-  <a href="/sugerir-animal" id="fabAddAnimal" class="fixed bottom-24 right-6 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 active:scale-95 transition-all z-30 px-5 h-14 gap-2">
-    <span id="fabIcon" class="text-xl">📣</span>
-    <span id="fabText" class="font-bold text-sm whitespace-nowrap">Sugerir</span>
-  </a>
+  <!-- Botões Flutuantes (FABs) -->
+  <div class="fixed bottom-24 right-6 flex flex-col items-end gap-3 z-30">
+    <!-- FAB Associar -->
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" target="_blank" rel="noopener noreferrer" class="bg-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-pink-700 active:scale-95 transition-all px-5 h-14 gap-2">
+      <span class="text-xl">💖</span>
+      <span class="font-bold text-sm whitespace-nowrap">Associar</span>
+    </a>
+    
+    <!-- FAB Sugerir/Novo Animal -->
+    <a href="/sugerir-animal" id="fabAddAnimal" class="bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 active:scale-95 transition-all px-5 h-14 gap-2">
+      <span id="fabIcon" class="text-xl">🐾</span>
+      <span id="fabText" class="font-bold text-sm whitespace-nowrap">Sugerir Animal</span>
+    </a>
+  </div>
 
 </Layout>
 
@@ -459,7 +468,7 @@ import Layout from '../layouts/Layout.astro';
     if (session) {
       if (fab) {
         fab.href = '/animais/novo';
-        fab.className = 'fixed bottom-24 right-6 w-14 h-14 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-95 transition-all z-30';
+        fab.className = 'w-14 h-14 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-95 transition-all';
       }
       if (fabIcon) fabIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
       if (fabIcon) fabIcon.className = ''; // Remove custom text classes
