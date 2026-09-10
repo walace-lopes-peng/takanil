@@ -135,15 +135,15 @@ import Layout from '../layouts/Layout.astro';
   <!-- Botões Flutuantes (FABs) -->
   <div class="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-30" id="fabsContainer">
     <!-- FAB Associar -->
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" id="fabAssociar" target="_blank" rel="noopener noreferrer" class="bg-white/60 backdrop-blur-md text-pink-600 border border-pink-100/50 rounded-full flex items-center justify-center shadow-lg hover:bg-white/90 active:scale-95 transition-all px-4 py-3 gap-2" title="Quero ser um associado">
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" id="fabAssociar" target="_blank" rel="noopener noreferrer" class="backdrop-blur-md text-white border border-pink-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-4 py-3 gap-2" style="background-color: rgba(236, 72, 153, 0.85);" title="Quero ser um associado">
       <span class="text-xl">💖</span>
-      <span id="fabAssociarText" class="font-bold text-xs uppercase tracking-wider text-pink-700">ASSOCIAR</span>
+      <span id="fabAssociarText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[100px] opacity-100">ASSOCIAR</span>
     </a>
     
     <!-- FAB Sugerir/Novo Animal -->
-    <a href="/sugerir-animal" id="fabAddAnimal" class="bg-taka-green-600/70 backdrop-blur-md text-white border border-taka-green-500/50 rounded-full flex items-center justify-center shadow-lg hover:bg-taka-green-600/90 active:scale-95 transition-all px-4 py-3 gap-2 shadow-taka-green-600/30" style="animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;" title="Sugerir novo animal">
+    <a href="/sugerir-animal" id="fabAddAnimal" class="backdrop-blur-md text-white border border-taka-green-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-4 py-3 gap-2 shadow-taka-green-600/30" style="background-color: rgba(55, 176, 141, 0.85);" title="Sugerir novo animal">
       <span id="fabIcon" class="text-xl drop-shadow-sm">🐾</span>
-      <span id="fabText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm">SUGERIR</span>
+      <span id="fabText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[100px] opacity-100">SUGERIR</span>
     </a>
   </div>
 
@@ -480,7 +480,8 @@ import Layout from '../layouts/Layout.astro';
       
       if (fab) {
         fab.href = '/animais/novo';
-        fab.className = 'bg-taka-orange-500/70 backdrop-blur-md text-white border border-taka-orange-400/50 rounded-full flex items-center justify-center shadow-lg hover:bg-taka-orange-600/90 active:scale-95 transition-all px-4 py-3 gap-2 shadow-taka-orange-500/30';
+        fab.className = 'backdrop-blur-md text-white border border-taka-orange-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-4 py-3 gap-2 shadow-taka-orange-500/30';
+        fab.style.backgroundColor = 'rgba(254, 118, 32, 0.85)'; // taka-orange
       }
       if (fabIcon) fabIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>`;
       if (fabIcon) fabIcon.className = ''; 
@@ -490,8 +491,50 @@ import Layout from '../layouts/Layout.astro';
       }
     }
 
-    // Removida lógica antiga que ocultava o texto do FAB no scroll
-    // Os FABs agora ficam em formato de pílula fixa
+    // Lógica de recolher (collapse) os FABs no scroll
+    const fabAssociar = document.getElementById('fabAssociar');
+    const fabAssociarText = document.getElementById('fabAssociarText');
+    let scrollTimeout;
+
+    const setFabState = (collapsed) => {
+      const stateConfigs = [
+        { btn: fab, text: fabText },
+        { btn: fabAssociar, text: fabAssociarText }
+      ];
+
+      stateConfigs.forEach(({ btn, text }) => {
+        if (!btn || !text) return;
+        
+        if (collapsed) {
+          // Recolher: esconde texto, tira gap, reduz opacidade do botão para ficar "transparente"
+          text.style.maxWidth = '0px';
+          text.style.opacity = '0';
+          btn.classList.remove('px-4', 'gap-2');
+          btn.classList.add('px-3'); // vira um círculo
+          btn.style.opacity = '0.5';
+        } else {
+          // Expandir: volta tudo ao normal
+          text.style.maxWidth = '100px';
+          text.style.opacity = '1';
+          btn.classList.add('px-4', 'gap-2');
+          btn.classList.remove('px-3');
+          btn.style.opacity = '1';
+        }
+      });
+    };
+
+    window.addEventListener('scroll', () => {
+      // Ao começar a rolar, imediatamente recolhe
+      setFabState(true);
+
+      // Limpa o temporizador antigo se a pessoa continuar rolando
+      clearTimeout(scrollTimeout);
+
+      // Define um novo temporizador de 3 segundos para expandir
+      scrollTimeout = setTimeout(() => {
+        setFabState(false);
+      }, 3000);
+    }, { passive: true });
 
     if (error) {
       console.error(error);
