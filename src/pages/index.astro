@@ -494,9 +494,9 @@ import Layout from '../layouts/Layout.astro';
     // Lógica de recolher (collapse) os FABs no scroll
     const fabAssociar = document.getElementById('fabAssociar');
     const fabAssociarText = document.getElementById('fabAssociarText');
-    let scrollTimeout;
+    let scrollTimeout: number;
 
-    const setFabState = (collapsed) => {
+    const setFabState = (collapsed: boolean) => {
       const stateConfigs = [
         { btn: fab, text: fabText },
         { btn: fabAssociar, text: fabAssociarText }
