@@ -8,8 +8,8 @@
   "theme_color": "#37b08d",
   "icons": [
     {
-      "src": "/logo.png",
-      "type": "image/png",
+      "src": "/assets/takanil-icon-png.jpg",
+      "type": "image/jpeg",
       "sizes": "512x512"
     }
   ]
