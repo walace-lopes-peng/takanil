@@ -1,0 +1,94 @@
+name: "🐛 Bug Report"
+description: Reportar um problema ou comportamento inesperado no sistema
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Preencha as informações abaixo com o máximo de detalhes possível — isso acelera o diagnóstico e a correção.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do bug
+      description: Uma descrição clara e concisa do problema.
+      placeholder: Descreva o que está acontecendo...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      description: Como podemos reproduzir o comportamento?
+      placeholder: |
+        1. Vá até '...'
+        2. Clique em '...'
+        3. Role até '...'
+        4. Veja o erro
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+      description: O que deveria acontecer?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamento atual
+      description: O que está acontecendo de fato?
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots, vídeos ou logs
+      description: Se aplicável, anexe evidências visuais ou trechos de log/stack trace.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severidade
+      options:
+        - Crítica (sistema fora do ar / bloqueio total)
+        - Alta (funcionalidade principal quebrada)
+        - Média (funcionalidade secundária afetada)
+        - Baixa (problema cosmético / menor)
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Ambiente
+      description: SO, navegador, versão do app/API, dispositivo, branch etc.
+      placeholder: "ex: Windows 11, Chrome 128, App v2.3.1, branch main"
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto adicional
+      description: Qualquer outra informação relevante (quando começou, frequência, workaround conhecido).
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Verifiquei que esse bug ainda não foi reportado em outra issue
+          required: true
+        - label: Estou usando a versão mais recente disponível
+          required: false

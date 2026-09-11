@@ -40,11 +40,11 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     {!modoEdicao && (
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Foto do Animal</label>
-      <label for="fotoInput" class="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-blue-400 hover:bg-blue-50/30 transition-all bg-gray-50 cursor-pointer w-full text-center group" id="fotoContainer">
-        <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-blue-500 transition-colors pointer-events-none" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+      <label for="fotoInput" class="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-taka-green-400 hover:bg-taka-green-50/30 transition-all bg-gray-50 cursor-pointer w-full text-center group" id="fotoContainer">
+        <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-taka-green-500 transition-colors pointer-events-none" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <span class="mt-2 text-sm font-medium text-blue-600 group-hover:text-blue-700 pointer-events-none">
+        <span class="mt-2 text-sm font-medium text-taka-green-600 group-hover:text-taka-green-700 pointer-events-none">
           Tirar Foto ou Escolher da Galeria
         </span>
         <span class="text-xs text-gray-400 mt-1 pointer-events-none">
@@ -54,7 +54,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       </label>
       <div id="fotoPreviewContainer" class="hidden mt-2 relative rounded-xl overflow-hidden aspect-video bg-gray-100">
           <img id="fotoPreview" class="object-cover w-full h-full" src="" alt="Preview da foto">
-          <button type="button" id="removerFoto" class="absolute top-2 right-2 bg-gray-900/70 text-white p-1.5 rounded-full backdrop-blur-sm">
+          <button type="button" id="removerFoto" class="absolute top-2 right-2 bg-taka-orange-500/70 text-white p-1.5 rounded-full backdrop-blur-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -66,7 +66,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Animal <span class="text-gray-400 font-normal">(Opcional)</span></label>
-        <input type="text" name="nome" id="nome" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: Rex (deixe em branco se não souber)" value={dadosIniciais?.nome && dadosIniciais.nome !== 'Desconhecido' ? dadosIniciais.nome : ''}>
+        <input type="text" name="nome" id="nome" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: Rex (deixe em branco se não souber)" value={dadosIniciais?.nome && dadosIniciais.nome !== 'Desconhecido' ? dadosIniciais.nome : ''}>
       </div>
     </div>
 
@@ -76,19 +76,19 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       <div class="grid grid-cols-3 gap-2">
         <label class="cursor-pointer">
           <input type="radio" name="especie" value="Cão" class="peer sr-only" required checked={dadosIniciais?.especie === 'Cão'}>
-          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all text-sm">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all text-sm">
             🐶 Cão
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="especie" value="Gato" class="peer sr-only" checked={dadosIniciais?.especie === 'Gato'}>
-          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all text-sm">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all text-sm">
             🐱 Gato
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="especie" value="Ambos/Múltiplos" class="peer sr-only" checked={dadosIniciais?.especie === 'Ambos/Múltiplos'}>
-          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all text-sm">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all text-sm">
             🐶🐱 Ambos
           </div>
         </label>
@@ -126,7 +126,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       <div class="grid grid-cols-4 gap-2">
         <label class="cursor-pointer">
           <input type="radio" name="sexo" value="Macho" class="peer sr-only" required checked={dadosIniciais?.sexo === 'Macho'}>
-          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:font-medium transition-all">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all">
             ♂ Macho
           </div>
         </label>
@@ -154,13 +154,13 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     <!-- Peso -->
     <div>
       <label for="peso" class="block text-sm font-medium text-gray-700">Peso Aproximado(kg)</label>
-      <input type="number" name="peso" id="peso" step="0.1" min="0.1" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: 4.5" value={dadosIniciais?.peso ?? ''}>
+      <input type="number" name="peso" id="peso" step="0.1" min="0.1" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: 4.5" value={dadosIniciais?.peso ?? ''}>
     </div>
 
     <!-- Localização / Situação -->
     <div>
       <label for="localizacao" class="block text-sm font-medium text-gray-700">Onde o animal está?</label>
-      <select name="localizacao" id="localizacao" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50">
+      <select name="localizacao" id="localizacao" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50">
         <option value="Abrigo Takanil" selected={dadosIniciais?.localizacao === 'Abrigo Takanil'}>Abrigo Takanil (Consome Ração)</option>
         <option value="Na rua" selected={dadosIniciais?.localizacao === 'Na rua'}>Na rua (sem abrigo)</option>
         <option value="Lar Temporário" selected={dadosIniciais?.localizacao === 'Lar Temporário'}>Lar Temporário</option>
@@ -198,12 +198,12 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       <!-- Quantidade -->
       <div>
         <label for="quantidade" class="block text-sm font-medium text-gray-700">Quantidade</label>
-        <input type="number" name="quantidade" id="quantidade" min="1" value={dadosIniciais?.quantidade ?? 1} required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50">
+        <input type="number" name="quantidade" id="quantidade" min="1" value={dadosIniciais?.quantidade ?? 1} required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50">
       </div>
       <!-- Temperamento -->
       <div>
         <label for="temperamento" class="block text-sm font-medium text-gray-700">Temperamento</label>
-        <select name="temperamento" id="temperamento" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border bg-gray-50">
+        <select name="temperamento" id="temperamento" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50">
           <option value="Não informado" selected={!dadosIniciais?.temperamento || dadosIniciais.temperamento === 'Não informado'}>Não informado</option>
           <option value="Dócil" selected={dadosIniciais?.temperamento === 'Dócil'}>Dócil</option>
           <option value="Brincalhão" selected={dadosIniciais?.temperamento === 'Brincalhão'}>Brincalhão</option>
@@ -219,24 +219,24 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Vacinado?</label>
         <div class="grid grid-cols-3 gap-1">
-          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Sim" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">Sim</div></label>
-          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">Não</div></label>
-          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não sei" class="peer sr-only" checked><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">?</div></label>
+          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Sim" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">Sim</div></label>
+          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">Não</div></label>
+          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não sei" class="peer sr-only" checked><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">?</div></label>
         </div>
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Castrado?</label>
         <div class="grid grid-cols-3 gap-1">
-          <label class="cursor-pointer"><input type="radio" name="castrado" value="Sim" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">Sim</div></label>
-          <label class="cursor-pointer"><input type="radio" name="castrado" value="Não" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">Não</div></label>
-          <label class="cursor-pointer"><input type="radio" name="castrado" value="Não sei" class="peer sr-only" checked><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 transition-all">?</div></label>
+          <label class="cursor-pointer"><input type="radio" name="castrado" value="Sim" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">Sim</div></label>
+          <label class="cursor-pointer"><input type="radio" name="castrado" value="Não" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">Não</div></label>
+          <label class="cursor-pointer"><input type="radio" name="castrado" value="Não sei" class="peer sr-only" checked><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">?</div></label>
         </div>
       </div>
     </div>
 
     <!-- Submit -->
     <div class="pt-4">
-      <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 active:scale-[0.98] transition-all disabled:opacity-70">
+      <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-taka-orange-500 hover:bg-taka-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-orange-500 active:scale-[0.98] transition-all disabled:opacity-70">
         <span>{btnText}</span>
         <svg id="loadingSpinner" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

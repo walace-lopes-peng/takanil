@@ -7,13 +7,13 @@ import Layout from '../layouts/Layout.astro';
   <div class="space-y-6 pb-20">
     
     <!-- Header / Ração -->
-    <div class="bg-blue-600 text-white rounded-2xl p-6 shadow-sm">
-      <h2 class="text-sm font-medium text-blue-100 mb-1">Previsão de Ração (Mensal)</h2>
+    <div class="bg-gradient-to-br from-taka-green-500 to-taka-green-700 text-white rounded-2xl p-6 shadow-md border border-taka-green-400/50">
+      <h2 class="text-sm font-medium text-taka-green-100 mb-1">Previsão de Ração (Mensal)</h2>
       <div class="flex items-baseline space-x-2">
         <span class="text-4xl font-bold" id="totalRacao">--</span>
-        <span class="text-blue-200">kg/mês</span>
+        <span class="text-taka-green-200">kg/mês</span>
       </div>
-      <p class="text-xs text-blue-200 mt-2">*Apenas para animais no Abrigo Takanil (aprox. 1.5% peso/dia)</p>
+      <p class="text-xs text-taka-green-200 mt-2">*Apenas para animais no Abrigo Takanil (aprox. 1.5% peso/dia)</p>
     </div>
 
     <!-- Banner de Pendências -->
@@ -50,7 +50,7 @@ import Layout from '../layouts/Layout.astro';
       </button>
 
       <div class="flex overflow-x-auto pb-3 pt-1 px-2 gap-2 w-full" style="scrollbar-width: none;" id="botoesFiltro">
-        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-900 text-white" data-filtro="Todos">Todos</button>
+        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-taka-orange-500 text-white" data-filtro="Todos">Todos</button>
         <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Urgências">🚨 Machucados</button>
         <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Desaparecidos">🔍 Desaparecidos</button>
         <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Abrigo">🏡 No Abrigo</button>
@@ -104,7 +104,7 @@ import Layout from '../layouts/Layout.astro';
         
         <div>
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Localização</label>
-          <select id="editLocalizacao" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-3 border bg-white">
+          <select id="editLocalizacao" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 text-sm p-3 border bg-white">
             <option value="Abrigo Takanil">Abrigo Takanil</option>
             <option value="Na rua">Na rua</option>
             <option value="Lar Temporário">Lar Temporário</option>
@@ -115,7 +115,7 @@ import Layout from '../layouts/Layout.astro';
 
         <div>
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Situação / Resolução</label>
-          <select id="editUrgencia" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm p-3 border bg-white">
+          <select id="editUrgencia" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 text-sm p-3 border bg-white">
             <option value="Nenhuma">Normal (Nenhuma)</option>
             <option value="Machucado/Risco">🚨 Machucado / Risco</option>
             <option value="Desaparecido">🔍 Desaparecido</option>
@@ -127,28 +127,24 @@ import Layout from '../layouts/Layout.astro';
       </div>
       <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
         <button onclick="fecharModalEdicao()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
-        <button onclick="salvarEdicao()" id="btnSalvarEdicao" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm">Salvar Alterações</button>
+        <button onclick="salvarEdicao()" id="btnSalvarEdicao" class="px-4 py-2 text-sm font-medium text-white bg-taka-green-600 hover:bg-taka-green-700 rounded-xl transition-colors shadow-sm">Salvar Alterações</button>
       </div>
     </div>
   </div>
 
   <!-- Botões Flutuantes (FABs) -->
-  <div class="fixed bottom-24 right-6 flex flex-col items-center gap-2 z-30" id="fabsContainer">
+  <div class="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-30" id="fabsContainer">
     <!-- FAB Associar -->
-    <div class="flex flex-col items-center gap-1" id="fabAssociarWrapper">
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" id="fabAssociar" target="_blank" rel="noopener noreferrer" class="bg-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-pink-700 active:scale-95 transition-all w-12 h-12">
-        <span class="text-xl">💖</span>
-      </a>
-      <span id="fabAssociarText" class="font-bold text-[10px] uppercase tracking-wider text-gray-800 drop-shadow-sm transition-opacity duration-300">ASSOCIAR</span>
-    </div>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" id="fabAssociar" target="_blank" rel="noopener noreferrer" class="backdrop-blur-md text-white border border-pink-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-50 hover:opacity-100" style="background-color: rgba(236, 72, 153, 0.85);" title="Quero ser um associado">
+      <span class="text-xl">💖</span>
+      <span id="fabAssociarText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[0px] opacity-0">ASSOCIAR</span>
+    </a>
     
     <!-- FAB Sugerir/Novo Animal -->
-    <div class="flex flex-col items-center gap-1" id="fabAddAnimalWrapper">
-      <a href="/sugerir-animal" id="fabAddAnimal" class="bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 active:scale-95 transition-all w-12 h-12">
-        <span id="fabIcon" class="text-xl">🐾</span>
-      </a>
-      <span id="fabText" class="font-bold text-[10px] uppercase tracking-wider text-gray-800 drop-shadow-sm transition-opacity duration-300">SUGERIR</span>
-    </div>
+    <a href="/sugerir-animal" id="fabAddAnimal" class="backdrop-blur-md text-white border border-taka-green-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-50 hover:opacity-100 shadow-taka-green-600/30" style="background-color: rgba(55, 176, 141, 0.85);" title="Sugerir novo animal">
+      <span id="fabIcon" class="text-xl drop-shadow-sm">🐾</span>
+      <span id="fabText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[0px] opacity-0">SUGERIR</span>
+    </a>
   </div>
 
 </Layout>
@@ -177,11 +173,11 @@ import Layout from '../layouts/Layout.astro';
     if (!btn) return;
     
     document.querySelectorAll('.filtro-btn').forEach(b => {
-      b.classList.remove('bg-gray-900', 'text-white');
+      b.classList.remove('bg-taka-orange-500', 'text-white');
       b.classList.add('bg-gray-100', 'text-gray-600');
     });
     btn.classList.remove('bg-gray-100', 'text-gray-600');
-    btn.classList.add('bg-gray-900', 'text-white');
+    btn.classList.add('bg-taka-orange-500', 'text-white');
 
     // Resetar Finais Felizes se clicar num pill normal
     if (mostrarFinaisFelizes) {
@@ -276,21 +272,21 @@ import Layout from '../layouts/Layout.astro';
         badgeUrgencia = `<span class="inline-block bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-sm border border-green-200">✅ Adotado</span>`;
         isResolvido = true;
       } else if (animal.situacao_urgencia === 'Tutor Encontrado') {
-        badgeUrgencia = `<span class="inline-block bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-sm border border-blue-200">🏠 Voltou pro Tutor</span>`;
+        badgeUrgencia = `<span class="inline-block bg-taka-green-100 text-taka-green-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-sm border border-taka-green-200">🏠 Voltou pro Tutor</span>`;
         isResolvido = true;
       }
 
       // Badges Secundárias (Tags)
       let tags = '';
-      if (animal.sexo === 'Macho') tags += `<span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded">♂ Macho</span> `;
+      if (animal.sexo === 'Macho') tags += `<span class="bg-taka-green-50 text-taka-green-600 text-[10px] px-1.5 py-0.5 rounded">♂ Macho</span> `;
       if (animal.sexo === 'Fêmea') tags += `<span class="bg-pink-50 text-pink-600 text-[10px] px-1.5 py-0.5 rounded">♀ Fêmea</span> `;
       if (animal.sexo === 'Misto (Ninhada)') tags += `<span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">♂♀ Misto</span> `;
       if (animal.quantidade > 1) tags += `<span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">📦 ${animal.quantidade} animais</span> `;
-      if (animal.vacinado === 'Sim') tags += `<span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded">💉 Vacinado</span> `;
+      if (animal.vacinado === 'Sim') tags += `<span class="bg-taka-green-50 text-taka-green-600 text-[10px] px-1.5 py-0.5 rounded">💉 Vacinado</span> `;
       if (animal.castrado === 'Sim') tags += `<span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">✂️ Castrado</span> `;
 
       htmlNormal += `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex gap-4 items-center group relative ${isResolvido ? 'bg-gray-50 border-gray-200' : (diffDays > 10 ? 'border-l-4 border-l-gray-300' : '')}">
+        <div class="bg-taka-orange-50/80 rounded-xl shadow-sm border border-taka-orange-200/60 p-4 flex gap-4 items-center group relative hover:shadow-md transition-all ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-70' : (diffDays > 10 ? 'border-l-4 border-l-gray-300' : '')}">
           <img src="${animal.imagem_url || ''}" class="w-20 h-20 rounded-lg object-cover bg-gray-100 flex-shrink-0" alt="${animal.nome}">
           <div class="flex-1 min-w-0 pr-8">
             ${badgeUrgencia}
@@ -299,7 +295,7 @@ import Layout from '../layouts/Layout.astro';
             <div class="mt-1.5 flex flex-wrap gap-1">
               ${tags}
             </div>
-            ${!isResolvido ? `<p class="text-[10px] font-medium text-blue-600 mt-1.5 truncate">📍 ${animal.localizacao}</p>` : ''}
+            ${!isResolvido ? `<p class="text-[10px] font-medium text-taka-green-600 mt-1.5 truncate">📍 ${animal.localizacao}</p>` : ''}
             <p class="text-[9px] text-gray-400 mt-0.5">Cadastrado em ${dataFormatada}</p>
           </div>
           ${isAdminGlob ? `
@@ -308,7 +304,7 @@ import Layout from '../layouts/Layout.astro';
             <button 
               onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${animal.nome}')" 
               title="Editar Status" 
-              class="p-2 text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              class="p-2 text-gray-300 hover:text-taka-green-600 hover:bg-taka-green-50 rounded-lg transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -378,7 +374,7 @@ import Layout from '../layouts/Layout.astro';
       
       // Apaga pílulas
       document.querySelectorAll('.filtro-btn').forEach(b => {
-        b.classList.remove('bg-gray-900', 'text-white');
+        b.classList.remove('bg-taka-orange-500', 'text-white');
         b.classList.add('bg-gray-100', 'text-gray-600');
       });
     } else {
@@ -390,7 +386,7 @@ import Layout from '../layouts/Layout.astro';
       filtroAtual = 'Todos';
       const btnTodos = document.querySelector('.filtro-btn[data-filtro="Todos"]');
       if (btnTodos) {
-        btnTodos.classList.add('bg-gray-900', 'text-white');
+        btnTodos.classList.add('bg-taka-orange-500', 'text-white');
         btnTodos.classList.remove('bg-gray-100', 'text-gray-600');
       }
     }
@@ -477,44 +473,74 @@ import Layout from '../layouts/Layout.astro';
     const fab = document.getElementById('fabAddAnimal') as HTMLAnchorElement;
     const fabIcon = document.getElementById('fabIcon');
     const fabText = document.getElementById('fabText');
-    const fabAssociarWrapper = document.getElementById('fabAssociarWrapper');
-    const fabAssociarText = document.getElementById('fabAssociarText');
-
+    
     if (session && isAdminGlob) {
-      if (fabAssociarWrapper) fabAssociarWrapper.style.display = 'none';
+      const fabAssociar = document.getElementById('fabAssociar');
+      if (fabAssociar) fabAssociar.style.display = 'none';
       
       if (fab) {
         fab.href = '/animais/novo';
-        fab.className = 'w-12 h-12 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-800 active:scale-95 transition-all';
+        fab.className = 'backdrop-blur-md text-white border border-taka-orange-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-50 shadow-taka-orange-500/30';
+        fab.style.backgroundColor = 'rgba(254, 118, 32, 0.85)'; // taka-orange
       }
-      if (fabIcon) fabIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
-      if (fabIcon) fabIcon.className = ''; // Remove custom text classes
-      if (fabText) fabText.style.display = 'none';
+      if (fabIcon) fabIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>`;
+      if (fabIcon) fabIcon.className = ''; 
+      if (fabText) {
+        fabText.innerText = 'CADASTRAR';
+        fabText.style.display = 'block';
+      }
     }
 
-    // Scroll dinâmico para ocultar texto suavemente
-    let lastScrollY = window.scrollY;
-    window.addEventListener('scroll', () => {
-      const currentScrollY = window.scrollY;
-      const isScrollingDown = currentScrollY > lastScrollY && currentScrollY > 50;
-      
-      const toggleText = (textEl: HTMLElement | null) => {
-        if (!textEl) return;
-        if (isScrollingDown) {
-          textEl.style.opacity = '0';
-          textEl.style.pointerEvents = 'none';
-        } else {
-          textEl.style.opacity = '1';
-          textEl.style.pointerEvents = 'auto';
-        }
-      };
+    // Lógica de recolher (collapse) os FABs no scroll
+    const fabAssociar = document.getElementById('fabAssociar');
+    const fabAssociarText = document.getElementById('fabAssociarText');
+    let scrollTimeout: number;
 
-      if (!isAdminGlob) {
-        toggleText(fabText);
-        toggleText(fabAssociarText);
+    const setFabState = (collapsed: boolean) => {
+      const stateConfigs = [
+        { btn: fab, text: fabText },
+        { btn: fabAssociar, text: fabAssociarText }
+      ];
+
+      stateConfigs.forEach(({ btn, text }) => {
+        if (!btn || !text) return;
+        
+        if (collapsed) {
+          // Recolher: esconde texto, tira gap, reduz opacidade do botão
+          text.style.maxWidth = '0px';
+          text.style.opacity = '0';
+          btn.classList.remove('px-4', 'py-3', 'gap-2');
+          btn.classList.add('px-3');
+          btn.style.opacity = '0.5';
+        } else {
+          // Expandir: mostra texto
+          text.style.maxWidth = '100px';
+          text.style.opacity = '1';
+          btn.classList.add('px-4', 'py-3', 'gap-2');
+          btn.classList.remove('px-3');
+          btn.style.opacity = '1';
+        }
+      });
+    };
+
+    // Estado inicial já vem recolhido no HTML. Apenas garantimos a variável
+    let isCollapsed = true;
+
+    window.addEventListener('scroll', () => {
+      // Ao começar a rolar, expande (se estiver recolhido)
+      if (isCollapsed) {
+        setFabState(false);
+        isCollapsed = false;
       }
-      
-      lastScrollY = currentScrollY;
+
+      // Limpa o temporizador se a pessoa continuar rolando
+      clearTimeout(scrollTimeout);
+
+      // Define um novo temporizador de 1 segundo para recolher após PARAR de rolar
+      scrollTimeout = setTimeout(() => {
+        setFabState(true);
+        isCollapsed = true;
+      }, 1000);
     }, { passive: true });
 
     if (error) {
