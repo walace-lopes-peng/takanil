@@ -127,17 +127,19 @@ jobs:
             // ─── Buscar dados em paralelo ─────────────────────────────────────
 
             core.info('Buscando milestones...');
-            const [numV092, numV093, numV11] = await Promise.all([
-              getMilestoneNumber('v0.9.2 — Bugs e Acessibilidade'),
-              getMilestoneNumber('v0.9.3 — Segurança e LGPD'),
-              getMilestoneNumber('v1.1 — Backlog de funcionalidades'),
+            const [numV101, numV110, numV120, numV110b] = await Promise.all([
+              getMilestoneNumber('v0.10.1 — Bugs e Acessibilidade'),
+              getMilestoneNumber('v0.11.0 — Segurança e LGPD'),
+              getMilestoneNumber('v0.12.0 — Vitrine Pública e Fase 4'),
+              getMilestoneNumber('v1.1.0 — Backlog de funcionalidades'),
             ]);
 
             core.info('Buscando issues e PRs...');
-            const [issues092, issues093, issues11, blocked, prs] = await Promise.all([
-              getIssuesByMilestone(numV092),
-              getIssuesByMilestone(numV093),
-              getIssuesByMilestone(numV11),
+            const [issues101, issues110, issues120, issues110b, blocked, prs] = await Promise.all([
+              getIssuesByMilestone(numV101),
+              getIssuesByMilestone(numV110),
+              getIssuesByMilestone(numV120),
+              getIssuesByMilestone(numV110b),
               getBlockedIssues(),
               getOpenPRs(),
             ]);
@@ -151,11 +153,13 @@ jobs:
             });
 
             // Detecta sprint atual pelo milestone com issues abertas
-            const sprintAtual = issues092.length > 0
-              ? 'v0.9.2 — Bugs e Acessibilidade'
-              : issues093.length > 0
-                ? 'v0.9.3 — Segurança e LGPD'
-                : 'v1.1 — Backlog de funcionalidades';
+            const sprintAtual = issues101.length > 0
+              ? 'v0.10.1 — Bugs e Acessibilidade'
+              : issues110.length > 0
+                ? 'v0.11.0 — Segurança e LGPD'
+                : issues120.length > 0
+                  ? 'v0.12.0 — Vitrine Pública e Fase 4'
+                  : 'v1.1.0 — Backlog de funcionalidades';
 
             const linhas = [
               '<!-- Atualizado automaticamente pelo GitHub Actions — nao edite manualmente -->',
@@ -184,33 +188,43 @@ jobs:
               '',
               '---',
               '',
-              '## Up Next — v0.9.2 Bugs e Acessibilidade',
+              '## Up Next — v0.10.1 Bugs e Acessibilidade',
               '',
-              '> Sprint ativo. Issues prontas para trabalhar.',
-              '',
-              '| # | Titulo | Labels |',
-              '|---|--------|--------|',
-              issueRows(issues092),
-              '',
-              '---',
-              '',
-              '## Proximo Sprint — v0.9.3 Seguranca e LGPD',
-              '',
-              '> Nao começar antes de fechar o v0.9.2.',
+              '> Sprint ativo. Fixes e polish em features existentes.',
               '',
               '| # | Titulo | Labels |',
               '|---|--------|--------|',
-              issueRows(issues093),
+              issueRows(issues101),
               '',
               '---',
               '',
-              '## Backlog — v1.1 Funcionalidades Futuras',
+              '## Proximo Sprint — v0.11.0 Seguranca e LGPD',
               '',
-              '> Trabalhar somente apos v1.0 estar lancada.',
+              '> Nao começar antes de fechar o v0.10.1.',
+              '',
+              '| # | Titulo | Labels |',
+              '|---|--------|--------|',
+              issueRows(issues110),
+              '',
+              '---',
+              '',
+              '## v0.12.0 — Vitrine Publica e Fase 4',
+              '',
+              '> Fase 4 do plano: pagina publica, PIX, Instagram, PWA.',
+              '',
+              '| # | Titulo | Labels |',
+              '|---|--------|--------|',
+              issueRows(issues120),
+              '',
+              '---',
+              '',
+              '## Backlog — v1.1.0 Funcionalidades Futuras',
+              '',
+              '> Trabalhar somente apos v1.0.0 estar lancada.',
               '',
               '| # | Titulo |',
               '|---|--------|',
-              issueRows(issues11, true),
+              issueRows(issues110b, true),
               '',
               '---',
               '',
@@ -231,6 +245,7 @@ jobs:
             core.info('Sprint Board atualizado!');
             core.info('Blockers:  ' + blocked.length);
             core.info('PRs:       ' + prs.length);
-            core.info('v0.9.2:    ' + issues092.length + ' issues');
-            core.info('v0.9.3:    ' + issues093.length + ' issues');
-            core.info('Backlog:   ' + issues11.length + ' issues');
+            core.info('v0.10.1:   ' + issues101.length + ' issues');
+            core.info('v0.11.0:   ' + issues110.length + ' issues');
+            core.info('v0.12.0:   ' + issues120.length + ' issues');
+            core.info('v1.1.0:    ' + issues110b.length + ' issues');
