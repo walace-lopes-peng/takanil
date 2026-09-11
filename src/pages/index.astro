@@ -537,7 +537,7 @@ import Layout from '../layouts/Layout.astro';
       clearTimeout(scrollTimeout);
 
       // Define um novo temporizador de 1 segundo para recolher após PARAR de rolar
-      scrollTimeout = setTimeout(() => {
+      scrollTimeout = window.setTimeout(() => {
         setFabState(true);
         isCollapsed = true;
       }, 1000);
