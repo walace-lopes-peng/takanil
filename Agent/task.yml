@@ -1,0 +1,56 @@
+name: "📋 Task / Chore"
+description: Tarefa técnica, refatoração, débito técnico ou trabalho interno
+title: "[TASK]: "
+labels: ["task"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição
+      description: O que precisa ser feito e por quê?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceite
+      description: Liste os critérios objetivos que definem essa tarefa como concluída.
+      placeholder: |
+        - [ ] Critério 1
+        - [ ] Critério 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical_notes
+    attributes:
+      label: Notas técnicas
+      description: Detalhes de implementação, dependências entre times/serviços, riscos conhecidos.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Tipo
+      options:
+        - Refatoração
+        - Débito técnico
+        - Infraestrutura / DevOps
+        - Documentação
+        - Testes
+        - Outro
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridade
+      options:
+        - Alta
+        - Média
+        - Baixa
+    validations:
+      required: false

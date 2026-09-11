@@ -1,0 +1,209 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Editar Animal - Hub Takanil">
+  <div id="carregando" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center py-16">
+    <p class="text-gray-500 text-sm">Carregando dados do animal...</p>
+  </div>
+
+  <div id="conteudoEdicao" class="hidden"></div>
+
+  <div id="erroEdicao" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center py-16">
+    <p class="text-red-500 text-sm">Animal não encontrado ou sem permissão de acesso.</p>
+    <a href="/" class="mt-4 inline-block text-taka-green-600 text-sm hover:underline">← Voltar ao início</a>
+  </div>
+</Layout>
+
+<script>
+  import { supabase } from '../../lib/supabaseClient';
+
+  // 1. Protege a rota: apenas admins logados
+  const { data: authData } = await supabase.auth.getSession();
+  if (!authData.session) {
+    window.location.replace('/login');
+  }
+
+  // 2. Pega o ID da query string: /animais/editar?id=xxx
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  const carregando = document.getElementById('carregando')!;
+  const erroEl = document.getElementById('erroEdicao')!;
+  const conteudo = document.getElementById('conteudoEdicao')!;
+
+  if (!id) {
+    carregando.classList.add('hidden');
+    erroEl.classList.remove('hidden');
+  } else {
+    const { data: animal, error } = await supabase
+      .from('animais')
+      .select('id, nome, fase_vida, sexo, peso')
+      .eq('id', id)
+      .single();
+
+    if (error || !animal) {
+      carregando.classList.add('hidden');
+      erroEl.classList.remove('hidden');
+    } else {
+      const checked = (cond: boolean) => cond ? 'checked' : '';
+      const nomeVal = (animal.nome && animal.nome !== 'Desconhecido') ? animal.nome : '';
+      const pesoVal = animal.peso ?? '';
+
+      conteudo.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div class="flex items-center justify-between mb-6">
+            <a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </a>
+            <h2 class="text-xl font-bold text-gray-800 text-center flex-1">Editar: ${animal.nome}</h2>
+            <div class="w-6"></div>
+          </div>
+
+          <p class="text-xs text-gray-400 mb-5 text-center">
+            Para editar localização e status, use o ícone de lápis no card.
+          </p>
+
+          <form id="formEdicao" class="space-y-5">
+
+            <!-- Nome -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">
+                Nome do Animal <span class="text-gray-400 font-normal">(Opcional)</span>
+              </label>
+              <input
+                type="text"
+                name="nome"
+                class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50"
+                placeholder="Ex: Rex (deixe em branco se não souber)"
+                value="${nomeVal}"
+              >
+            </div>
+
+            <!-- Fase de Vida -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Fase de Vida</label>
+              <div class="grid grid-cols-3 gap-2">
+                <label class="cursor-pointer">
+                  <input type="radio" name="fase_vida" value="Filhote" class="peer sr-only" ${checked(animal.fase_vida === 'Filhote')}>
+                  <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">Filhote</div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="fase_vida" value="Adulto" class="peer sr-only" ${checked(animal.fase_vida === 'Adulto')}>
+                  <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">Adulto</div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="fase_vida" value="Idoso" class="peer sr-only" ${checked(animal.fase_vida === 'Idoso')}>
+                  <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">Idoso</div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Sexo -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Sexo</label>
+              <div class="grid grid-cols-4 gap-2">
+                <label class="cursor-pointer">
+                  <input type="radio" name="sexo" value="Macho" class="peer sr-only" ${checked(animal.sexo === 'Macho')}>
+                  <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all">♂ Macho</div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="sexo" value="Fêmea" class="peer sr-only" ${checked(animal.sexo === 'Fêmea')}>
+                  <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-pink-500 peer-checked:bg-pink-50 peer-checked:text-pink-700 peer-checked:font-medium transition-all">♀ Fêmea</div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="sexo" value="Não sei" class="peer sr-only" ${checked(animal.sexo === 'Não sei')}>
+                  <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-gray-500 peer-checked:bg-gray-100 peer-checked:text-gray-700 peer-checked:font-medium transition-all">Não sei</div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="sexo" value="Misto (Ninhada)" class="peer sr-only" ${checked(animal.sexo === 'Misto (Ninhada)')}>
+                  <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs flex items-center justify-center peer-checked:border-purple-500 peer-checked:bg-purple-50 peer-checked:text-purple-700 peer-checked:font-medium transition-all">Misto</div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Peso -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Peso Aproximado (kg)</label>
+              <input
+                type="number"
+                name="peso"
+                step="0.1"
+                min="0.1"
+                required
+                class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50"
+                placeholder="Ex: 4.5"
+                value="${pesoVal}"
+              >
+            </div>
+
+            <!-- Submit -->
+            <div class="pt-4">
+              <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-taka-orange-500 hover:bg-taka-orange-600 active:scale-[0.98] transition-all disabled:opacity-70">
+                <span id="submitText">Salvar Alterações</span>
+                <svg id="loadingSpinner" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
+            </div>
+            <div id="statusMessage" class="hidden text-center text-sm font-medium p-3 rounded-xl"></div>
+          </form>
+        </div>
+      `;
+
+      carregando.classList.add('hidden');
+      conteudo.classList.remove('hidden');
+
+      const form = document.getElementById('formEdicao') as HTMLFormElement;
+      const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+      const submitText = document.getElementById('submitText')!;
+      const spinner = document.getElementById('loadingSpinner')!;
+      const statusMessage = document.getElementById('statusMessage')!;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+
+        const nome_raw = fd.get('nome') as string;
+        const nome = nome_raw.trim() !== '' ? nome_raw : 'Desconhecido';
+        const fase_vida = fd.get('fase_vida') as string;
+        const sexo = fd.get('sexo') as string;
+        const peso = parseFloat(fd.get('peso') as string);
+
+        // Somente os campos editáveis são atualizados — localização, status e outros
+        // permanecem intactos no banco, garantindo extensibilidade futura.
+        if (!fase_vida || !sexo || isNaN(peso) || peso <= 0) {
+          statusMessage.textContent = 'Por favor, preencha todos os campos obrigatórios.';
+          statusMessage.className = 'text-center text-sm font-medium p-3 rounded-xl bg-red-50 text-red-700';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitText.textContent = 'Salvando...';
+        spinner.classList.remove('hidden');
+        statusMessage.className = 'hidden';
+
+        const { error: dbError } = await supabase
+          .from('animais')
+          .update({ nome, fase_vida, sexo, peso })
+          .eq('id', id!);
+
+        submitBtn.disabled = false;
+        submitText.textContent = 'Salvar Alterações';
+        spinner.classList.add('hidden');
+
+        if (dbError) {
+          statusMessage.textContent = 'Erro ao salvar: ' + dbError.message;
+          statusMessage.className = 'text-center text-sm font-medium p-3 rounded-xl bg-red-50 text-red-700';
+        } else {
+          statusMessage.textContent = '✅ Dados atualizados com sucesso!';
+          statusMessage.className = 'text-center text-sm font-medium p-3 rounded-xl bg-green-50 text-green-700';
+          setTimeout(() => { window.location.href = '/'; }, 1500);
+        }
+      });
+    }
+  }
+</script>
