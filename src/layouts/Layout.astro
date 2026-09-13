@@ -239,6 +239,15 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
       supabase.auth.onAuthStateChange(() => {
         renderAuthStatus();
       });
+
+      // Registra Service Worker para suporte PWA e prompt de instalação no celular
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.error('Erro ao registrar Service Worker:', err);
+          });
+        });
+      }
     </script>
   </body>
 </html>
