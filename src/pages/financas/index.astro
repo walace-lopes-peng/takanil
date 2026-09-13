@@ -377,6 +377,38 @@ import Layout from '../../layouts/Layout.astro';
     return dataISO;
   }
 
+  const MAPA_CATEGORIAS: Record<string, string> = {
+    racao: 'Ração',
+    veterinario: 'Veterinário',
+    medicamento: 'Medicamento',
+    castracao: 'Castração',
+    doacao: 'Doação',
+    bazar: 'Bazar',
+    rifa: 'Rifa',
+    ajuste: 'Ajuste de Caixa',
+    outro: 'Outro'
+  };
+
+  function obterNomeCategoria(categoria: string): string {
+    return MAPA_CATEGORIAS[categoria] || (categoria ? categoria.charAt(0).toUpperCase() + categoria.slice(1) : '');
+  }
+
+  function temDescricaoPersonalizada(descricao?: string, categoria?: string): boolean {
+    if (!descricao || !descricao.trim()) return false;
+    const descNorm = descricao.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const catNorm = (categoria || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return descNorm !== catNorm;
+  }
+
+  function escapeHtml(texto: string): string {
+    return (texto || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   // Atualizar visual dos chips de atalho
   function atualizarBotoesAtalho() {
     botoesAtalho.forEach((btn) => {
@@ -451,7 +483,11 @@ import Layout from '../../layouts/Layout.astro';
       if (error) throw error;
       await carregarDados();
     } catch (err: any) {
-      alert('Erro ao excluir: ' + err.message);
+      if ((window as any).mostrarToast) {
+        (window as any).mostrarToast('Erro ao excluir: ' + err.message, 'erro');
+      } else {
+        alert('Erro ao excluir: ' + err.message);
+      }
       if (loadingState) loadingState.style.display = 'none';
     }
   };
@@ -463,7 +499,8 @@ import Layout from '../../layouts/Layout.astro';
     lancamentoIdInput.value = l.id;
     tipoInput.value = l.tipo;
     (document.getElementById('valor') as HTMLInputElement).value = l.valor;
-    (document.getElementById('descricao') as HTMLInputElement).value = l.descricao || '';
+    const descVal = temDescricaoPersonalizada(l.descricao, l.categoria) ? l.descricao : '';
+    (document.getElementById('descricao') as HTMLInputElement).value = descVal;
     (document.getElementById('data') as HTMLInputElement).value = l.data;
     
     // Atualiza a lista de categorias antes de marcar o rádio
@@ -545,19 +582,25 @@ import Layout from '../../layouts/Layout.astro';
       if (isEntrada) totalEntradas += l.valor;
       else totalSaidas += l.valor;
 
-      const catLabel = l.categoria.charAt(0).toUpperCase() + l.categoria.slice(1);
+      const catLabel = obterNomeCategoria(l.categoria);
+      const temDescricao = temDescricaoPersonalizada(l.descricao, l.categoria);
 
       html += `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center">
-          <div class="flex-1 pr-4">
-            <h4 class="font-bold text-gray-800 text-sm truncate">${l.descricao}</h4>
-            <p class="text-xs text-gray-500 mt-0.5">${catLabel} • ${formatarDataBR(l.data)}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-start">
+          <div class="flex-1 pr-3">
+            <h4 class="font-bold text-gray-800 text-sm sm:text-base leading-tight">${catLabel}</h4>
+            ${temDescricao ? `
+              <p class="text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed break-words" title="${escapeHtml(l.descricao)}">
+                ${escapeHtml(l.descricao)}
+              </p>
+            ` : ''}
+            <p class="text-[11px] text-gray-400 mt-1">${formatarDataBR(l.data)}</p>
           </div>
           <div class="text-right flex-shrink-0">
-            <p class="font-bold text-sm ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
-            <div class="flex justify-end gap-3 mt-1.5">
-              <button onclick="window.editarLancamento('${l.id}')" class="text-xs font-medium text-taka-green-600 hover:text-taka-green-800 underline">Editar</button>
-              <button onclick="window.deletarLancamento('${l.id}')" class="text-xs font-medium text-red-600 hover:text-red-800 underline">Excluir</button>
+            <p class="font-bold text-sm sm:text-base ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
+            <div class="flex justify-end gap-3 mt-2">
+              <button onclick="window.editarLancamento('${l.id}')" class="text-xs font-medium text-taka-green-600 hover:text-taka-green-800 py-1 hover:underline">Editar</button>
+              <button onclick="window.deletarLancamento('${l.id}')" class="text-xs font-medium text-red-600 hover:text-red-800 py-1 hover:underline">Excluir</button>
             </div>
           </div>
         </div>
@@ -588,15 +631,19 @@ import Layout from '../../layouts/Layout.astro';
   const btnExportar = document.getElementById('btnExportar');
   btnExportar?.addEventListener('click', () => {
     if (lancamentosAtuais.length === 0) {
-      alert('Nenhum dado para exportar neste período.');
+      if ((window as any).mostrarToast) {
+        (window as any).mostrarToast('Nenhum dado para exportar neste período.', 'aviso');
+      } else {
+        alert('Nenhum dado para exportar neste período.');
+      }
       return;
     }
 
     const linhas = lancamentosAtuais.map(l => ({
       Data: formatarDataBR(l.data),
       Tipo: l.tipo,
-      Categoria: l.categoria.charAt(0).toUpperCase() + l.categoria.slice(1),
-      Descrição: l.descricao || 'Sem descrição',
+      Categoria: obterNomeCategoria(l.categoria),
+      Descrição: temDescricaoPersonalizada(l.descricao, l.categoria) ? l.descricao : 'Sem descrição adicional',
       Valor: formatarMoeda(l.valor)
     }));
 
