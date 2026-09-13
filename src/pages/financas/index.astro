@@ -223,11 +223,11 @@ import Layout from '../../layouts/Layout.astro';
     </div>
   </div>
 
+  <!-- Backdrop com desfoque suave puro (sem tarja preta) para fechar ao tocar fora -->
+  <div id="fabBackdrop" class="fixed inset-0 backdrop-blur-[2px] hidden z-40 transition-opacity"></div>
+
   <!-- Botão Flutuante de Ação (FAB) Exclusivo de Finanças -->
   <div class="fixed bottom-20 z-50 left-1/2 -translate-x-1/2 w-full max-w-md pointer-events-none px-4 flex justify-end">
-    <!-- Backdrop suave para fechar ao tocar fora -->
-    <div id="fabBackdrop" class="fixed inset-0 bg-black/20 backdrop-blur-[1px] hidden z-40 pointer-events-auto transition-opacity"></div>
-
     <div class="pointer-events-auto flex flex-col items-end relative z-50">
       <!-- Menu Flutuante de Ações Rápidas (Speed-Dial) -->
       <div id="fabMenu" class="flex flex-col items-end gap-2.5 mb-3 hidden z-50 transition-all duration-200 origin-bottom-right">
