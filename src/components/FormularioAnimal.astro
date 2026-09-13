@@ -500,23 +500,26 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     });
   }
 
-  // --- Lógica dos botões de incremento/decremento de Peso ---
+  // --- Lógica dos botões de incremento/decremento de Peso (Hold a 450 BPM) ---
   const inputPeso = document.getElementById('peso') as HTMLInputElement;
   const btnDecrementarPeso = document.getElementById('btnDecrementarPeso');
   const btnIncrementarPeso = document.getElementById('btnIncrementarPeso');
 
   if (inputPeso && btnDecrementarPeso && btnIncrementarPeso) {
     let animTimer: any = null;
+    let holdTimeout: any = null;
+    let holdInterval: any = null;
+    const INTERVALO_450BPM = Math.round(60000 / 450); // ~110ms
 
     const animarTrocaPeso = () => {
       clearTimeout(animTimer);
       inputPeso.classList.add('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
       animTimer = setTimeout(() => {
         inputPeso.classList.remove('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
-      }, 120);
+      }, 100);
     };
 
-    btnDecrementarPeso.addEventListener('click', () => {
+    const decrementar = () => {
       const valorAtual = parseFloat(inputPeso.value) || 0;
       if (valorAtual <= 0.25) {
         inputPeso.value = '0.1';
@@ -527,9 +530,9 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       novoValor = Math.max(0.1, novoValor);
       inputPeso.value = (Math.round(novoValor * 100) / 100).toString();
       animarTrocaPeso();
-    });
+    };
 
-    btnIncrementarPeso.addEventListener('click', () => {
+    const incrementar = () => {
       const valorAtual = parseFloat(inputPeso.value) || 0;
       if (valorAtual < 0.1) {
         inputPeso.value = '0.25';
@@ -539,7 +542,36 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       let novoValor = Math.ceil((valorAtual + 0.001) / 0.25) * 0.25;
       inputPeso.value = (Math.round(novoValor * 100) / 100).toString();
       animarTrocaPeso();
-    });
+    };
+
+    const iniciarHold = (acao: () => void) => {
+      pararHold();
+      acao();
+      holdTimeout = setTimeout(() => {
+        holdInterval = setInterval(acao, INTERVALO_410BPM);
+      }, 300);
+    };
+
+    const pararHold = () => {
+      clearTimeout(holdTimeout);
+      clearInterval(holdInterval);
+    };
+
+    // Eventos do botão Decrementar (Mouse + Touch)
+    btnDecrementarPeso.addEventListener('mousedown', (e) => { e.preventDefault(); iniciarHold(decrementar); });
+    btnDecrementarPeso.addEventListener('mouseup', pararHold);
+    btnDecrementarPeso.addEventListener('mouseleave', pararHold);
+    btnDecrementarPeso.addEventListener('touchstart', (e) => { e.preventDefault(); iniciarHold(decrementar); }, { passive: false });
+    btnDecrementarPeso.addEventListener('touchend', pararHold);
+    btnDecrementarPeso.addEventListener('touchcancel', pararHold);
+
+    // Eventos do botão Incrementar (Mouse + Touch)
+    btnIncrementarPeso.addEventListener('mousedown', (e) => { e.preventDefault(); iniciarHold(incrementar); });
+    btnIncrementarPeso.addEventListener('mouseup', pararHold);
+    btnIncrementarPeso.addEventListener('mouseleave', pararHold);
+    btnIncrementarPeso.addEventListener('touchstart', (e) => { e.preventDefault(); iniciarHold(incrementar); }, { passive: false });
+    btnIncrementarPeso.addEventListener('touchend', pararHold);
+    btnIncrementarPeso.addEventListener('touchcancel', pararHold);
 
     // Selecionar todo o texto ao focar/clicar para facilitar a digitação manual no mobile
     inputPeso.addEventListener('focus', () => {
