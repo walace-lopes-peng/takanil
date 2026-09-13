@@ -163,7 +163,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         >
           −
         </button>
-        <div class="relative w-32 shrink-0">
+        <div class="relative w-32 shrink-0 flex items-center">
           <input
             type="number"
             name="peso"
@@ -171,10 +171,11 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
             step="0.05"
             min="0.1"
             required
-            class="block w-full text-left font-bold text-lg rounded-xl border-taka-green-200 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 pl-3 pr-2 border bg-taka-green-50/20 text-taka-green-800 h-10 tracking-tight transition-all duration-150 transform-gpu"
+            class="block w-full text-left font-bold text-lg rounded-xl border-taka-green-200 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 pl-3 pr-8 border bg-taka-green-50/20 text-taka-green-800 h-10 tracking-tight transition-all duration-150 transform-gpu"
             placeholder="4.5"
             value={dadosIniciais?.peso ?? ''}
           >
+          <span class="absolute right-3 text-xs font-bold text-taka-green-600/70 pointer-events-none select-none">kg</span>
         </div>
         <button
           type="button"
