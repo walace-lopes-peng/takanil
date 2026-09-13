@@ -450,8 +450,9 @@ import Layout from '../../layouts/Layout.astro';
       const { error } = await supabase.from('financas').delete().eq('id', id);
       if (error) throw error;
       await carregarDados();
+      (window as any).mostrarToast('Lançamento excluído com sucesso!', 'sucesso');
     } catch (err: any) {
-      alert('Erro ao excluir: ' + err.message);
+      (window as any).mostrarToast('Erro ao excluir: ' + err.message, 'erro');
       if (loadingState) loadingState.style.display = 'none';
     }
   };
@@ -588,7 +589,7 @@ import Layout from '../../layouts/Layout.astro';
   const btnExportar = document.getElementById('btnExportar');
   btnExportar?.addEventListener('click', () => {
     if (lancamentosAtuais.length === 0) {
-      alert('Nenhum dado para exportar neste período.');
+      (window as any).mostrarToast('Nenhum dado para exportar neste período.', 'aviso');
       return;
     }
 

@@ -1,5 +1,6 @@
 ---
 import BannerInstalar from '../components/BannerInstalar.astro';
+import Toast from '../components/Toast.astro';
 
 interface Props {
   title: string;
@@ -101,7 +102,11 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
     <!-- Banner de instalacao PWA (aparece apenas em mobile nao instalado) -->
     <BannerInstalar />
 
+    <!-- Sistema Global de Notificações (Toast) -->
+    <Toast />
+
     <!-- Conteúdo principal -->
+
     <main class="flex-1 w-full max-w-md mx-auto p-4 flex flex-col pb-24">
       <slot />
     </main>
@@ -181,7 +186,7 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
             }
           } catch (err) {
             console.error('Falha ao copiar:', err);
-            alert('Falha ao copiar. Chave: 35998687395');
+            (window as any).mostrarToast('Falha ao copiar a chave. Chave: 35998687395', 'erro');
           }
         });
       }

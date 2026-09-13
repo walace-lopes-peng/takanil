@@ -85,9 +85,10 @@ import Layout from '../layouts/Layout.astro';
         
       if (error) throw error;
       carregarPendentes();
+      (window as any).mostrarToast(`Registro "${nome}" aprovado com sucesso!`, 'sucesso');
     } catch (err) {
       console.error(err);
-      alert('Erro ao aprovar o registro.');
+      (window as any).mostrarToast('Erro ao aprovar o registro.', 'erro');
     }
   };
 
@@ -103,9 +104,10 @@ import Layout from '../layouts/Layout.astro';
         
       if (error) throw error;
       carregarPendentes();
+      (window as any).mostrarToast(`Registro "${nome}" descartado.`, 'info');
     } catch (err) {
       console.error(err);
-      alert('Erro ao descartar o registro.');
+      (window as any).mostrarToast('Erro ao descartar o registro.', 'erro');
     }
   };
 

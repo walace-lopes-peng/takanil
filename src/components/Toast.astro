@@ -1,0 +1,112 @@
+---
+// Toast.astro
+// Sistema de notificação toast flutuante para substituição de alert() nativo.
+---
+
+<div
+  id="toastContainer"
+  class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md pointer-events-none flex flex-col gap-2"
+  aria-live="polite"
+>
+  <!-- Os elementos de toast serão injetados dinamicamente via JS -->
+</div>
+
+<script>
+  export type TipoToast = 'sucesso' | 'erro' | 'aviso' | 'info';
+
+  interface OpcoesToast {
+    duracao?: number; // em milissegundos
+  }
+
+  function criarToast(mensagem: string, tipo: TipoToast = 'info', opcoes: OpcoesToast = {}) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    // Configuração de cores, ícones e comportamento padrão por tipo
+    const config = {
+      sucesso: {
+        bg: 'bg-emerald-600',
+        border: 'border-emerald-500',
+        text: 'text-white',
+        icone: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-emerald-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+        duracaoPadrao: 4000
+      },
+      erro: {
+        bg: 'bg-red-600',
+        border: 'border-red-500',
+        text: 'text-white',
+        icone: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-red-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+        duracaoPadrao: 6000 // Erro fica visível um pouco mais ou até fechar
+      },
+      aviso: {
+        bg: 'bg-amber-500',
+        border: 'border-amber-400',
+        text: 'text-white',
+        icone: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-amber-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`,
+        duracaoPadrao: 4000
+      },
+      info: {
+        bg: 'bg-taka-green-600',
+        border: 'border-taka-green-500',
+        text: 'text-white',
+        icone: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0 text-taka-green-100" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+        duracaoPadrao: 4000
+      }
+    };
+
+    const c = config[tipo] || config.info;
+    const duracao = opcoes.duracao ?? c.duracaoPadrao;
+
+    // Elemento principal do Toast
+    const toastEl = document.createElement('div');
+    toastEl.role = tipo === 'erro' ? 'alert' : 'status';
+    toastEl.className = `pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-2xl shadow-xl border ${c.bg} ${c.border} ${c.text} transform transition-all duration-300 translate-y-[-1rem] opacity-0`;
+
+    toastEl.innerHTML = `
+      <div class="flex items-center gap-3 min-w-0">
+        ${c.icone}
+        <span class="text-sm font-medium leading-snug break-words">${mensagem}</span>
+      </div>
+      <button
+        type="button"
+        aria-label="Fechar notificação"
+        class="flex-shrink-0 min-w-[44px] min-h-[44px] -mr-2 flex items-center justify-center rounded-xl hover:bg-black/10 active:bg-black/20 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/80 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    `;
+
+    container.appendChild(toastEl);
+
+    // Animação de Entrada (slide-down + fade-in)
+    requestAnimationFrame(() => {
+      toastEl.classList.remove('translate-y-[-1rem]', 'opacity-0');
+      toastEl.classList.add('translate-y-0', 'opacity-100');
+    });
+
+    // Função de remoção suave
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const removerToast = () => {
+      if (timer) clearTimeout(timer);
+      toastEl.classList.remove('translate-y-0', 'opacity-100');
+      toastEl.classList.add('translate-y-[-1rem]', 'opacity-0');
+      setTimeout(() => {
+        toastEl.remove();
+      }, 300);
+    };
+
+    // Botão de fechar manual
+    const btnFechar = toastEl.querySelector('button');
+    btnFechar?.addEventListener('click', removerToast);
+
+    // Auto-dismiss se duração > 0
+    if (duracao > 0) {
+      timer = setTimeout(removerToast, duracao);
+    }
+  }
+
+  // Disponibiliza no objeto window
+  (window as any).mostrarToast = criarToast;
+</script>

@@ -514,9 +514,10 @@ import Layout from '../layouts/Layout.astro';
       if (error) throw error;
 
       carregarDados();
+      (window as any).mostrarToast('Registro excluído com sucesso!', 'sucesso');
     } catch (err) {
       console.error(err);
-      alert('Erro ao excluir o registro.');
+      (window as any).mostrarToast('Erro ao excluir o registro.', 'erro');
     }
   };
 
@@ -582,9 +583,10 @@ import Layout from '../layouts/Layout.astro';
       
       (window as any).fecharModalEdicao();
       carregarDados(); // Recarrega os cards
+      (window as any).mostrarToast('Status do animal atualizado!', 'sucesso');
     } catch (err) {
       console.error(err);
-      alert('Erro ao atualizar o status do animal.');
+      (window as any).mostrarToast('Erro ao atualizar o status do animal.', 'erro');
     } finally {
       btn.innerHTML = 'Salvar Alterações';
       btn.removeAttribute('disabled');
@@ -600,9 +602,10 @@ import Layout from '../layouts/Layout.astro';
       if (error) throw error;
 
       carregarDados();
+      (window as any).mostrarToast(`Animal marcado como ${novoStatus}!`, 'sucesso');
     } catch (err) {
       console.error(err);
-      alert('Erro ao atualizar o registro.');
+      (window as any).mostrarToast('Erro ao atualizar o registro.', 'erro');
     }
   };
 
