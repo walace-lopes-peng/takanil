@@ -57,13 +57,13 @@ jobs:
 
             // ─── Helpers ─────────────────────────────────────────────────────
 
-            /** Busca o numero de um milestone pelo titulo exato */
-            async function getMilestoneNumber(title) {
+            /** Busca o numero de um milestone pelo prefixo da versão (ex: v0.10.1) */
+            async function getMilestoneNumber(prefix) {
               const { data } = await github.rest.issues.listMilestones({
                 owner: OWNER, repo: REPO,
                 state: 'open', per_page: 100,
               });
-              return data.find(m => m.title === title)?.number ?? null;
+              return data.find(m => m.title.startsWith(prefix))?.number ?? null;
             }
 
             /** Busca issues abertas de um milestone (exclui PRs) */
@@ -128,10 +128,10 @@ jobs:
 
             core.info('Buscando milestones...');
             const [numV101, numV110, numV120, numV110b] = await Promise.all([
-              getMilestoneNumber('v0.10.1 — Bugs e Acessibilidade'),
-              getMilestoneNumber('v0.11.0 — Segurança e LGPD'),
-              getMilestoneNumber('v0.12.0 — Vitrine Pública e Fase 4'),
-              getMilestoneNumber('v1.1.0 — Backlog de funcionalidades'),
+              getMilestoneNumber('v0.10.1'),
+              getMilestoneNumber('v0.11.0'),
+              getMilestoneNumber('v0.12.0'),
+              getMilestoneNumber('v1.1.0'),
             ]);
 
             core.info('Buscando issues e PRs...');
