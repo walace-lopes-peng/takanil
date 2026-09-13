@@ -1,3 +1,4 @@
+
 ---
 // BannerInstalar.astro
 // Exibe um prompt de instalacao PWA para dispositivos moveis / navegadores moveis.
@@ -125,10 +126,12 @@
     window.matchMedia('(display-mode: standalone)').matches;
 
   const dispensadoAte = localStorage.getItem(CHAVE_STORAGE);
-  const dispensado = dispensadoAte && Date.now() < Number(dispensadoAte);
+  // Em desenvolvimento (DEV), ignora o timer de dispensado para facilitar o teste visual
+  const ehDev = import.meta.env.DEV;
+  const dispensado = !ehDev && dispensadoAte && Date.now() < Number(dispensadoAte);
 
-  // Exibe se não estiver instalado e não tiver sido dispensado recentemente
-  if (!jaInstalado && !dispensado) {
+  // Exibe se não estiver instalado e não tiver sido dispensado recentemente (ou se estiver em DEV)
+  if (!jaInstalado && (!dispensado || ehDev)) {
     const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
     const banner = document.getElementById('bannerInstalar');
