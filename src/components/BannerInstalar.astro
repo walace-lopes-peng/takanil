@@ -118,7 +118,7 @@
 
 <script>
   const CHAVE_STORAGE = 'takanil_banner_install_dispensado_ate';
-  const DIAS_SUPRIMIR = 3; // Reduzido de 7 para 3 dias
+  const DIAS_SUPRIMIR = 3;
 
   // Nao exibe se ja instalado (modo standalone)
   const jaInstalado =
@@ -126,14 +126,14 @@
     window.matchMedia('(display-mode: standalone)').matches;
 
   const dispensadoAte = localStorage.getItem(CHAVE_STORAGE);
-  // Em desenvolvimento (DEV), ignora o timer de dispensado para facilitar o teste visual
-  const ehDev = import.meta.env.DEV;
-  const dispensado = !ehDev && dispensadoAte && Date.now() < Number(dispensadoAte);
+  const dispensado = dispensadoAte && Date.now() < Number(dispensadoAte);
+  
+  // Apenas em telas/dispositivos moveis
+  const ehMobile = window.innerWidth < 768 || /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+  const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
-  // Exibe se não estiver instalado e não tiver sido dispensado recentemente (ou se estiver em DEV)
-  if (!jaInstalado && (!dispensado || ehDev)) {
-    const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
+  // Exibe apenas se mobile, nao instalado e nao dispensado recentemente
+  if (!jaInstalado && !dispensado && ehMobile) {
     const banner = document.getElementById('bannerInstalar');
     const btnInstalar = document.getElementById('btnInstalar');
     const btnFechar = document.getElementById('btnFecharBanner');
@@ -170,24 +170,27 @@
       instrucaoModal?.classList.add('hidden');
     }
 
-    // Intercepta evento nativo se disparado pelo navegador
+    // Android / Chrome: Apenas exibe o banner quando o evento nativo 'beforeinstallprompt' for disparado
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       eventoInstalacao = e;
       exibirBanner();
     });
 
-    // Exibe sempre o banner orientativo caso não seja um app já instalado
-    exibirBanner();
+    // iOS Safari: Nao possui evento nativo, entao exibe o banner orientativo direto no mobile
+    if (ehIOS) {
+      exibirBanner();
+    }
 
     btnInstalar?.addEventListener('click', async () => {
       if (eventoInstalacao) {
+        // Dispara a caixa nativa de instalação diretamente no celular
         eventoInstalacao.prompt();
         const { outcome } = await eventoInstalacao.userChoice;
         if (outcome === 'accepted') fecharBanner();
         eventoInstalacao = null;
       } else {
-        // Se o navegador não deu o prompt automático, abre instrução visual
+        // No iOS ou fallback abre o modal com o passo a passo
         abrirModalInstrucao();
       }
     });
