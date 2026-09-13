@@ -40,30 +40,6 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
 
-    <!-- Filtros por Urgência (Chips) -->
-    <div class="relative flex items-center group">
-      <!-- Seta Esquerda -->
-      <button id="scrollLeftBtn" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur shadow-sm p-1.5 rounded-full hidden md:flex items-center justify-center text-gray-600 hover:text-gray-900 border border-gray-200 z-10 cursor-pointer -ml-2" title="Rolar para esquerda">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-
-      <div class="flex overflow-x-auto pb-3 pt-1 px-2 gap-2 w-full" style="scrollbar-width: none;" id="botoesFiltro">
-        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-taka-orange-500 text-white" data-filtro="Todos">Todos</button>
-        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Urgências">🚨 Machucados</button>
-        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Desaparecidos">🔍 Desaparecidos</button>
-        <button class="filtro-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 bg-gray-100 text-gray-600 hover:bg-gray-200" data-filtro="Abrigo">🏡 No Abrigo</button>
-      </div>
-      
-      <!-- Seta Direita -->
-      <button id="scrollRightBtn" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur shadow-sm p-1.5 rounded-full hidden md:flex items-center justify-center text-gray-600 hover:text-gray-900 border border-gray-200 z-10 cursor-pointer -mr-2" title="Rolar para direita">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
-
     <!-- Todos os Animais -->
     <div>
       <div class="flex justify-between items-center mb-4">
@@ -71,11 +47,23 @@ import Layout from '../layouts/Layout.astro';
           <h3 class="text-lg font-bold text-gray-800" id="tituloSecao">Animais Cadastrados</h3>
           <span class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded-full" id="totalAnimais">0</span>
         </div>
-        <button onclick="alternarFinaisFelizes()" title="Ver finais felizes" class="text-gray-400 hover:text-pink-500 transition-colors p-1" id="btnFinaisFelizes">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-          </svg>
-        </button>
+        <div class="flex items-center gap-4">
+          <button
+            onclick="abrirModalFiltros()"
+            id="btnAbrirFiltros"
+            class="px-3.5 py-1.5 rounded-xl border border-taka-green-300 bg-taka-green-50 text-taka-green-700 font-bold text-sm hover:bg-taka-green-100 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <span>Filtrar</span>
+          </button>
+          <button onclick="alternarFinaisFelizes()" title="Ver finais felizes" class="text-gray-400 hover:text-pink-500 transition-colors p-1" id="btnFinaisFelizes">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
       </div>
       <div id="listaAnimais" class="space-y-4">
         <div class="text-center py-8 text-gray-400 text-sm" id="loadingState">
@@ -86,6 +74,91 @@ import Layout from '../layouts/Layout.astro';
           Carregando dados...
         </div>
         <!-- Inserido via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Filtros (Organizado em 2 Colunas Limpas) -->
+  <div id="modalFiltros" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-taka-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          <h3 class="font-bold text-gray-800 text-lg">Filtrar Animais</h3>
+        </div>
+        <button onclick="fecharModalFiltros()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-5 max-h-[70vh] overflow-y-auto">
+        <!-- Categoria 1: Situação / Urgência -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Situação / Urgência</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Todos">
+              <span>Todos</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Machucados">
+              <span>🚨 Machucados</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Desaparecidos">
+              <span>🔍 Sumidos</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Categoria 2: Localização -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Localização</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Todas">
+              <span>Todas</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Abrigo Takanil">
+              <span>🏡 No Abrigo</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Na rua">
+              <span>🐾 Na Rua</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Lar Temporário">
+              <span>🚧 Lar Temp.</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Categoria 3: Espécie -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Espécie</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Todas">
+              <span>Todas</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Cão">
+              <span>🐶 Cães</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Gato">
+              <span>🐱 Gatos</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-gray-100 bg-gray-50 flex gap-2">
+        <button onclick="limparFiltrosModal()" class="flex-1 py-3 text-sm font-bold text-gray-600 hover:bg-gray-200 rounded-xl transition-colors">Limpar</button>
+        <button onclick="aplicarFiltrosModal()" class="flex-[2] py-3 text-sm font-bold text-white bg-taka-green-600 hover:bg-taka-green-700 rounded-xl transition-colors shadow-md active:scale-95">Aplicar Filtros</button>
       </div>
     </div>
   </div>
@@ -164,22 +237,51 @@ import Layout from '../layouts/Layout.astro';
   // Estado local
   let animaisGlobais: any[] = [];
   let isAdminGlob = false;
-  let filtroAtual = 'Todos';
+  // Variáveis de Filtro do Modal
+  let filtroUrgencia = 'Todos';
+  let filtroLocalizacao = 'Todas';
+  let filtroEspecie = 'Todas';
   let mostrarFinaisFelizes = false;
 
-  // Lógica dos Filtros (Chips) de filtro
-  document.getElementById('botoesFiltro')?.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.filtro-btn');
-    if (!btn) return;
-    
-    document.querySelectorAll('.filtro-btn').forEach(b => {
-      b.classList.remove('bg-taka-orange-500', 'text-white');
-      b.classList.add('bg-gray-100', 'text-gray-600');
-    });
-    btn.classList.remove('bg-gray-100', 'text-gray-600');
-    btn.classList.add('bg-taka-orange-500', 'text-white');
+  // Lógica de abertura/fechamento do Modal de Filtros
+  (window as any).abrirModalFiltros = () => {
+    document.getElementById('modalFiltros')?.classList.remove('hidden');
+    sincronizarUIModalFiltros();
+  };
 
-    // Resetar Finais Felizes se clicar num pill normal
+  (window as any).fecharModalFiltros = () => {
+    document.getElementById('modalFiltros')?.classList.add('hidden');
+  };
+
+  (window as any).limparFiltrosModal = () => {
+    filtroUrgencia = 'Todos';
+    filtroLocalizacao = 'Todas';
+    filtroEspecie = 'Todas';
+    sincronizarUIModalFiltros();
+    (window as any).aplicarFiltrosModal();
+  };
+
+  (window as any).aplicarFiltrosModal = () => {
+    (window as any).fecharModalFiltros();
+    
+    // Atualizar badge no botão Filtrar
+    const btnFiltrar = document.getElementById('btnAbrirFiltros');
+    const totalFiltrosAtivos = (filtroUrgencia !== 'Todos' ? 1 : 0) + 
+                              (filtroLocalizacao !== 'Todas' ? 1 : 0) + 
+                              (filtroEspecie !== 'Todas' ? 1 : 0);
+
+    if (btnFiltrar) {
+      if (totalFiltrosAtivos > 0) {
+        btnFiltrar.classList.remove('bg-taka-green-50', 'text-taka-green-700', 'border-taka-green-300');
+        btnFiltrar.classList.add('bg-taka-green-600', 'text-white', 'border-taka-green-600');
+        btnFiltrar.querySelector('span')!.textContent = `Filtrar (${totalFiltrosAtivos})`;
+      } else {
+        btnFiltrar.classList.remove('bg-taka-green-600', 'text-white', 'border-taka-green-600');
+        btnFiltrar.classList.add('bg-taka-green-50', 'text-taka-green-700', 'border-taka-green-300');
+        btnFiltrar.querySelector('span')!.textContent = 'Filtrar';
+      }
+    }
+
     if (mostrarFinaisFelizes) {
       mostrarFinaisFelizes = false;
       document.getElementById('btnFinaisFelizes')!.classList.remove('text-pink-500');
@@ -187,32 +289,77 @@ import Layout from '../layouts/Layout.astro';
       document.getElementById('tituloSecao')!.innerText = 'Animais Cadastrados';
     }
 
-    filtroAtual = (btn as HTMLElement).getAttribute('data-filtro') || 'Todos';
     renderLista(animaisGlobais);
-  });
+  };
 
-  // Scroll horizontal com mouse wheel e seta no desktop
-  const filtrosContainer = document.getElementById('botoesFiltro');
-  const scrollRightBtn = document.getElementById('scrollRightBtn');
-  const scrollLeftBtn = document.getElementById('scrollLeftBtn');
-  
-  if (filtrosContainer) {
-    filtrosContainer.addEventListener('wheel', (e) => {
-      // Se não estiver rolando perfeitamente vertical, converte em scroll horizontal
-      if (Math.abs(e.deltaY) > 0) {
-        e.preventDefault();
-        filtrosContainer.scrollLeft += e.deltaY;
+  function sincronizarUIModalFiltros() {
+    // Categoria Urgência
+    document.querySelectorAll('.opt-filtro-urgencia').forEach(btn => {
+      const val = btn.getAttribute('data-urgencia');
+      const check = btn.querySelector('.check-icon');
+      if (val === filtroUrgencia) {
+        btn.classList.add('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.remove('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.remove('hidden');
+      } else {
+        btn.classList.remove('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.add('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.add('hidden');
       }
     });
 
-    scrollRightBtn?.addEventListener('click', () => {
-      filtrosContainer.scrollBy({ left: 150, behavior: 'smooth' });
+    // Categoria Localização
+    document.querySelectorAll('.opt-filtro-loc').forEach(btn => {
+      const val = btn.getAttribute('data-loc');
+      const check = btn.querySelector('.check-icon');
+      if (val === filtroLocalizacao) {
+        btn.classList.add('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.remove('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.remove('hidden');
+      } else {
+        btn.classList.remove('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.add('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.add('hidden');
+      }
     });
 
-    scrollLeftBtn?.addEventListener('click', () => {
-      filtrosContainer.scrollBy({ left: -150, behavior: 'smooth' });
+    // Categoria Espécie
+    document.querySelectorAll('.opt-filtro-especie').forEach(btn => {
+      const val = btn.getAttribute('data-especie');
+      const check = btn.querySelector('.check-icon');
+      if (val === filtroEspecie) {
+        btn.classList.add('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.remove('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.remove('hidden');
+      } else {
+        btn.classList.remove('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.add('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.add('hidden');
+      }
     });
   }
+
+  // Handlers de seleção dos botões dentro do Modal
+  document.querySelectorAll('.opt-filtro-urgencia').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtroUrgencia = btn.getAttribute('data-urgencia') || 'Todos';
+      sincronizarUIModalFiltros();
+    });
+  });
+
+  document.querySelectorAll('.opt-filtro-loc').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtroLocalizacao = btn.getAttribute('data-loc') || 'Todas';
+      sincronizarUIModalFiltros();
+    });
+  });
+
+  document.querySelectorAll('.opt-filtro-especie').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtroEspecie = btn.getAttribute('data-especie') || 'Todas';
+      sincronizarUIModalFiltros();
+    });
+  });
 
   function renderLista(animais: any[]) {
     let htmlNormal = '';
@@ -226,16 +373,23 @@ import Layout from '../layouts/Layout.astro';
       filtrados = baseAnimais.filter(a => statusFinais.includes(a.situacao_urgencia));
     } else {
       // Normal filters on active animals
-      const ativos = baseAnimais.filter(a => !statusFinais.includes(a.situacao_urgencia));
+      filtrados = baseAnimais.filter(a => !statusFinais.includes(a.situacao_urgencia));
       
-      if (filtroAtual === 'Todos') {
-        filtrados = ativos;
-      } else if (filtroAtual === 'Urgências') {
-        filtrados = ativos.filter(a => a.situacao_urgencia === 'Machucado/Risco');
-      } else if (filtroAtual === 'Desaparecidos') {
-        filtrados = ativos.filter(a => a.situacao_urgencia === 'Desaparecido' || a.localizacao.includes('Desaparecido'));
-      } else if (filtroAtual === 'Abrigo') {
-        filtrados = ativos.filter(a => a.localizacao === 'Abrigo Takanil');
+      // Aplicar Filtro de Urgência
+      if (filtroUrgencia === 'Machucados') {
+        filtrados = filtrados.filter(a => a.situacao_urgencia === 'Machucado/Risco');
+      } else if (filtroUrgencia === 'Desaparecidos') {
+        filtrados = filtrados.filter(a => a.situacao_urgencia === 'Desaparecido' || a.localizacao.includes('Desaparecido'));
+      }
+
+      // Aplicar Filtro de Localização
+      if (filtroLocalizacao !== 'Todas') {
+        filtrados = filtrados.filter(a => a.localizacao === filtroLocalizacao);
+      }
+
+      // Aplicar Filtro de Espécie
+      if (filtroEspecie !== 'Todas') {
+        filtrados = filtrados.filter(a => a.especie === filtroEspecie);
       }
     }
 
@@ -382,12 +536,15 @@ import Layout from '../layouts/Layout.astro';
       btn.classList.add('text-gray-400');
       titulo.innerText = 'Animais Cadastrados';
       
-      // Restaura o filtro "Todos" ativo
-      filtroAtual = 'Todos';
-      const btnTodos = document.querySelector('.filtro-btn[data-filtro="Todos"]');
-      if (btnTodos) {
-        btnTodos.classList.add('bg-taka-orange-500', 'text-white');
-        btnTodos.classList.remove('bg-gray-100', 'text-gray-600');
+      // Restaura os filtros padrões
+      filtroUrgencia = 'Todos';
+      filtroLocalizacao = 'Todas';
+      filtroEspecie = 'Todas';
+      const btnFiltrar = document.getElementById('btnAbrirFiltros');
+      if (btnFiltrar) {
+        btnFiltrar.classList.remove('bg-taka-green-600', 'text-white', 'border-taka-green-600');
+        btnFiltrar.classList.add('bg-taka-green-50', 'text-taka-green-700', 'border-taka-green-300');
+        btnFiltrar.querySelector('span')!.textContent = 'Filtrar';
       }
     }
     carregarDados();
