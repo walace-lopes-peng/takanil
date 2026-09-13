@@ -117,22 +117,26 @@
 </div>
 
 <script>
-  const CHAVE_STORAGE = 'takanil_banner_install_dispensado_ate';
-  const DIAS_SUPRIMIR = 3;
+  const CHAVE_DISPENSADO = 'takanil_banner_install_dispensado_ate';
+  const CHAVE_CONTAGEM   = 'takanil_banner_install_contagem';
+
+  // Escalonamento de pausa por numero de vezes dispensado (em horas)
+  const PAUSAS_HORAS = [4, 72, 168, 240, 720, 2160]; // 4h, 3d, 7d, 10d, 30d, 90d
 
   // Nao exibe se ja instalado (modo standalone)
   const jaInstalado =
     (window.navigator as any).standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches;
 
-  const dispensadoAte = localStorage.getItem(CHAVE_STORAGE);
-  const dispensado = dispensadoAte && Date.now() < Number(dispensadoAte);
-  
+  const dispensadoAte = localStorage.getItem(CHAVE_DISPENSADO);
+  // Em DEV, ignora o timer para facilitar testes visuais
+  const ehDev = import.meta.env.DEV;
+  const dispensado = !ehDev && dispensadoAte && Date.now() < Number(dispensadoAte);
+
   // Apenas em telas/dispositivos moveis
   const ehMobile = window.innerWidth < 768 || /iphone|ipad|ipod|android/i.test(navigator.userAgent);
   const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
-  // Exibe apenas se mobile, nao instalado e nao dispensado recentemente
   if (!jaInstalado && !dispensado && ehMobile) {
     const banner = document.getElementById('bannerInstalar');
     const btnInstalar = document.getElementById('btnInstalar');
@@ -149,8 +153,16 @@
 
     function fecharBanner() {
       banner?.classList.add('hidden');
-      const ate = Date.now() + DIAS_SUPRIMIR * 24 * 60 * 60 * 1000;
-      localStorage.setItem(CHAVE_STORAGE, String(ate));
+
+      // Lê e incrementa a contagem de vezes dispensado
+      const contagem = parseInt(localStorage.getItem(CHAVE_CONTAGEM) || '0', 10);
+      const novaContagem = contagem + 1;
+      localStorage.setItem(CHAVE_CONTAGEM, String(novaContagem));
+
+      // Busca a pausa correspondente (usa a ultima se ultrapassar o array)
+      const pausaHoras = PAUSAS_HORAS[Math.min(contagem, PAUSAS_HORAS.length - 1)];
+      const ate = Date.now() + pausaHoras * 60 * 60 * 1000;
+      localStorage.setItem(CHAVE_DISPENSADO, String(ate));
     }
 
     function abrirModalInstrucao() {
@@ -168,7 +180,7 @@
       instrucaoModal?.classList.add('hidden');
     }
 
-    // Exibe sempre o banner orientativo em dispositivos móveis não instalados
+    // Exibe o banner sempre que as condicoes forem satisfeitas
     exibirBanner();
 
     btnInstalar?.addEventListener('click', async () => {
@@ -178,10 +190,15 @@
         // Dispara a caixa nativa de instalação diretamente no celular
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') fecharBanner();
+        if (outcome === 'accepted') {
+          // Zera o historico apos instalacao confirmada
+          localStorage.removeItem(CHAVE_DISPENSADO);
+          localStorage.removeItem(CHAVE_CONTAGEM);
+          fecharBanner();
+        }
         (window as any).deferredInstallPrompt = null;
       } else {
-        // No iOS ou fallback abre o modal com o passo a passo
+        // No iOS ou fallback (DEV/HTTP), abre o modal com o passo a passo
         abrirModalInstrucao();
       }
     });
@@ -189,6 +206,10 @@
     btnFecharModal?.addEventListener('click', fecharModalInstrucao);
     overlayModal?.addEventListener('click', fecharModalInstrucao);
     btnFechar?.addEventListener('click', fecharBanner);
-    window.addEventListener('appinstalled', fecharBanner);
+    window.addEventListener('appinstalled', () => {
+      localStorage.removeItem(CHAVE_DISPENSADO);
+      localStorage.removeItem(CHAVE_CONTAGEM);
+      banner?.classList.add('hidden');
+    });
   }
 </script>
