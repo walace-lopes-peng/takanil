@@ -500,7 +500,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     });
   }
 
-  // --- Lógica dos botões de incremento/decremento de Peso (Hold a 450 BPM) ---
+  // --- Lógica dos botões de incremento/decremento de Peso (Opção C: Híbrida) ---
   const inputPeso = document.getElementById('peso') as HTMLInputElement;
   const btnDecrementarPeso = document.getElementById('btnDecrementarPeso');
   const btnIncrementarPeso = document.getElementById('btnIncrementarPeso');
@@ -509,14 +509,21 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     let animTimer: any = null;
     let holdTimeout: any = null;
     let holdInterval: any = null;
-    const INTERVALO_450BPM = Math.round(60000 / 450); // ~110ms
+    let isHolding = false;
+    const INTERVALO_450BPM = Math.round(60000 / 450); // ~133ms
 
     const animarTrocaPeso = () => {
       clearTimeout(animTimer);
-      inputPeso.classList.add('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
-      animTimer = setTimeout(() => {
-        inputPeso.classList.remove('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
-      }, 100);
+      if (isHolding) {
+        // No modo HOLD (rolagem rápida): usa apenas destaque suave de cor sem zoom, ultra-fluido
+        inputPeso.classList.add('bg-taka-green-100/80', 'border-taka-green-400');
+      } else {
+        // No clique ÚNICO: pulso de zoom elegante
+        inputPeso.classList.add('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
+        animTimer = setTimeout(() => {
+          inputPeso.classList.remove('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
+        }, 120);
+      }
     };
 
     const decrementar = () => {
@@ -546,15 +553,19 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
 
     const iniciarHold = (acao: () => void) => {
       pararHold();
+      isHolding = false;
       acao();
       holdTimeout = setTimeout(() => {
-        holdInterval = setInterval(acao, INTERVALO_410BPM);
-      }, 300);
+        isHolding = true;
+        holdInterval = setInterval(acao, INTERVALO_450BPM);
+      }, 90);
     };
 
     const pararHold = () => {
       clearTimeout(holdTimeout);
       clearInterval(holdInterval);
+      isHolding = false;
+      inputPeso.classList.remove('scale-105', 'bg-taka-green-100/80', 'bg-taka-green-100/70', 'border-taka-green-400');
     };
 
     // Eventos do botão Decrementar (Mouse + Touch)
@@ -572,6 +583,10 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     btnIncrementarPeso.addEventListener('touchstart', (e) => { e.preventDefault(); iniciarHold(incrementar); }, { passive: false });
     btnIncrementarPeso.addEventListener('touchend', pararHold);
     btnIncrementarPeso.addEventListener('touchcancel', pararHold);
+
+    // Garantir que se soltar o botão fora do elemento a repetição pare
+    window.addEventListener('mouseup', pararHold);
+    window.addEventListener('touchend', pararHold);
 
     // Selecionar todo o texto ao focar/clicar para facilitar a digitação manual no mobile
     inputPeso.addEventListener('focus', () => {
