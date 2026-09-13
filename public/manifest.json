@@ -1,11 +1,14 @@
 {
+  "id": "/",
   "name": "Hub Takanil",
   "short_name": "Takanil",
   "description": "App para gestão e transparência da ONG Takanil",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#f9fafb",
   "theme_color": "#37b08d",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/assets/takanil-icon-png.png",

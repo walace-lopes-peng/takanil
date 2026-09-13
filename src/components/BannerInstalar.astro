@@ -143,8 +143,6 @@
     const passosIOS = document.getElementById('passosIOS');
     const passosGeral = document.getElementById('passosGeral');
 
-    let eventoInstalacao: any = null;
-
     function exibirBanner() {
       banner?.classList.remove('hidden');
     }
@@ -170,25 +168,18 @@
       instrucaoModal?.classList.add('hidden');
     }
 
-    // Android / Chrome: Apenas exibe o banner quando o evento nativo 'beforeinstallprompt' for disparado
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      eventoInstalacao = e;
-      exibirBanner();
-    });
-
-    // iOS Safari: Nao possui evento nativo, entao exibe o banner orientativo direto no mobile
-    if (ehIOS) {
-      exibirBanner();
-    }
+    // Exibe sempre o banner orientativo em dispositivos móveis não instalados
+    exibirBanner();
 
     btnInstalar?.addEventListener('click', async () => {
-      if (eventoInstalacao) {
+      const deferredPrompt = (window as any).deferredInstallPrompt;
+
+      if (deferredPrompt) {
         // Dispara a caixa nativa de instalação diretamente no celular
-        eventoInstalacao.prompt();
-        const { outcome } = await eventoInstalacao.userChoice;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') fecharBanner();
-        eventoInstalacao = null;
+        (window as any).deferredInstallPrompt = null;
       } else {
         // No iOS ou fallback abre o modal com o passo a passo
         abrirModalInstrucao();
