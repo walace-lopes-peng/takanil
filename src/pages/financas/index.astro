@@ -43,10 +43,6 @@ import Layout from '../../layouts/Layout.astro';
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
             </svg>
           </button>
-
-          <span id="badgeStatusCaixa" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-100 border border-emerald-400/30">
-            ✅ Caixa Positivo
-          </span>
         </div>
       </div>
 
@@ -59,8 +55,8 @@ import Layout from '../../layouts/Layout.astro';
       </p>
     </div>
 
-    <!-- Formulário (Escondido por padrão) -->
-    <form id="formFinancas" class="space-y-5 hidden bg-gray-50 p-4 rounded-xl border border-gray-200 mt-4">
+    <!-- Formulário (Escondido por padrão com animação suave) -->
+    <form id="formFinancas" class="space-y-5 hidden bg-gray-50 p-4 rounded-xl border border-gray-200 mt-4 transition-all duration-200 ease-out">
       <div class="flex justify-between items-center mb-1">
         <h3 id="formTitle" class="font-bold text-gray-800 text-lg">Nova Transação</h3>
         <button type="button" id="btnCancelar" class="text-gray-400 hover:text-gray-600 p-1">
@@ -73,22 +69,22 @@ import Layout from '../../layouts/Layout.astro';
       <input type="hidden" id="lancamentoId" name="lancamentoId" value="">
       <input type="hidden" id="tipo" name="tipo" value="Entrada">
 
-      <!-- Alternador de Tipo (Entrada vs Saída) Integrado ao Card -->
-      <div class="grid grid-cols-2 gap-1.5 p-1 bg-gray-200/80 rounded-2xl">
+      <!-- Alternador de Tipo (Entrada vs Saída) Integrado ao Card - Alto Contraste -->
+      <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-200 border border-slate-300/80 rounded-2xl select-none">
         <button
           type="button"
           id="btnToggleTipoEntrada"
-          class="py-2.5 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs bg-white text-emerald-700"
+          class="h-11 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-150 shadow-sm bg-emerald-600 text-white border border-emerald-700/20"
         >
-          <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-black">＋</span>
+          <span id="badgeIconeEntrada" class="w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-black transition-colors">＋</span>
           <span>Entrada</span>
         </button>
         <button
           type="button"
           id="btnToggleTipoSaida"
-          class="py-2.5 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-1.5 transition-all text-gray-500 hover:text-gray-800"
+          class="h-11 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-150 text-slate-700 hover:text-slate-900 border border-transparent"
         >
-          <span class="w-5 h-5 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-black">−</span>
+          <span id="badgeIconeSaida" class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-black transition-colors">−</span>
           <span>Saída</span>
         </button>
       </div>
@@ -107,9 +103,9 @@ import Layout from '../../layouts/Layout.astro';
             −
           </button>
 
-          <!-- Input com prefixo R$ -->
+          <!-- Input com prefixo R$ (alinhado a esquerda para evitar overlap do cursor com placeholder) -->
           <div class="relative flex-1">
-            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm pointer-events-none">R$</span>
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm pointer-events-none select-none">R$</span>
             <input
               type="number"
               name="valor"
@@ -117,8 +113,8 @@ import Layout from '../../layouts/Layout.astro';
               step="0.01"
               min="0.01"
               required
-              class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 text-lg font-bold p-3 pl-11 pr-3 bg-white text-gray-800 text-center transition-all"
-              placeholder="0,00"
+              class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 text-lg font-bold p-3 pl-11 pr-3 bg-white text-gray-800 text-left placeholder:text-gray-300 transition-all"
+              placeholder="0.00"
             />
           </div>
 
@@ -175,7 +171,7 @@ import Layout from '../../layouts/Layout.astro';
 
       <!-- Submit -->
       <div class="pt-4">
-        <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-taka-orange-500 hover:bg-taka-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-orange-500 active:scale-[0.98] transition-all disabled:opacity-70">
+        <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-taka-green-600 hover:bg-taka-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-green-500 active:scale-[0.98] transition-all disabled:opacity-70">
           <span>Salvar Lançamento</span>
           <svg id="loadingSpinner" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -414,17 +410,6 @@ import Layout from '../../layouts/Layout.astro';
 
       saldoTotalGeral = saldoTotal;
       renderizarSaldoDisplay();
-
-      const badge = document.getElementById('badgeStatusCaixa');
-      if (badge) {
-        if (saldoTotal >= 0) {
-          badge.textContent = '✅ Caixa Positivo';
-          badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-100 border border-emerald-400/30';
-        } else {
-          badge.textContent = '⚠️ Caixa Negativo';
-          badge.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-100 border border-rose-400/30';
-        }
-      }
     } catch (err) {
       console.error('Erro ao calcular saldo total em caixa:', err);
     }
@@ -436,41 +421,45 @@ import Layout from '../../layouts/Layout.astro';
   if (filtroDataInicio) filtroDataInicio.value = periodoAtual.inicio;
   if (filtroDataFim) filtroDataFim.value = periodoAtual.fim;
 
-  // Alternador de Tipo no Formulário (Entrada vs Saída)
+  // Alternador de Tipo no Formulário (Entrada vs Saída) - Alto Contraste
   const btnToggleTipoEntrada = document.getElementById('btnToggleTipoEntrada');
   const btnToggleTipoSaida = document.getElementById('btnToggleTipoSaida');
 
   function setTipoFormulario(novoTipo: 'Entrada' | 'Saída') {
     tipoInput.value = novoTipo;
+    const badgeIconeEntrada = document.getElementById('badgeIconeEntrada');
+    const badgeIconeSaida = document.getElementById('badgeIconeSaida');
 
     if (novoTipo === 'Entrada') {
-      btnToggleTipoEntrada?.classList.add('bg-white', 'text-emerald-700', 'shadow-xs', 'font-bold');
-      btnToggleTipoEntrada?.classList.remove('text-gray-500', 'font-medium');
-      btnToggleTipoSaida?.classList.remove('bg-white', 'text-rose-700', 'shadow-xs', 'font-bold');
-      btnToggleTipoSaida?.classList.add('text-gray-500', 'font-medium');
+      btnToggleTipoEntrada?.classList.add('bg-emerald-600', 'text-white', 'shadow-sm', 'border-emerald-700/20');
+      btnToggleTipoEntrada?.classList.remove('text-slate-700', 'hover:text-slate-900', 'border-transparent');
+      btnToggleTipoSaida?.classList.remove('bg-rose-600', 'text-white', 'shadow-sm', 'border-rose-700/20');
+      btnToggleTipoSaida?.classList.add('text-slate-700', 'hover:text-slate-900', 'border-transparent');
 
-      if (!lancamentoIdInput.value) {
-        if (formTitle) {
-          formTitle.textContent = 'Nova Entrada';
-          formTitle.className = 'font-bold text-lg text-emerald-700';
-        }
+      if (badgeIconeEntrada) badgeIconeEntrada.className = 'w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-black transition-colors';
+      if (badgeIconeSaida) badgeIconeSaida.className = 'w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-black transition-colors';
+
+      if (!lancamentoIdInput.value && formTitle) {
+        formTitle.textContent = 'Nova Entrada';
+        formTitle.className = 'font-bold text-lg text-emerald-700';
       }
     } else {
-      btnToggleTipoSaida?.classList.add('bg-white', 'text-rose-700', 'shadow-xs', 'font-bold');
-      btnToggleTipoSaida?.classList.remove('text-gray-500', 'font-medium');
-      btnToggleTipoEntrada?.classList.remove('bg-white', 'text-emerald-700', 'shadow-xs', 'font-bold');
-      btnToggleTipoEntrada?.classList.add('text-gray-500', 'font-medium');
+      btnToggleTipoSaida?.classList.add('bg-rose-600', 'text-white', 'shadow-sm', 'border-rose-700/20');
+      btnToggleTipoSaida?.classList.remove('text-slate-700', 'hover:text-slate-900', 'border-transparent');
+      btnToggleTipoEntrada?.classList.remove('bg-emerald-600', 'text-white', 'shadow-sm', 'border-emerald-700/20');
+      btnToggleTipoEntrada?.classList.add('text-slate-700', 'hover:text-slate-900', 'border-transparent');
 
-      if (!lancamentoIdInput.value) {
-        if (formTitle) {
-          formTitle.textContent = 'Nova Saída';
-          formTitle.className = 'font-bold text-lg text-rose-700';
-        }
+      if (badgeIconeSaida) badgeIconeSaida.className = 'w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-black transition-colors';
+      if (badgeIconeEntrada) badgeIconeEntrada.className = 'w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-black transition-colors';
+
+      if (!lancamentoIdInput.value && formTitle) {
+        formTitle.textContent = 'Nova Saída';
+        formTitle.className = 'font-bold text-lg text-rose-700';
       }
     }
 
-    // Atualiza a visibilidade das categorias mantendo intactos valor, descricao e data!
-    document.querySelectorAll('.cat-toggle').forEach(el => {
+    // Atualiza a visibilidade das categorias sem salto vertical
+    document.querySelectorAll('.cat-toggle').forEach((el: any) => {
       const t = el.getAttribute('data-tipo');
       if (t === novoTipo || t === 'Ambos') {
         el.classList.remove('hidden');
@@ -568,13 +557,35 @@ import Layout from '../../layouts/Layout.astro';
     window.addEventListener('mouseup', pararHold);
     window.addEventListener('touchend', pararHold);
 
-    // Selecionar todo o texto ao focar/clicar para facilitar a digitação manual no mobile
+    // Limpa placeholder ao focar para evitar sobreposição com o cursor
     inputValor.addEventListener('focus', () => {
-      inputValor.select();
+      inputValor.placeholder = '';
+      if (inputValor.value) inputValor.select();
+    });
+
+    // Trava de no máximo 2 casas decimais durante a digitação
+    inputValor.addEventListener('input', () => {
+      if (inputValor.value.includes('.')) {
+        const [inteiro, decimal] = inputValor.value.split('.');
+        if (decimal && decimal.length > 2) {
+          inputValor.value = `${inteiro}.${decimal.slice(0, 2)}`;
+        }
+      }
+    });
+
+    inputValor.addEventListener('blur', () => {
+      if (!inputValor.value) {
+        inputValor.placeholder = '0.00';
+      } else {
+        const num = parseFloat(inputValor.value);
+        if (!isNaN(num) && num > 0) {
+          inputValor.value = (Math.round(num * 100) / 100).toFixed(2);
+        }
+      }
     });
   }
 
-  // Abrir / Fechar Formulário
+  // Abrir / Fechar Formulário com transição suave (sem tranco abrupto)
   function openForm(tipo: 'Entrada' | 'Saída') {
     lancamentoIdInput.value = '';
     form.reset();
@@ -584,18 +595,28 @@ import Layout from '../../layouts/Layout.astro';
 
     barraLancamentoRapido?.classList.add('hidden');
     form.classList.remove('hidden');
-    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    form.classList.add('opacity-0', '-translate-y-2');
+    requestAnimationFrame(() => {
+      form.classList.remove('opacity-0', '-translate-y-2');
+    });
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setTimeout(() => {
-      (document.getElementById('valor') as HTMLInputElement)?.focus();
-    }, 100);
+      (document.getElementById('valor') as HTMLInputElement)?.focus({ preventScroll: true });
+    }, 250);
   }
 
-  btnCancelar?.addEventListener('click', () => {
-    form.classList.add('hidden');
-    form.reset();
-    dataInput.value = hoje;
-    barraLancamentoRapido?.classList.remove('hidden');
-  });
+  function closeForm() {
+    form.classList.add('opacity-0', '-translate-y-2');
+    setTimeout(() => {
+      form.classList.add('hidden');
+      form.classList.remove('opacity-0', '-translate-y-2');
+      form.reset();
+      dataInput.value = hoje;
+      barraLancamentoRapido?.classList.remove('hidden');
+    }, 200);
+  }
+
+  btnCancelar?.addEventListener('click', closeForm);
 
   const showStatus = (msg: string, type: 'success' | 'error') => {
     if (!statusMessage) return;
@@ -659,9 +680,8 @@ import Layout from '../../layouts/Layout.astro';
       dataInput.value = hoje;
       
       setTimeout(() => {
-        form.classList.add('hidden');
+        closeForm();
         statusMessage?.classList.add('hidden');
-        barraLancamentoRapido?.classList.remove('hidden');
         carregarDados();
       }, 1500);
 
