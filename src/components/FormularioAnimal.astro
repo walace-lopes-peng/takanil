@@ -158,7 +158,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         <button
           type="button"
           id="btnDecrementarPeso"
-          class="h-10 w-10 flex items-center justify-center text-lg font-bold bg-gray-100 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-colors select-none shrink-0 leading-none"
+          class="h-10 w-10 flex items-center justify-center text-lg font-bold bg-taka-green-50 border border-taka-green-200 rounded-xl text-taka-green-700 hover:bg-taka-green-100 active:scale-95 transition-all select-none shrink-0 leading-none shadow-sm"
           aria-label="Diminuir peso em 0.25 kg"
         >
           −
@@ -171,7 +171,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
             step="0.05"
             min="0.1"
             required
-            class="block w-full text-left font-bold text-lg rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 pl-3 pr-2 border bg-gray-50 h-10 tracking-tight"
+            class="block w-full text-left font-bold text-lg rounded-xl border-taka-green-200 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 pl-3 pr-2 border bg-taka-green-50/20 text-taka-green-800 h-10 tracking-tight transition-all duration-150 transform-gpu"
             placeholder="4.5"
             value={dadosIniciais?.peso ?? ''}
           >
@@ -179,7 +179,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         <button
           type="button"
           id="btnIncrementarPeso"
-          class="h-10 w-10 flex items-center justify-center text-lg font-bold bg-gray-100 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-colors select-none shrink-0 leading-none"
+          class="h-10 w-10 flex items-center justify-center text-lg font-bold bg-taka-green-50 border border-taka-green-200 rounded-xl text-taka-green-700 hover:bg-taka-green-100 active:scale-95 transition-all select-none shrink-0 leading-none shadow-sm"
           aria-label="Aumentar peso em 0.25 kg"
         >
           +
@@ -505,25 +505,39 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
   const btnIncrementarPeso = document.getElementById('btnIncrementarPeso');
 
   if (inputPeso && btnDecrementarPeso && btnIncrementarPeso) {
+    let animTimer: any = null;
+
+    const animarTrocaPeso = () => {
+      clearTimeout(animTimer);
+      inputPeso.classList.add('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
+      animTimer = setTimeout(() => {
+        inputPeso.classList.remove('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
+      }, 120);
+    };
+
     btnDecrementarPeso.addEventListener('click', () => {
       const valorAtual = parseFloat(inputPeso.value) || 0;
       if (valorAtual <= 0.25) {
         inputPeso.value = '0.1';
+        animarTrocaPeso();
         return;
       }
       let novoValor = Math.floor((valorAtual - 0.001) / 0.25) * 0.25;
       novoValor = Math.max(0.1, novoValor);
       inputPeso.value = (Math.round(novoValor * 100) / 100).toString();
+      animarTrocaPeso();
     });
 
     btnIncrementarPeso.addEventListener('click', () => {
       const valorAtual = parseFloat(inputPeso.value) || 0;
       if (valorAtual < 0.1) {
         inputPeso.value = '0.25';
+        animarTrocaPeso();
         return;
       }
       let novoValor = Math.ceil((valorAtual + 0.001) / 0.25) * 0.25;
       inputPeso.value = (Math.round(novoValor * 100) / 100).toString();
+      animarTrocaPeso();
     });
 
     // Selecionar todo o texto ao focar/clicar para facilitar a digitação manual no mobile
