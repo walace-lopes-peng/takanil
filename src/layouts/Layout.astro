@@ -15,10 +15,10 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
 ---
 
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="App para gestão e transparência da ONG Takanil" />
     <link rel="icon" type="image/png" href="/assets/takanil-icon-png.png" />
     <link rel="manifest" href="/manifest.json" />
@@ -47,21 +47,37 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
       });
     </script>
   </head>
-  <body class="bg-taka-green-50 text-gray-900 font-sans min-h-screen antialiased flex flex-col">
-    <!-- Navbar simples provisória -->
-    <header class="bg-taka-green-600 text-white shadow-sm sticky top-0 z-50">
-      <div class="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
-        <a href="/" class="font-bold text-lg hover:text-taka-green-100 transition-colors flex items-center gap-2">
-          <img src="/assets/takanil-icon-png.png" alt="Logo Takanil" class="w-10 h-10 rounded-full object-cover border-2 border-white/20 bg-white" />
-          Hub Takanil
-        </a>
+  <body class="bg-taka-green-50 text-gray-900 font-sans min-h-screen antialiased flex flex-col overflow-x-hidden">
+    <!-- Navbar responsiva adaptativa -->
+    <header class="bg-taka-green-600 text-white shadow-sm sticky top-0 z-50 w-full">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-4 sm:gap-6 min-w-0">
+          <a href="/" class="font-bold text-lg hover:text-taka-green-100 transition-colors flex items-center gap-2.5 shrink-0">
+            <img src="/assets/takanil-icon-png.png" alt="Logo Takanil" class="w-10 h-10 rounded-full object-cover border-2 border-white/20 bg-white" />
+            <span class="tracking-tight text-base sm:text-lg">Hub Takanil</span>
+          </a>
+
+          <!-- Links de Navegação para Tablet / Desktop (>= md) -->
+          <nav class="hidden md:flex items-center gap-1.5" id="navDesktopLinks">
+            <a href="/" class={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${currentPath === '/' ? 'bg-white/20 text-white shadow-inner' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
+              🐾 Animais
+            </a>
+            <a href="/financas" id="desktopFinancasTab" class={`hidden px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${currentPath.startsWith('/financas') ? 'bg-white/20 text-white shadow-inner' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
+              💰 Finanças
+            </a>
+            <a href="/aprovacoes" id="desktopAprovacoesTab" class={`hidden px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${currentPath.startsWith('/aprovacoes') ? 'bg-white/20 text-white shadow-inner' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
+              📋 Aprovações
+            </a>
+          </nav>
+        </div>
+
         <div class="flex items-center gap-3">
           <!-- Botão Cãotribuição -->
-          <button id="btnOpenPixDrawer" class="rounded-full border border-taka-green-300 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center bg-white text-taka-orange-500 shadow-sm px-3 py-1.5 gap-1.5" title="Fazer uma doação">
+          <button id="btnOpenPixDrawer" class="rounded-full border border-taka-green-300 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center bg-white text-taka-orange-500 shadow-sm px-3.5 py-1.5 gap-1.5 min-h-[40px]" title="Fazer uma doação">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
             </svg>
-            <span class="text-[11px] font-bold uppercase tracking-wider">Cãotribuição</span>
+            <span class="text-xs font-bold uppercase tracking-wider">Cãotribuição</span>
           </button>
           
           <div id="authContainer" class="text-sm font-medium">
@@ -77,7 +93,7 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
       <div id="drawerOverlay" class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
       
       <!-- Painel Retrátil -->
-      <div id="drawerPanel" class="absolute top-14 w-full max-w-md left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xl rounded-b-3xl shadow-2xl -translate-y-[150%] transition-transform duration-300 pointer-events-none border-b border-taka-green-100">
+      <div id="drawerPanel" class="absolute top-16 w-full max-w-md left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xl rounded-b-3xl shadow-2xl -translate-y-[150%] transition-transform duration-300 pointer-events-none border-b border-taka-green-100">
         <div class="p-6 flex flex-col gap-4">
           <!-- Fechar -->
           <button id="btnCloseDrawer" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition-colors p-1">
@@ -119,29 +135,36 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
     <Toast />
     <ModalConfirmacao />
 
-    <!-- Conteúdo principal -->
-
-    <main class="flex-1 w-full max-w-md mx-auto p-4 flex flex-col pb-24">
+    <!-- Conteúdo principal adaptativo -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col pb-24 md:pb-12">
       <slot />
     </main>
 
-    <!-- Menu de Navegação Inferior (Bottom Tab Bar) -->
-    <nav id="bottomNav" style="display: none;" class="fixed bottom-0 w-full bg-white/80 backdrop-blur-md border-t border-gray-200 z-40 pb-safe">
-      <div class="max-w-md mx-auto h-16 flex justify-around items-center">
+    <!-- Menu de Navegação Inferior (Bottom Tab Bar - visível apenas no Mobile) -->
+    <nav id="bottomNav" class="flex md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 pb-safe shadow-lg">
+      <div class="max-w-md mx-auto h-16 flex justify-around items-center w-full px-2">
         <!-- Tab: Animais (Home) -->
-        <a href="/" class={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${currentPath === '/' ? 'text-taka-green-600' : 'text-gray-400 hover:text-gray-600'}`}>
+        <a href="/" class={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors ${currentPath === '/' ? 'text-taka-green-600 font-bold' : 'text-gray-400 hover:text-gray-600'}`}>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width={currentPath === '/' ? "2.5" : "2"}>
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
           <span class="text-[10px] font-medium">Animais</span>
         </a>
 
-        <!-- Tab: Finanças -->
-        <a href="/financas" id="financasTab" style="display: none;" class={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${currentPath.startsWith('/financas') ? 'text-taka-green-600' : 'text-gray-400 hover:text-gray-600'}`}>
+        <!-- Tab: Finanças (Adm/Dev) -->
+        <a href="/financas" id="financasTab" class={`hidden flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors ${currentPath.startsWith('/financas') ? 'text-taka-green-600 font-bold' : 'text-gray-400 hover:text-gray-600'}`}>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width={currentPath.startsWith('/financas') ? "2.5" : "2"}>
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span class="text-[10px] font-medium">Finanças</span>
+        </a>
+
+        <!-- Tab: Aprovações (Adm/Dev) -->
+        <a href="/aprovacoes" id="aprovacoesTab" class={`hidden flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors ${currentPath.startsWith('/aprovacoes') ? 'text-taka-green-600 font-bold' : 'text-gray-400 hover:text-gray-600'}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width={currentPath.startsWith('/aprovacoes') ? "2.5" : "2"}>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+          <span class="text-[10px] font-medium">Aprovações</span>
         </a>
       </div>
     </nav>
@@ -151,7 +174,9 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
 
       const authContainer = document.getElementById('authContainer');
       const financasTab = document.getElementById('financasTab');
-      const bottomNav = document.getElementById('bottomNav');
+      const aprovacoesTab = document.getElementById('aprovacoesTab');
+      const desktopFinancasTab = document.getElementById('desktopFinancasTab');
+      const desktopAprovacoesTab = document.getElementById('desktopAprovacoesTab');
 
       // Lógica do Painel Cãotribuição
       const btnOpenPix = document.getElementById('btnOpenPixDrawer');
@@ -211,8 +236,15 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
         if (session) {
           const role = await getUserRole();
           if (role === 'adm' || role === 'dev') {
-            if (bottomNav) bottomNav.style.display = 'block';
-            if (financasTab) financasTab.style.display = 'flex';
+            financasTab?.classList.remove('hidden');
+            aprovacoesTab?.classList.remove('hidden');
+            desktopFinancasTab?.classList.remove('hidden');
+            desktopAprovacoesTab?.classList.remove('hidden');
+          } else {
+            financasTab?.classList.add('hidden');
+            aprovacoesTab?.classList.add('hidden');
+            desktopFinancasTab?.classList.add('hidden');
+            desktopAprovacoesTab?.classList.add('hidden');
           }
 
           if (authContainer) {
@@ -231,6 +263,11 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
           });
           }
         } else {
+          financasTab?.classList.add('hidden');
+          aprovacoesTab?.classList.add('hidden');
+          desktopFinancasTab?.classList.add('hidden');
+          desktopAprovacoesTab?.classList.add('hidden');
+
           if (authContainer) {
             authContainer.innerHTML = `
               <a href="/login" class="text-white hover:text-taka-green-100 transition-colors flex items-center gap-1">
@@ -241,8 +278,6 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
               </a>
             `;
           }
-          if (financasTab) financasTab.style.display = 'none';
-          if (bottomNav) bottomNav.style.display = 'none';
         }
       }
 
