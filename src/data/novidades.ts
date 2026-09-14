@@ -31,5 +31,10 @@ export const NOVIDADES_VERSAO: ItemNovidade[] = [
     icone: '📸',
     titulo: '5. Instagram Oficial & Posts',
     descricao: 'Acesse o Instagram da ONG pelo novo botão flutuante e veja os posts dos animais direto nos cards.'
+  },
+  {
+    icone: '🗑️',
+    titulo: '6. Gestão de Rejeitados & Lixeira',
+    descricao: 'Na aba de Aprovações, agora é possível consultar a lixeira de sugestões rejeitadas, restaurar animais ou esvaziar a lixeira.'
   }
 ];
