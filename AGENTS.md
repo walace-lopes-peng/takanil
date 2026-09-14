@@ -149,10 +149,15 @@ Toda e qualquer nova feature ou alteração em tela existente DEVE priorizar ace
 3. **Toque Confortável**: Todos os botões e áreas clicáveis devem ter altura mínima de 44px a 48px (`py-3`).
 4. **Contraste & Tipografia**: Alto contraste de cor com texto em destaque, fácil de ler em telas de celular sob luz solar.
 
+## 📌 Gestão de Versões e Release Notes
+- **RELEASE_NOTES.md:** O agente DEVE sempre registrar e manter o arquivo `RELEASE_NOTES.md` atualizado com o histórico de cada entrega/release para facilitar o acompanhamento do lançamento.
+- **package.json:** O agente DEVE sempre verificar e sincronizar o campo `"version"` no `package.json` para corresponder à versão do build/release atual (ex: `0.10.1`).
+
 ## Antes de considerar uma tarefa pronta
 - [ ] `npm run build` roda sem erro
 - [ ] Testado manualmente em viewport mobile (375px)
 - [ ] Nenhuma chave/segredo foi commitada
+- [ ] Versão atualizada no `package.json` e `RELEASE_NOTES.md`
 - [ ] Mudança está limitada à Parte pedida, nada a mais
 - [ ] Mensagens de erro para o usuário estão em português e são compreensíveis
 
