@@ -131,12 +131,15 @@ import Layout from '../layouts/Layout.astro';
       
     } catch (error: any) {
       console.error('Erro de login:', error);
+      const msgErro = error.message === 'Invalid login credentials' 
+        ? 'E-mail ou senha incorretos.' 
+        : 'Ocorreu um erro ao tentar logar. Tente novamente.';
+
       if (errorText && errorAlert) {
-        errorText.textContent = error.message === 'Invalid login credentials' 
-          ? 'E-mail ou senha incorretos.' 
-          : 'Ocorreu um erro ao tentar logar. Tente novamente.';
+        errorText.textContent = msgErro;
         errorAlert.classList.remove('hidden');
       }
+      (window as any).mostrarToast?.(msgErro, 'erro');
       
       // Revert UI
       submitBtn.disabled = false;

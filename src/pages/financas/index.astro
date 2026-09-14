@@ -3,193 +3,311 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout title="Finanças - Hub Takanil">
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-    <div class="flex items-center justify-between mb-6">
-      <a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-      </a>
-      <h2 class="text-xl font-bold text-gray-800 text-center flex-1">Finanças</h2>
-      <div class="w-6"></div>
-    </div>
-
-    <!-- Resumo Financeiro / Saldo -->
-    <div class="bg-taka-orange-500 text-white rounded-2xl p-5 shadow-sm mb-6 transition-all duration-300">
-      <h2 class="text-sm font-medium text-gray-300 mb-1">Saldo</h2>
-      <div class="flex items-baseline space-x-2">
-        <span class="text-3xl font-bold" id="resumoSaldo">R$ 0,00</span>
-      </div>
-      <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-700/50">
-        <div>
-          <p class="text-xs text-gray-400 mb-0.5">Entradas</p>
-          <p class="text-sm font-bold text-green-400" id="resumoEntradas">R$ 0,00</p>
-        </div>
-        <div>
-          <p class="text-xs text-gray-400 mb-0.5">Saídas</p>
-          <p class="text-sm font-bold text-red-400" id="resumoSaidas">R$ 0,00</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Botões de Ação -->
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <button id="btnEntrada" class="py-4 rounded-xl text-white font-bold text-lg bg-green-600 hover:bg-green-700 active:scale-95 transition-all shadow-sm">
-        Nova Entrada
-      </button>
-      <button id="btnSaida" class="py-4 rounded-xl text-white font-bold text-lg bg-red-600 hover:bg-red-700 active:scale-95 transition-all shadow-sm">
-        Nova Saída
-      </button>
-    </div>
-
-    <!-- Formulário (Escondido por padrão) -->
-    <form id="formFinancas" class="space-y-5 hidden bg-gray-50 p-4 rounded-xl border border-gray-200 mt-4">
-      <div class="flex justify-between items-center mb-2">
-        <h3 id="formTitle" class="font-bold text-gray-800 text-lg">Nova Transação</h3>
-        <button type="button" id="btnCancelar" class="text-gray-400 hover:text-gray-600">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <input type="hidden" id="lancamentoId" name="lancamentoId" value="">
-      <input type="hidden" id="tipo" name="tipo" value="">
-
-      <!-- Valor -->
-      <div>
-        <label for="valor" class="block text-sm font-medium text-gray-700">Valor (R$)</label>
-        <input type="number" name="valor" id="valor" step="0.01" min="0.01" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-white" placeholder="Ex: 150.00">
-      </div>
-
-      <!-- Descrição -->
-      <div>
-        <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição <span class="text-xs text-gray-400 font-normal">(Opcional)</span></label>
-        <input type="text" name="descricao" id="descricao" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-white" placeholder="Ex: Ração clínica">
-      </div>
-
-      <!-- Categoria (Toggle) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {
-            [
-              { label: 'Ração', value: 'racao', type: 'Saída' },
-              { label: 'Veterinário', value: 'veterinario', type: 'Saída' },
-              { label: 'Medicamento', value: 'medicamento', type: 'Saída' },
-              { label: 'Castração', value: 'castracao', type: 'Saída' },
-              { label: 'Doação', value: 'doacao', type: 'Entrada' },
-              { label: 'Bazar', value: 'bazar', type: 'Entrada' },
-              { label: 'Rifa', value: 'rifa', type: 'Entrada' },
-              { label: 'Ajuste de Caixa', value: 'ajuste', type: 'Ambos' },
-              { label: 'Outro', value: 'outro', type: 'Ambos' }
-            ].map((cat) => (
-              <label class="cursor-pointer cat-toggle" data-tipo={cat.type}>
-                <input type="radio" name="categoria" value={cat.value} class="peer sr-only" required>
-                <div class="text-center p-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all">
-                  {cat.label}
-                </div>
-              </label>
-            ))
-          }
-        </div>
-      </div>
-
-      <!-- Data -->
-      <div>
-        <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
-        <input type="date" name="data" id="data" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-white">
-      </div>
-
-      <!-- Submit -->
-      <div class="pt-4">
-        <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-taka-orange-500 hover:bg-taka-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-orange-500 active:scale-[0.98] transition-all disabled:opacity-70">
-          <span>Salvar Lançamento</span>
-          <svg id="loadingSpinner" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Mensagem de erro/sucesso -->
-      <div id="statusMessage" class="hidden text-center text-sm font-medium p-3 rounded-xl mt-2"></div>
-    </form>
-  </div>
-
-  <!-- Seção de Filtros de Período -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
-    <div class="flex items-center justify-between mb-3">
-      <h3 class="text-sm font-bold text-gray-700">Filtrar por Período</h3>
-      <div class="flex items-center gap-3">
-        <span id="labelPeriodoAtual" class="text-xs text-taka-green-600 font-medium"></span>
-        <button id="btnExportar" class="text-xs font-bold text-taka-green-700 bg-taka-green-100 px-2 py-1 rounded hover:bg-taka-green-200 flex items-center gap-1 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          Excel
-        </button>
-      </div>
-    </div>
-
-    <!-- Chips / Atalhos de Data -->
-    <div class="flex flex-wrap gap-2" id="containerAtalhos">
-      <button type="button" data-atalho="este_mes" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-taka-green-500 bg-taka-green-50 text-taka-green-700 transition-all">
-        Este mês
-      </button>
-      <button type="button" data-atalho="hoje" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
-        Hoje
-      </button>
-      <button type="button" data-atalho="esta_semana" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
-        Esta semana
-      </button>
-      <button type="button" data-atalho="semana_passada" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
-        Semana passada
-      </button>
-      <button type="button" data-atalho="mes_passado" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
-        Mês passado
-      </button>
-      <button type="button" data-atalho="personalizado" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
-        Personalizado
-      </button>
-    </div>
-
-    <!-- Campos de Data Personalizada -->
-    <div id="containerPersonalizado" class="hidden mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-3">
-      <div>
-        <label for="filtroDataInicio" class="block text-xs font-medium text-gray-600 mb-1">Data Inicial</label>
-        <input type="date" id="filtroDataInicio" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-gray-50 focus:border-taka-green-500 focus:bg-white transition-all">
-      </div>
-      <div>
-        <label for="filtroDataFim" class="block text-xs font-medium text-gray-600 mb-1">Data Final</label>
-        <input type="date" id="filtroDataFim" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-gray-50 focus:border-taka-green-500 focus:bg-white transition-all">
-      </div>
-    </div>
-
-    <!-- Gráfico de Evolução SVG -->
-    <div id="containerGrafico" class="mt-5 pt-4 border-t border-gray-100">
-      <h4 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Evolução no Período</h4>
-      <div id="graficoSvgContainer" class="w-full">
-        <!-- SVG injetado via JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Lista de Lançamentos -->
-  <div>
-    <div class="flex justify-between items-center mb-4 px-1">
-      <h3 class="text-lg font-bold text-gray-800">Lançamentos</h3>
-      <span id="totalRegistros" class="text-xs bg-gray-200 text-gray-700 font-bold px-2 py-0.5 rounded-full">0</span>
-    </div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
     
-    <div id="listaLancamentos" class="space-y-3 pb-20">
-      <div class="text-center py-8 text-gray-400 text-sm" id="loadingState">
-        <svg class="animate-spin mx-auto h-8 w-8 text-gray-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        Carregando dados...
+    <!-- Coluna Esquerda: Saldo Total + Formulário de Transação (lg:col-span-5 xl:col-span-4) -->
+    <div class="lg:col-span-5 xl:col-span-4 space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-5">
+          <a href="/" class="text-gray-500 hover:text-gray-900 transition-colors p-1 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </a>
+          <h2 class="text-xl font-bold text-gray-800 text-center flex-1">Finanças</h2>
+          <div class="w-6"></div>
+        </div>
+
+        <!-- Saldo Total em Caixa (Estilo Verde Institucional Takanil - Alto Contraste) -->
+        <div class="bg-gradient-to-br from-taka-green-900 via-taka-green-800 to-emerald-950 text-white rounded-2xl p-6 shadow-md transition-all duration-300 relative overflow-hidden">
+          <!-- Toque decorativo suave no fundo -->
+          <div class="absolute -right-8 -bottom-8 w-44 h-44 bg-taka-green-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div class="flex items-center justify-between mb-2 relative z-10">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-200 flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Saldo Total em Caixa
+            </span>
+            <div class="flex items-center gap-2">
+              <!-- Botão Olhinho (Ocultar / Exibir Saldo) -->
+              <button
+                type="button"
+                id="btnToggleOcultarSaldo"
+                class="p-1.5 rounded-lg text-emerald-200 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                title="Ocultar ou exibir saldo"
+                aria-label="Ocultar ou exibir saldo"
+              >
+                <svg id="iconeOlhoAberto" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg id="iconeOlhoFechado" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-baseline gap-2 mt-1 relative z-10">
+            <span class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-xs" id="resumoSaldo">R$ 0,00</span>
+          </div>
+
+          <p class="text-xs text-emerald-100/80 mt-2 relative z-10">
+            Disponível para custeio, resgates e cuidados dos animais da ONG.
+          </p>
+        </div>
+
+        <!-- Formulário (Escondido por padrão com animação suave) -->
+        <form id="formFinancas" class="space-y-5 hidden bg-gray-50 p-4 rounded-xl border border-gray-200 mt-4 transition-all duration-200 ease-out">
+          <div class="flex justify-between items-center mb-1">
+            <h3 id="formTitle" class="font-bold text-gray-800 text-lg">Nova Transação</h3>
+            <button type="button" id="btnCancelar" class="text-gray-400 hover:text-gray-600 p-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <input type="hidden" id="lancamentoId" name="lancamentoId" value="">
+          <input type="hidden" id="tipo" name="tipo" value="Entrada">
+
+          <!-- Alternador de Tipo (Entrada vs Saída) Integrado ao Card - Alto Contraste -->
+          <div class="grid grid-cols-2 gap-1.5 p-1.5 bg-slate-200 border border-slate-300/80 rounded-2xl select-none">
+            <button
+              type="button"
+              id="btnToggleTipoEntrada"
+              class="h-11 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-150 shadow-sm bg-emerald-600 text-white border border-emerald-700/20"
+            >
+              <span id="badgeIconeEntrada" class="w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-black transition-colors">＋</span>
+              <span>Entrada</span>
+            </button>
+            <button
+              type="button"
+              id="btnToggleTipoSaida"
+              class="h-11 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-150 text-slate-700 hover:text-slate-900 border border-transparent"
+            >
+              <span id="badgeIconeSaida" class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-black transition-colors">−</span>
+              <span>Saída</span>
+            </button>
+          </div>
+
+          <!-- Valor com Scroller de R$ 5 -->
+          <div>
+            <label for="valor" class="block text-sm font-medium text-gray-700 mb-1.5">Valor (R$)</label>
+            <div class="flex items-center gap-2">
+              <!-- Botão Decrementar (- R$ 5) -->
+              <button
+                type="button"
+                id="btnDecrementarValor"
+                class="w-12 h-12 min-w-[48px] min-h-[48px] rounded-xl border border-gray-200 bg-white hover:bg-gray-50 active:scale-95 flex items-center justify-center font-extrabold text-2xl text-gray-700 select-none shadow-xs transition-transform"
+                aria-label="Diminuir 5 reais"
+              >
+                −
+              </button>
+
+              <!-- Input com prefixo R$ -->
+              <div class="relative flex-1">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm pointer-events-none select-none">R$</span>
+                <input
+                  type="number"
+                  name="valor"
+                  id="valor"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  class="block w-full rounded-xl border border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 text-lg font-bold p-3 pl-11 pr-3 bg-white text-gray-800 text-left placeholder:text-gray-300 transition-all"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <!-- Botão Incrementar (+ R$ 5) -->
+              <button
+                type="button"
+                id="btnIncrementarValor"
+                class="w-12 h-12 min-w-[48px] min-h-[48px] rounded-xl border border-gray-200 bg-white hover:bg-gray-50 active:scale-95 flex items-center justify-center font-extrabold text-2xl text-gray-700 select-none shadow-xs transition-transform"
+                aria-label="Aumentar 5 reais"
+              >
+                ＋
+              </button>
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          <div>
+            <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição <span class="text-xs text-gray-400 font-normal">(Opcional)</span></label>
+            <input type="text" name="descricao" id="descricao" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-white" placeholder="Ex: Ração clínica">
+          </div>
+
+          <!-- Categoria (Toggle) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {
+                [
+                  { label: 'Ração', value: 'racao', type: 'Saída' },
+                  { label: 'Veterinário', value: 'veterinario', type: 'Saída' },
+                  { label: 'Medicamento', value: 'medicamento', type: 'Saída' },
+                  { label: 'Castração', value: 'castracao', type: 'Saída' },
+                  { label: 'Doação', value: 'doacao', type: 'Entrada' },
+                  { label: 'Bazar', value: 'bazar', type: 'Entrada' },
+                  { label: 'Rifa', value: 'rifa', type: 'Entrada' },
+                  { label: 'Ajuste de Caixa', value: 'ajuste', type: 'Ambos' },
+                  { label: 'Outro', value: 'outro', type: 'Ambos' }
+                ].map((cat) => (
+                  <label class="cursor-pointer cat-toggle" data-tipo={cat.type}>
+                    <input type="radio" name="categoria" value={cat.value} class="peer sr-only" required>
+                    <div class="text-center p-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all">
+                      {cat.label}
+                    </div>
+                  </label>
+                ))
+              }
+            </div>
+          </div>
+
+          <!-- Data -->
+          <div>
+            <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
+            <input type="date" name="data" id="data" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-white">
+          </div>
+
+          <!-- Submit -->
+          <div class="pt-4">
+            <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-taka-green-600 hover:bg-taka-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-green-500 active:scale-[0.98] transition-all disabled:opacity-70">
+              <span>Salvar Lançamento</span>
+              <svg id="loadingSpinner" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Mensagem de erro/sucesso -->
+          <div id="statusMessage" class="hidden text-center text-sm font-medium p-3 rounded-xl mt-2"></div>
+        </form>
       </div>
+    </div>
+
+    <!-- Coluna Direita: Filtros + Gráfico + Extrato de Lançamentos (lg:col-span-7 xl:col-span-8) -->
+    <div class="lg:col-span-7 xl:col-span-8 space-y-6">
+      <!-- Seção de Filtros de Período -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold text-gray-700">Filtrar por Período</h3>
+          <div class="flex items-center gap-3">
+            <span id="labelPeriodoAtual" class="text-xs text-taka-green-600 font-medium"></span>
+            <button id="btnExportar" class="text-xs font-bold text-taka-green-700 bg-taka-green-100 px-2 py-1 rounded hover:bg-taka-green-200 flex items-center gap-1 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Exportar
+            </button>
+          </div>
+        </div>
+
+        <!-- Chips / Atalhos de Data -->
+        <div class="flex flex-wrap gap-2" id="containerAtalhos">
+          <button type="button" data-atalho="este_mes" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-taka-green-500 bg-taka-green-50 text-taka-green-700 transition-all">
+            Este mês
+          </button>
+          <button type="button" data-atalho="hoje" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+            Hoje
+          </button>
+          <button type="button" data-atalho="esta_semana" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+            Esta semana
+          </button>
+          <button type="button" data-atalho="semana_passada" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+            Semana passada
+          </button>
+          <button type="button" data-atalho="mes_passado" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+            Mês passado
+          </button>
+          <button type="button" data-atalho="todo_periodo" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+            Todo o período
+          </button>
+          <button type="button" data-atalho="personalizado" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+            Personalizado
+          </button>
+        </div>
+
+        <!-- Campos de Data Personalizada -->
+        <div id="containerPersonalizado" class="hidden mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-3">
+          <div>
+            <label for="filtroDataInicio" class="block text-xs font-medium text-gray-600 mb-1">Data Inicial</label>
+            <input type="date" id="filtroDataInicio" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-gray-50 focus:border-taka-green-500 focus:bg-white transition-all">
+          </div>
+          <div>
+            <label for="filtroDataFim" class="block text-xs font-medium text-gray-600 mb-1">Data Final</label>
+            <input type="date" id="filtroDataFim" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-gray-50 focus:border-taka-green-500 focus:bg-white transition-all">
+          </div>
+        </div>
+
+        <!-- Gráfico / Visão Financeira -->
+        <div id="containerGrafico" class="mt-5 pt-4 border-t border-gray-100">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <h4 id="tituloGrafico" class="text-xs font-bold text-gray-500 uppercase tracking-wider">Evolução do Saldo</h4>
+            
+            <!-- Toggle de Abas: Evolução vs Categorias -->
+            <div class="inline-flex p-0.5 bg-gray-100 rounded-xl" role="tablist">
+              <button type="button" id="tabEvolucao" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-800 shadow-sm">
+                📈 Evolução
+              </button>
+              <button type="button" id="tabCategorias" class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-gray-800 transition-all">
+                🏷️ Categorias
+              </button>
+            </div>
+          </div>
+
+          <div id="graficoSvgContainer" class="w-full">
+            <!-- Injetado dinamicamente via JS (Curva SVG ou Barras de Categoria) -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Lançamentos -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-800">Lançamentos</h3>
+          <span id="totalRegistros" class="text-xs bg-gray-200 text-gray-700 font-bold px-2 py-0.5 rounded-full">0</span>
+        </div>
+        
+        <div id="listaLancamentos" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="col-span-full text-center py-8 text-gray-400 text-sm" id="loadingState">
+            <svg class="animate-spin mx-auto h-8 w-8 text-gray-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Carregando dados...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra Flutuante de Ação Rápida (Pílula Dupla que substitui o FAB) -->
+  <div id="barraLancamentoRapido" class="fixed bottom-20 z-40 left-1/2 -translate-x-1/2 w-full max-w-md pointer-events-none px-4 flex justify-center transition-all duration-300">
+    <div class="pointer-events-auto flex items-center bg-white/95 backdrop-blur-md p-1.5 rounded-full shadow-xl border border-gray-200/90 gap-2">
+      <!-- Botão Nova Entrada -->
+      <button
+        type="button"
+        id="btnFabEntrada"
+        class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-full transition-all active:scale-95 text-xs sm:text-sm shadow-sm"
+      >
+        <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-black text-xs">＋</span>
+        <span>Entrada</span>
+      </button>
+
+      <!-- Botão Nova Saída -->
+      <button
+        type="button"
+        id="btnFabSaida"
+        class="flex items-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2.5 rounded-full transition-all active:scale-95 text-xs sm:text-sm shadow-sm"
+      >
+        <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-black text-xs">−</span>
+        <span>Saída</span>
+      </button>
     </div>
   </div>
 </Layout>
@@ -207,12 +325,10 @@ import Layout from '../../layouts/Layout.astro';
     }
   }
   import { obterIntervaloPorAtalho, type TipoAtalhoData } from '../../lib/filtrosData';
-  import { agruparLancamentos, gerarSvgGrafico } from '../../lib/agrupamentoFinancas';
+  import { calcularEvolucaoSaldo, gerarSvgCurvaSaldo, agruparPorCategorias, gerarHtmlCategorias } from '../../lib/agrupamentoFinancas';
   import * as XLSX from 'xlsx';
 
   // Elementos do Formulário
-  const btnEntrada = document.getElementById('btnEntrada');
-  const btnSaida = document.getElementById('btnSaida');
   const btnCancelar = document.getElementById('btnCancelar');
   const form = document.getElementById('formFinancas') as HTMLFormElement;
   const lancamentoIdInput = document.getElementById('lancamentoId') as HTMLInputElement;
@@ -237,14 +353,79 @@ import Layout from '../../layouts/Layout.astro';
 
   // Elementos do Resumo e Gráfico
   const resumoSaldo = document.getElementById('resumoSaldo');
-  const resumoEntradas = document.getElementById('resumoEntradas');
-  const resumoSaidas = document.getElementById('resumoSaidas');
   const graficoSvgContainer = document.getElementById('graficoSvgContainer');
+  const tabEvolucao = document.getElementById('tabEvolucao');
+  const tabCategorias = document.getElementById('tabCategorias');
+  const tituloGrafico = document.getElementById('tituloGrafico');
 
-  // Estado atual do filtro
+  // Barra Flutuante de Ação Rápida (Pílula Dupla que substitui o FAB)
+  const barraLancamentoRapido = document.getElementById('barraLancamentoRapido');
+  const btnFabEntrada = document.getElementById('btnFabEntrada');
+  const btnFabSaida = document.getElementById('btnFabSaida');
+
+  btnFabEntrada?.addEventListener('click', () => {
+    openForm('Entrada');
+  });
+
+  btnFabSaida?.addEventListener('click', () => {
+    openForm('Saída');
+  });
+
+  // Estado atual do filtro e visão gráfica
   let atalhoAtivo: TipoAtalhoData = 'este_mes';
+  let visualizacaoAtiva: 'evolucao' | 'categorias' = 'evolucao';
   let periodoAtual = obterIntervaloPorAtalho('este_mes');
   let lancamentosAtuais: any[] = [];
+
+  // Olhinho de Privacidade (Ocultar / Exibir Saldo)
+  const btnToggleOcultarSaldo = document.getElementById('btnToggleOcultarSaldo');
+  const iconeOlhoAberto = document.getElementById('iconeOlhoAberto');
+  const iconeOlhoFechado = document.getElementById('iconeOlhoFechado');
+  let saldoOculto = localStorage.getItem('takanil_ocultar_saldo') === 'true';
+  let saldoTotalGeral = 0;
+
+  function renderizarSaldoDisplay() {
+    if (!resumoSaldo) return;
+    if (saldoOculto) {
+      resumoSaldo.textContent = 'R$ ••••••';
+      iconeOlhoAberto?.classList.add('hidden');
+      iconeOlhoFechado?.classList.remove('hidden');
+    } else {
+      resumoSaldo.textContent = formatarMoeda(saldoTotalGeral);
+      iconeOlhoAberto?.classList.remove('hidden');
+      iconeOlhoFechado?.classList.add('hidden');
+    }
+  }
+
+  btnToggleOcultarSaldo?.addEventListener('click', () => {
+    saldoOculto = !saldoOculto;
+    localStorage.setItem('takanil_ocultar_saldo', saldoOculto ? 'true' : 'false');
+    renderizarSaldoDisplay();
+  });
+
+  // Saldo Total Geral da ONG
+  async function atualizarSaldoTotal() {
+    try {
+      const { data: todos, error } = await supabase
+        .from('financas')
+        .select('tipo, valor');
+
+      if (error) throw error;
+
+      let saldoTotal = 0;
+      if (todos) {
+        todos.forEach((l: any) => {
+          if (l.tipo === 'Entrada') saldoTotal += l.valor;
+          else saldoTotal -= l.valor;
+        });
+      }
+
+      saldoTotalGeral = saldoTotal;
+      renderizarSaldoDisplay();
+    } catch (err) {
+      console.error('Erro ao calcular saldo total em caixa:', err);
+    }
+  }
 
   // Setar data padrão do formulário para hoje
   const hoje = new Date().toISOString().split('T')[0];
@@ -252,49 +433,215 @@ import Layout from '../../layouts/Layout.astro';
   if (filtroDataInicio) filtroDataInicio.value = periodoAtual.inicio;
   if (filtroDataFim) filtroDataFim.value = periodoAtual.fim;
 
-  // Abrir / Fechar Formulário
-  function openForm(tipo: 'Entrada' | 'Saída') {
-    tipoInput.value = tipo;
-    formTitle!.textContent = `Nova ${tipo}`;
-    if (submitText) submitText.textContent = 'Salvar Lançamento';
-    
-    // Atualiza a lista de categorias mostradas baseadas no tipo
-    document.querySelectorAll('.cat-toggle').forEach(el => {
+  // Alternador de Tipo no Formulário (Entrada vs Saída) - Alto Contraste
+  const btnToggleTipoEntrada = document.getElementById('btnToggleTipoEntrada');
+  const btnToggleTipoSaida = document.getElementById('btnToggleTipoSaida');
+
+  function setTipoFormulario(novoTipo: 'Entrada' | 'Saída') {
+    tipoInput.value = novoTipo;
+    const badgeIconeEntrada = document.getElementById('badgeIconeEntrada');
+    const badgeIconeSaida = document.getElementById('badgeIconeSaida');
+
+    if (novoTipo === 'Entrada') {
+      btnToggleTipoEntrada?.classList.add('bg-emerald-600', 'text-white', 'shadow-sm', 'border-emerald-700/20');
+      btnToggleTipoEntrada?.classList.remove('text-slate-700', 'hover:text-slate-900', 'border-transparent');
+      btnToggleTipoSaida?.classList.remove('bg-rose-600', 'text-white', 'shadow-sm', 'border-rose-700/20');
+      btnToggleTipoSaida?.classList.add('text-slate-700', 'hover:text-slate-900', 'border-transparent');
+
+      if (badgeIconeEntrada) badgeIconeEntrada.className = 'w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-black transition-colors';
+      if (badgeIconeSaida) badgeIconeSaida.className = 'w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-black transition-colors';
+
+      if (!lancamentoIdInput.value && formTitle) {
+        formTitle.textContent = 'Nova Entrada';
+        formTitle.className = 'font-bold text-lg text-emerald-700';
+      }
+    } else {
+      btnToggleTipoSaida?.classList.add('bg-rose-600', 'text-white', 'shadow-sm', 'border-rose-700/20');
+      btnToggleTipoSaida?.classList.remove('text-slate-700', 'hover:text-slate-900', 'border-transparent');
+      btnToggleTipoEntrada?.classList.remove('bg-emerald-600', 'text-white', 'shadow-sm', 'border-emerald-700/20');
+      btnToggleTipoEntrada?.classList.add('text-slate-700', 'hover:text-slate-900', 'border-transparent');
+
+      if (badgeIconeSaida) badgeIconeSaida.className = 'w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-black transition-colors';
+      if (badgeIconeEntrada) badgeIconeEntrada.className = 'w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-black transition-colors';
+
+      if (!lancamentoIdInput.value && formTitle) {
+        formTitle.textContent = 'Nova Saída';
+        formTitle.className = 'font-bold text-lg text-rose-700';
+      }
+    }
+
+    // Atualiza a visibilidade das categorias sem salto vertical
+    document.querySelectorAll('.cat-toggle').forEach((el: any) => {
       const t = el.getAttribute('data-tipo');
-      if (t === tipo || t === 'Ambos') {
+      if (t === novoTipo || t === 'Ambos') {
         el.classList.remove('hidden');
       } else {
         el.classList.add('hidden');
+        // Se a categoria que estava selecionada não pertence ao novo tipo, desseleciona
+        const radio = el.querySelector('input[type="radio"]') as HTMLInputElement;
+        if (radio && radio.checked) {
+          radio.checked = false;
+        }
+      }
+    });
+  }
+
+  btnToggleTipoEntrada?.addEventListener('click', () => setTipoFormulario('Entrada'));
+  btnToggleTipoSaida?.addEventListener('click', () => setTipoFormulario('Saída'));
+
+  // --- Lógica dos botões de incremento/decremento de Valor (R$ 5) ---
+  const inputValor = document.getElementById('valor') as HTMLInputElement;
+  const btnDecrementarValor = document.getElementById('btnDecrementarValor');
+  const btnIncrementarValor = document.getElementById('btnIncrementarValor');
+
+  if (inputValor && btnDecrementarValor && btnIncrementarValor) {
+    let animTimer: any = null;
+    let holdTimeout: any = null;
+    let holdInterval: any = null;
+    let isHolding = false;
+    const INTERVALO_450BPM = Math.round(60000 / 450); // ~133ms
+    const PASSO_VALOR = 5.0;
+
+    const animarTrocaValor = () => {
+      clearTimeout(animTimer);
+      if (isHolding) {
+        inputValor.classList.add('bg-taka-green-50', 'border-taka-green-400');
+      } else {
+        inputValor.classList.add('scale-[1.02]', 'bg-taka-green-50', 'border-taka-green-400');
+        animTimer = setTimeout(() => {
+          inputValor.classList.remove('scale-[1.02]', 'bg-taka-green-50', 'border-taka-green-400');
+        }, 120);
+      }
+    };
+
+    const decrementarValor = () => {
+      const valorAtual = parseFloat(inputValor.value) || 0;
+      if (valorAtual <= PASSO_VALOR) {
+        inputValor.value = '0';
+        animarTrocaValor();
+        return;
+      }
+      let novoValor = Math.floor((valorAtual - 0.001) / PASSO_VALOR) * PASSO_VALOR;
+      novoValor = Math.max(0, novoValor);
+      inputValor.value = (Math.round(novoValor * 100) / 100).toString();
+      animarTrocaValor();
+    };
+
+    const incrementarValor = () => {
+      const valorAtual = parseFloat(inputValor.value) || 0;
+      let novoValor = Math.ceil((valorAtual + 0.001) / PASSO_VALOR) * PASSO_VALOR;
+      if (novoValor === valorAtual) novoValor += PASSO_VALOR;
+      inputValor.value = (Math.round(novoValor * 100) / 100).toString();
+      animarTrocaValor();
+    };
+
+    const iniciarHold = (acao: () => void) => {
+      pararHold();
+      isHolding = false;
+      acao();
+      holdTimeout = setTimeout(() => {
+        isHolding = true;
+        holdInterval = setInterval(acao, INTERVALO_450BPM);
+      }, 90);
+    };
+
+    const pararHold = () => {
+      clearTimeout(holdTimeout);
+      clearInterval(holdInterval);
+      isHolding = false;
+      inputValor.classList.remove('scale-[1.02]', 'bg-taka-green-50', 'border-taka-green-400');
+    };
+
+    btnDecrementarValor.addEventListener('mousedown', (e) => { e.preventDefault(); iniciarHold(decrementarValor); });
+    btnDecrementarValor.addEventListener('mouseup', pararHold);
+    btnDecrementarValor.addEventListener('mouseleave', pararHold);
+    btnDecrementarValor.addEventListener('touchstart', (e) => { e.preventDefault(); iniciarHold(decrementarValor); }, { passive: false });
+    btnDecrementarValor.addEventListener('touchend', pararHold);
+    btnDecrementarValor.addEventListener('touchcancel', pararHold);
+
+    btnIncrementarValor.addEventListener('mousedown', (e) => { e.preventDefault(); iniciarHold(incrementarValor); });
+    btnIncrementarValor.addEventListener('mouseup', pararHold);
+    btnIncrementarValor.addEventListener('mouseleave', pararHold);
+    btnIncrementarValor.addEventListener('touchstart', (e) => { e.preventDefault(); iniciarHold(incrementarValor); }, { passive: false });
+    btnIncrementarValor.addEventListener('touchend', pararHold);
+    btnIncrementarValor.addEventListener('touchcancel', pararHold);
+
+    window.addEventListener('mouseup', pararHold);
+    window.addEventListener('touchend', pararHold);
+
+    // Limpa placeholder ao focar para evitar sobreposição com o cursor
+    inputValor.addEventListener('focus', () => {
+      inputValor.placeholder = '';
+      if (inputValor.value) inputValor.select();
+    });
+
+    // Trava de no máximo 2 casas decimais durante a digitação
+    inputValor.addEventListener('input', () => {
+      if (inputValor.value.includes('.')) {
+        const [inteiro, decimal] = inputValor.value.split('.');
+        if (decimal && decimal.length > 2) {
+          inputValor.value = `${inteiro}.${decimal.slice(0, 2)}`;
+        }
       }
     });
 
+    inputValor.addEventListener('blur', () => {
+      if (!inputValor.value) {
+        inputValor.placeholder = '0.00';
+      } else {
+        const num = parseFloat(inputValor.value);
+        if (!isNaN(num) && num > 0) {
+          inputValor.value = (Math.round(num * 100) / 100).toFixed(2);
+        }
+      }
+    });
+  }
+
+  // Abrir / Fechar Formulário com transição suave (sem tranco abrupto)
+  function openForm(tipo: 'Entrada' | 'Saída') {
     lancamentoIdInput.value = '';
     form.reset();
     dataInput.value = hoje;
-    if (formTitle) {
-      formTitle.textContent = tipo === 'Entrada' ? 'Nova Entrada' : 'Nova Saída';
-      formTitle.className = tipo === 'Entrada' ? 'font-bold text-lg text-green-700' : 'font-bold text-lg text-red-700';
-    }
+    if (submitText) submitText.textContent = 'Salvar Lançamento';
+    setTipoFormulario(tipo);
+
+    barraLancamentoRapido?.classList.add('hidden');
     form.classList.remove('hidden');
-    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    form.classList.add('opacity-0', '-translate-y-2');
+    requestAnimationFrame(() => {
+      form.classList.remove('opacity-0', '-translate-y-2');
+    });
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      (document.getElementById('valor') as HTMLInputElement)?.focus({ preventScroll: true });
+    }, 250);
   }
 
-  btnEntrada?.addEventListener('click', () => openForm('Entrada'));
-  btnSaida?.addEventListener('click', () => openForm('Saída'));
-  btnCancelar?.addEventListener('click', () => {
-    form.classList.add('hidden');
-    form.reset();
-    dataInput.value = hoje;
-  });
+  function closeForm() {
+    form.classList.add('opacity-0', '-translate-y-2');
+    setTimeout(() => {
+      form.classList.add('hidden');
+      form.classList.remove('opacity-0', '-translate-y-2');
+      form.reset();
+      dataInput.value = hoje;
+      barraLancamentoRapido?.classList.remove('hidden');
+    }, 200);
+  }
+
+  btnCancelar?.addEventListener('click', closeForm);
 
   const showStatus = (msg: string, type: 'success' | 'error') => {
-    if (!statusMessage) return;
-    statusMessage.textContent = msg;
-    statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
-    if (type === 'error') {
-      statusMessage.classList.add('bg-red-50', 'text-red-700');
-    } else {
-      statusMessage.classList.add('bg-green-50', 'text-green-700');
+    if (statusMessage) {
+      statusMessage.textContent = msg;
+      statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
+      if (type === 'error') {
+        statusMessage.classList.add('bg-red-50', 'text-red-700');
+      } else {
+        statusMessage.classList.add('bg-green-50', 'text-green-700');
+      }
+    }
+    if ((window as any).mostrarToast) {
+      (window as any).mostrarToast(msg, type === 'success' ? 'sucesso' : 'erro');
     }
   };
 
@@ -349,7 +696,7 @@ import Layout from '../../layouts/Layout.astro';
       dataInput.value = hoje;
       
       setTimeout(() => {
-        form.classList.add('hidden');
+        closeForm();
         statusMessage?.classList.add('hidden');
         carregarDados();
       }, 1500);
@@ -377,6 +724,38 @@ import Layout from '../../layouts/Layout.astro';
     return dataISO;
   }
 
+  const MAPA_CATEGORIAS: Record<string, string> = {
+    racao: 'Ração',
+    veterinario: 'Veterinário',
+    medicamento: 'Medicamento',
+    castracao: 'Castração',
+    doacao: 'Doação',
+    bazar: 'Bazar',
+    rifa: 'Rifa',
+    ajuste: 'Ajuste de Caixa',
+    outro: 'Outro'
+  };
+
+  function obterNomeCategoria(categoria: string): string {
+    return MAPA_CATEGORIAS[categoria] || (categoria ? categoria.charAt(0).toUpperCase() + categoria.slice(1) : '');
+  }
+
+  function temDescricaoPersonalizada(descricao?: string, categoria?: string): boolean {
+    if (!descricao || !descricao.trim()) return false;
+    const descNorm = descricao.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const catNorm = (categoria || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return descNorm !== catNorm;
+  }
+
+  function escapeHtml(texto: string): string {
+    return (texto || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   // Atualizar visual dos chips de atalho
   function atualizarBotoesAtalho() {
     botoesAtalho.forEach((btn) => {
@@ -395,7 +774,11 @@ import Layout from '../../layouts/Layout.astro';
     }
 
     if (labelPeriodoAtual) {
-      labelPeriodoAtual.textContent = `${formatarDataBR(periodoAtual.inicio)} até ${formatarDataBR(periodoAtual.fim)}`;
+      if (atalhoAtivo === 'todo_periodo') {
+        labelPeriodoAtual.textContent = 'Histórico completo';
+      } else {
+        labelPeriodoAtual.textContent = `${formatarDataBR(periodoAtual.inicio)} até ${formatarDataBR(periodoAtual.fim)}`;
+      }
     }
   }
 
@@ -441,17 +824,68 @@ import Layout from '../../layouts/Layout.astro';
   filtroDataInicio?.addEventListener('change', onDataPersonalizadaChange);
   filtroDataFim?.addEventListener('change', onDataPersonalizadaChange);
 
+  // Alternância e renderização da Visão Gráfica (Evolução vs Categorias)
+  function renderizarVisaoGrafica() {
+    if (!graficoSvgContainer) return;
+
+    if (!lancamentosAtuais || lancamentosAtuais.length === 0) {
+      graficoSvgContainer.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">Sem dados para exibir no período.</div>';
+      return;
+    }
+
+    if (visualizacaoAtiva === 'evolucao') {
+      if (tituloGrafico) tituloGrafico.textContent = 'Evolução do Saldo';
+      tabEvolucao?.classList.add('bg-white', 'text-gray-800', 'shadow-sm', 'font-bold');
+      tabEvolucao?.classList.remove('text-gray-500', 'font-medium');
+      tabCategorias?.classList.remove('bg-white', 'text-gray-800', 'shadow-sm', 'font-bold');
+      tabCategorias?.classList.add('text-gray-500', 'font-medium');
+
+      const pontos = calcularEvolucaoSaldo(lancamentosAtuais as any, periodoAtual.inicio, periodoAtual.fim);
+      graficoSvgContainer.innerHTML = gerarSvgCurvaSaldo(pontos);
+    } else {
+      if (tituloGrafico) tituloGrafico.textContent = 'Distribuição por Categorias';
+      tabCategorias?.classList.add('bg-white', 'text-gray-800', 'shadow-sm', 'font-bold');
+      tabCategorias?.classList.remove('text-gray-500', 'font-medium');
+      tabEvolucao?.classList.remove('bg-white', 'text-gray-800', 'shadow-sm', 'font-bold');
+      tabEvolucao?.classList.add('text-gray-500', 'font-medium');
+
+      const dist = agruparPorCategorias(lancamentosAtuais as any);
+      graficoSvgContainer.innerHTML = gerarHtmlCategorias(dist, formatarMoeda);
+    }
+  }
+
+  tabEvolucao?.addEventListener('click', () => {
+    if (visualizacaoAtiva !== 'evolucao') {
+      visualizacaoAtiva = 'evolucao';
+      renderizarVisaoGrafica();
+    }
+  });
+
+  tabCategorias?.addEventListener('click', () => {
+    if (visualizacaoAtiva !== 'categorias') {
+      visualizacaoAtiva = 'categorias';
+      renderizarVisaoGrafica();
+    }
+  });
+
   // Expor funções globais de edição e deleção
   (window as any).deletarLancamento = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.')) return;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Excluir lançamento?',
+      mensagem: 'Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.',
+      textoConfirmar: 'Sim, Excluir',
+      tipo: 'perigo'
+    });
+    if (!confirmou) return;
     
     try {
       if (loadingState) loadingState.style.display = 'block';
       const { error } = await supabase.from('financas').delete().eq('id', id);
       if (error) throw error;
       await carregarDados();
+      (window as any).mostrarToast('Lançamento excluído com sucesso!', 'sucesso');
     } catch (err: any) {
-      alert('Erro ao excluir: ' + err.message);
+      (window as any).mostrarToast('Erro ao excluir: ' + err.message, 'erro');
       if (loadingState) loadingState.style.display = 'none';
     }
   };
@@ -461,27 +895,21 @@ import Layout from '../../layouts/Layout.astro';
     if (!l) return;
     
     lancamentoIdInput.value = l.id;
-    tipoInput.value = l.tipo;
     (document.getElementById('valor') as HTMLInputElement).value = l.valor;
-    (document.getElementById('descricao') as HTMLInputElement).value = l.descricao || '';
+    const descVal = temDescricaoPersonalizada(l.descricao, l.categoria) ? l.descricao : '';
+    (document.getElementById('descricao') as HTMLInputElement).value = descVal;
     (document.getElementById('data') as HTMLInputElement).value = l.data;
     
-    // Atualiza a lista de categorias antes de marcar o rádio
-    document.querySelectorAll('.cat-toggle').forEach(el => {
-      const t = el.getAttribute('data-tipo');
-      if (t === l.tipo || t === 'Ambos') {
-        el.classList.remove('hidden');
-      } else {
-        el.classList.add('hidden');
-      }
-    });
+    setTipoFormulario(l.tipo as 'Entrada' | 'Saída');
 
     const radioCat = document.querySelector(`input[name="categoria"][value="${l.categoria}"]`) as HTMLInputElement;
     if (radioCat) radioCat.checked = true;
 
     formTitle!.textContent = 'Editar Lançamento';
+    formTitle!.className = 'font-bold text-gray-800 text-lg';
     if (submitText) submitText.textContent = 'Atualizar Lançamento';
     
+    barraLancamentoRapido?.classList.add('hidden');
     form.classList.remove('hidden');
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -492,11 +920,16 @@ import Layout from '../../layouts/Layout.astro';
       loadingState.style.display = 'block';
     }
 
-    const { data: lancamentos, error } = await supabase
+    let query = supabase
       .from('financas')
-      .select('*')
-      .gte('data', periodoAtual.inicio)
-      .lte('data', periodoAtual.fim)
+      .select('*');
+
+    if (atalhoAtivo !== 'todo_periodo') {
+      if (periodoAtual.inicio) query = query.gte('data', periodoAtual.inicio);
+      if (periodoAtual.fim) query = query.lte('data', periodoAtual.fim);
+    }
+
+    const { data: lancamentos, error } = await query
       .order('data', { ascending: false })
       .order('created_at', { ascending: false });
 
@@ -519,17 +952,13 @@ import Layout from '../../layouts/Layout.astro';
     if (!lancamentos || lancamentos.length === 0) {
       if (listaLancamentos) {
         listaLancamentos.innerHTML = `
-          <div class="text-center py-8 text-gray-500 bg-white rounded-xl border border-gray-100 shadow-sm text-sm">
+          <div class="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-xl border border-gray-100 shadow-sm text-sm">
             Nenhum lançamento encontrado para este período.
           </div>`;
       }
       
-      // Zera o resumo e gráfico
-      if (resumoSaldo) { resumoSaldo.textContent = 'R$ 0,00'; resumoSaldo.className = 'text-3xl font-bold text-gray-300'; }
-      if (resumoEntradas) resumoEntradas.textContent = 'R$ 0,00';
-      if (resumoSaidas) resumoSaidas.textContent = 'R$ 0,00';
-      if (graficoSvgContainer) graficoSvgContainer.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">Sem dados para exibir no gráfico.</div>';
-      
+      if (graficoSvgContainer) graficoSvgContainer.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">Sem dados para exibir no período.</div>';
+      atualizarSaldoTotal();
       return;
     }
 
@@ -545,19 +974,25 @@ import Layout from '../../layouts/Layout.astro';
       if (isEntrada) totalEntradas += l.valor;
       else totalSaidas += l.valor;
 
-      const catLabel = l.categoria.charAt(0).toUpperCase() + l.categoria.slice(1);
+      const catLabel = obterNomeCategoria(l.categoria);
+      const temDescricao = temDescricaoPersonalizada(l.descricao, l.categoria);
 
       html += `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center">
-          <div class="flex-1 pr-4">
-            <h4 class="font-bold text-gray-800 text-sm truncate">${l.descricao}</h4>
-            <p class="text-xs text-gray-500 mt-0.5">${catLabel} • ${formatarDataBR(l.data)}</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-start">
+          <div class="flex-1 pr-3">
+            <h4 class="font-bold text-gray-800 text-sm sm:text-base leading-tight">${catLabel}</h4>
+            ${temDescricao ? `
+              <p class="text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed break-words" title="${escapeHtml(l.descricao)}">
+                ${escapeHtml(l.descricao)}
+              </p>
+            ` : ''}
+            <p class="text-[11px] text-gray-400 mt-1">${formatarDataBR(l.data)}</p>
           </div>
           <div class="text-right flex-shrink-0">
-            <p class="font-bold text-sm ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
-            <div class="flex justify-end gap-3 mt-1.5">
-              <button onclick="window.editarLancamento('${l.id}')" class="text-xs font-medium text-taka-green-600 hover:text-taka-green-800 underline">Editar</button>
-              <button onclick="window.deletarLancamento('${l.id}')" class="text-xs font-medium text-red-600 hover:text-red-800 underline">Excluir</button>
+            <p class="font-bold text-sm sm:text-base ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
+            <div class="flex justify-end gap-3 mt-2">
+              <button onclick="window.editarLancamento('${l.id}')" class="text-xs font-medium text-taka-green-600 hover:text-taka-green-800 py-1 hover:underline">Editar</button>
+              <button onclick="window.deletarLancamento('${l.id}')" class="text-xs font-medium text-red-600 hover:text-red-800 py-1 hover:underline">Excluir</button>
             </div>
           </div>
         </div>
@@ -566,37 +1001,26 @@ import Layout from '../../layouts/Layout.astro';
 
     if (listaLancamentos) listaLancamentos.innerHTML = html;
 
-    // Atualizar Resumo
-    const saldo = totalEntradas - totalSaidas;
-    if (resumoEntradas) resumoEntradas.textContent = formatarMoeda(totalEntradas);
-    if (resumoSaidas) resumoSaidas.textContent = formatarMoeda(totalSaidas);
-    if (resumoSaldo) {
-      resumoSaldo.textContent = formatarMoeda(saldo);
-      if (saldo > 0) resumoSaldo.className = 'text-3xl font-bold text-green-400';
-      else if (saldo < 0) resumoSaldo.className = 'text-3xl font-bold text-red-400';
-      else resumoSaldo.className = 'text-3xl font-bold text-gray-300';
-    }
-    
-    // Atualizar Gráfico
-    if (graficoSvgContainer) {
-      const grupos = agruparLancamentos(lancamentos as any, periodoAtual.inicio, periodoAtual.fim);
-      graficoSvgContainer.innerHTML = gerarSvgGrafico(grupos);
-    }
+    // Atualizar Visão Gráfica (Evolução ou Categorias)
+    renderizarVisaoGrafica();
+
+    // Atualizar Saldo Total em Caixa (sempre reflete a conta real da ONG)
+    atualizarSaldoTotal();
   }
 
   // Exportar Excel
   const btnExportar = document.getElementById('btnExportar');
   btnExportar?.addEventListener('click', () => {
     if (lancamentosAtuais.length === 0) {
-      alert('Nenhum dado para exportar neste período.');
+      (window as any).mostrarToast('Nenhum dado para exportar neste período.', 'aviso');
       return;
     }
 
     const linhas = lancamentosAtuais.map(l => ({
       Data: formatarDataBR(l.data),
       Tipo: l.tipo,
-      Categoria: l.categoria.charAt(0).toUpperCase() + l.categoria.slice(1),
-      Descrição: l.descricao || 'Sem descrição',
+      Categoria: obterNomeCategoria(l.categoria),
+      Descrição: temDescricaoPersonalizada(l.descricao, l.categoria) ? l.descricao : 'Sem descrição adicional',
       Valor: formatarMoeda(l.valor)
     }));
 

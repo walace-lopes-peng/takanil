@@ -141,23 +141,10 @@ tocar em algo fora do escopo da Parte pedida, pare e explique antes de agir.
 - Erros de usuário (formulário inválido, falha de rede) sempre viram uma
   mensagem em português simples na tela — nunca só um `console.error` silencioso
 
-## ♿ Acessibilidade Universal & Inclusão Visual (Regra Geral)
-As usuárias finais são voluntárias da ONG (muitas com mais idade ou sem experiência técnica).
-Toda e qualquer nova feature ou alteração em tela existente DEVE priorizar acessibilidade e legibilidade:
-1. **Legibilidade Clara**: Botões e controles com texto limpo e direto (ex: "Filtrar"), evitando ícones soltos ou rolagem horizontal escondida.
-2. **Organização em Colunas e Linhas**: Telas com múltiplas opções (como modais de filtro) devem distribuir os itens em colunas e linhas paralelas bem alinhadas para leitura rápida, sem rolagem horizontal.
-3. **Toque Confortável**: Todos os botões e áreas clicáveis devem ter altura mínima de 44px a 48px (`py-3`).
-4. **Contraste & Tipografia**: Alto contraste de cor com texto em destaque, fácil de ler em telas de celular sob luz solar.
-
-## 📌 Gestão de Versões e Release Notes
-- **RELEASE_NOTES.md:** O agente DEVE sempre registrar e manter o arquivo `RELEASE_NOTES.md` atualizado com o histórico de cada entrega/release para facilitar o acompanhamento do lançamento.
-- **package.json:** O agente DEVE sempre verificar e sincronizar o campo `"version"` no `package.json` para corresponder à versão do build/release atual (ex: `0.10.1`).
-
 ## Antes de considerar uma tarefa pronta
 - [ ] `npm run build` roda sem erro
 - [ ] Testado manualmente em viewport mobile (375px)
 - [ ] Nenhuma chave/segredo foi commitada
-- [ ] Versão atualizada no `package.json` e `RELEASE_NOTES.md`
 - [ ] Mudança está limitada à Parte pedida, nada a mais
 - [ ] Mensagens de erro para o usuário estão em português e são compreensíveis
 

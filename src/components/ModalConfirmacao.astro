@@ -1,0 +1,133 @@
+---
+// ModalConfirmacao.astro
+// Modal visual de confirmação acessível para substituir window.confirm() nativo.
+---
+
+<div
+  id="modalConfirmacaoGlobal"
+  class="fixed inset-0 z-[9998] bg-black/60 hidden flex items-center justify-center p-4 backdrop-blur-xs transition-opacity duration-150 opacity-0"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modalConfirmacaoTitulo"
+>
+  <div
+    id="modalConfirmacaoCard"
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-6 transform transition-all duration-150 scale-95 flex flex-col gap-4 border border-gray-100"
+  >
+    <div class="flex items-start gap-3">
+      <div id="modalConfirmacaoIcone" class="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-xl shrink-0">
+        ⚠️
+      </div>
+      <div class="flex-1 min-w-0 pt-0.5">
+        <h3 id="modalConfirmacaoTitulo" class="text-base font-bold text-gray-900 leading-snug">
+          Confirmar ação
+        </h3>
+        <p id="modalConfirmacaoMensagem" class="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed break-words">
+          Tem certeza que deseja continuar?
+        </p>
+      </div>
+    </div>
+
+    <div class="flex gap-2.5 mt-2 pt-2 border-t border-gray-100">
+      <button
+        type="button"
+        id="modalConfirmacaoBtnCancelar"
+        class="flex-1 py-3 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 active:scale-95 text-gray-700 font-bold text-sm transition-all min-h-[48px] flex items-center justify-center"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        id="modalConfirmacaoBtnConfirmar"
+        class="flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold text-sm transition-all shadow-sm min-h-[48px] flex items-center justify-center"
+      >
+        Sim, Excluir
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    window.confirmarAcao = function (opcoes) {
+      opcoes = opcoes || {};
+      return new Promise(function (resolve) {
+        const modal = document.getElementById('modalConfirmacaoGlobal');
+        const card = document.getElementById('modalConfirmacaoCard');
+        const tituloEl = document.getElementById('modalConfirmacaoTitulo');
+        const msgEl = document.getElementById('modalConfirmacaoMensagem');
+        const btnConfirmar = document.getElementById('modalConfirmacaoBtnConfirmar');
+        const btnCancelar = document.getElementById('modalConfirmacaoBtnCancelar');
+        const iconeContainer = document.getElementById('modalConfirmacaoIcone');
+
+        if (!modal || !card || !tituloEl || !msgEl || !btnConfirmar || !btnCancelar) {
+          resolve(window.confirm(opcoes.mensagem || 'Deseja confirmar?'));
+          return;
+        }
+
+        const titulo = opcoes.titulo || 'Confirmar ação';
+        const mensagem = opcoes.mensagem || 'Tem certeza que deseja continuar?';
+        const tipo = opcoes.tipo || 'perigo';
+        const textoConfirmar = opcoes.textoConfirmar || (tipo === 'perigo' ? 'Sim, Excluir' : 'Confirmar');
+        const textoCancelar = opcoes.textoCancelar || 'Cancelar';
+
+        tituloEl.textContent = titulo;
+        msgEl.textContent = mensagem;
+        btnConfirmar.textContent = textoConfirmar;
+        btnCancelar.textContent = textoCancelar;
+
+        if (tipo === 'perigo') {
+          btnConfirmar.className = 'flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold text-sm transition-all shadow-sm min-h-[48px] flex items-center justify-center';
+          if (iconeContainer) {
+            iconeContainer.className = 'w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-xl shrink-0';
+            iconeContainer.textContent = '⚠️';
+          }
+        } else {
+          btnConfirmar.className = 'flex-1 py-3 px-4 rounded-xl bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-sm transition-all shadow-sm min-h-[48px] flex items-center justify-center';
+          if (iconeContainer) {
+            iconeContainer.className = 'w-12 h-12 rounded-2xl bg-taka-green-100 text-taka-green-700 flex items-center justify-center text-xl shrink-0';
+            iconeContainer.textContent = '✅';
+          }
+        }
+
+        function fechar(resultado) {
+          modal.classList.remove('opacity-100');
+          card.classList.remove('scale-100');
+          card.classList.add('scale-95');
+          setTimeout(function () {
+            modal.classList.add('hidden');
+            btnConfirmar.removeEventListener('click', onConfirmClick);
+            btnCancelar.removeEventListener('click', onCancelClick);
+            modal.removeEventListener('click', onBackdropClick);
+            resolve(resultado);
+          }, 150);
+        }
+
+        function onConfirmClick() {
+          fechar(true);
+        }
+
+        function onCancelClick() {
+          fechar(false);
+        }
+
+        function onBackdropClick(e) {
+          if (e.target === modal) {
+            fechar(false);
+          }
+        }
+
+        btnConfirmar.addEventListener('click', onConfirmClick);
+        btnCancelar.addEventListener('click', onCancelClick);
+        modal.addEventListener('click', onBackdropClick);
+
+        modal.classList.remove('hidden');
+        requestAnimationFrame(function () {
+          modal.classList.add('opacity-100');
+          card.classList.remove('scale-95');
+          card.classList.add('scale-100');
+        });
+      });
+    };
+  })();
+</script>

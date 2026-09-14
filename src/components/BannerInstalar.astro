@@ -1,34 +1,36 @@
+
 ---
 // BannerInstalar.astro
-// Exibe um prompt de instalacao PWA para dispositivos moveis.
+// Exibe um prompt de instalacao PWA para dispositivos moveis / navegadores moveis.
 // Android: usa o evento nativo `beforeinstallprompt` do browser.
 // iOS: exibe instrucao manual (Safari nao dispara o evento nativo).
+// Desktop/Geral: fallback para teste ou navegadores sem acionamento automatico.
 ---
 
 <div id="bannerInstalar" class="hidden">
   <!-- Banner principal -->
   <div
     id="bannerConteudo"
-    class="fixed top-14 left-0 right-0 z-50 mx-auto max-w-md px-3 pt-2"
+    class="fixed top-16 left-0 right-0 z-50 mx-auto max-w-md px-3 pt-1"
   >
-    <div class="flex items-center gap-3 rounded-2xl bg-taka-green-600 px-4 py-3 shadow-lg text-white">
+    <div class="flex items-center gap-3 rounded-2xl bg-white border border-taka-green-200 p-3.5 shadow-2xl text-gray-900 ring-1 ring-black/5">
       <!-- Icone do app -->
-      <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-taka-green-100 flex items-center justify-center text-taka-green-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
       </div>
 
       <!-- Texto -->
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold leading-tight">Instale o Hub Takanil</p>
-        <p class="text-xs text-taka-green-100 leading-tight mt-0.5">Acesse mais rapido, sem precisar do navegador</p>
+        <p class="text-sm font-bold leading-tight text-gray-900">Instale o Hub Takanil</p>
+        <p class="text-xs text-gray-500 leading-tight mt-0.5">Acesse mais rápido na tela inicial</p>
       </div>
 
       <!-- Botao instalar -->
       <button
         id="btnInstalar"
-        class="flex-shrink-0 bg-white text-taka-green-600 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-taka-green-50 transition-colors"
+        class="flex-shrink-0 bg-taka-green-600 hover:bg-taka-green-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl active:scale-95 transition-all shadow-sm"
       >
         Instalar
       </button>
@@ -36,8 +38,8 @@
       <!-- Fechar -->
       <button
         id="btnFecharBanner"
-        aria-label="Fechar banner"
-        class="flex-shrink-0 text-taka-green-200 hover:text-white transition-colors ml-1"
+        aria-label="Fechar banner de instalação"
+        class="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 active:scale-90 transition-all rounded-full"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -46,25 +48,26 @@
     </div>
   </div>
 
-  <!-- Instrucao iOS (overlay deslizavel) -->
+  <!-- Instrucao de instalacao (Modal/Overlay) -->
   <div
-    id="instrucaoIOS"
+    id="instrucaoInstalacao"
     class="hidden fixed inset-0 z-50 flex items-end"
   >
-    <div id="overlayIOS" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div id="overlayInstalacao" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
     <div class="relative w-full max-w-md mx-auto bg-white rounded-t-3xl p-6 pb-10 shadow-2xl">
       <div class="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-5"></div>
 
-      <h2 class="text-base font-bold text-gray-900 text-center mb-4">
-        Adicionar a Tela Inicial
+      <h2 id="tituloModalInstalacao" class="text-base font-bold text-gray-900 text-center mb-4">
+        Adicionar à Tela Inicial
       </h2>
 
-      <ol class="space-y-4">
+      <!-- Passos iOS -->
+      <ol id="passosIOS" class="space-y-4 hidden">
         <li class="flex items-start gap-3">
           <span class="flex-shrink-0 w-7 h-7 rounded-full bg-taka-green-100 text-taka-green-600 text-sm font-bold flex items-center justify-center">1</span>
           <p class="text-sm text-gray-700 pt-0.5">
-            Toque no botao <strong>Compartilhar</strong>
+            Toque no botão <strong>Compartilhar</strong>
             <span class="inline-flex items-center justify-center w-6 h-6 bg-taka-green-500 rounded-md mx-1 align-middle">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -76,7 +79,7 @@
         <li class="flex items-start gap-3">
           <span class="flex-shrink-0 w-7 h-7 rounded-full bg-taka-green-100 text-taka-green-600 text-sm font-bold flex items-center justify-center">2</span>
           <p class="text-sm text-gray-700 pt-0.5">
-            Role para baixo e toque em <strong>"Adicionar a Tela Inicial"</strong>
+            Role para baixo e toque em <strong>"Adicionar à Tela Inicial"</strong>
           </p>
         </li>
         <li class="flex items-start gap-3">
@@ -87,8 +90,24 @@
         </li>
       </ol>
 
+      <!-- Passos Geral (Android / Chrome sem prompt automático) -->
+      <ol id="passosGeral" class="space-y-4 hidden">
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-taka-green-100 text-taka-green-600 text-sm font-bold flex items-center justify-center">1</span>
+          <p class="text-sm text-gray-700 pt-0.5">
+            Abra o menu do navegador (ícone de <strong>3 pontos ⋮</strong> ou opções no topo/rodapé)
+          </p>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-taka-green-100 text-taka-green-600 text-sm font-bold flex items-center justify-center">2</span>
+          <p class="text-sm text-gray-700 pt-0.5">
+            Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à Tela Inicial"</strong>
+          </p>
+        </li>
+      </ol>
+
       <button
-        id="btnFecharIOS"
+        id="btnFecharModalInstalacao"
         class="mt-6 w-full bg-taka-green-600 text-white font-semibold py-3 rounded-xl hover:bg-taka-green-700 transition-colors"
       >
         Entendi
@@ -98,35 +117,33 @@
 </div>
 
 <script>
-  const CHAVE_STORAGE = 'takanil_banner_install_dispensado_ate';
-  const DIAS_SUPRIMIR = 7;
+  const CHAVE_DISPENSADO = 'takanil_banner_install_dispensado_ate';
+  const CHAVE_CONTAGEM   = 'takanil_banner_install_contagem';
 
-  // 1. Nao exibe se ja instalado (modo standalone)
-  // navigator.standalone e propriedade nao padronizada do iOS — cast necessario
+  // Escalonamento de pausa por numero de vezes dispensado (em horas)
+  const PAUSAS_HORAS = [4, 72, 168, 240, 720, 2160]; // 4h, 3d, 7d, 10d, 30d, 90d
+
+  // Nao exibe se ja instalado (modo standalone)
   const jaInstalado =
     (window.navigator as any).standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches;
 
-  // 2. Nao exibe se dispensado recentemente
-  const dispensadoAte = localStorage.getItem(CHAVE_STORAGE);
-  const dispensado = dispensadoAte && Date.now() < Number(dispensadoAte);
+  const dispensadoAte = localStorage.getItem(CHAVE_DISPENSADO);
+  const dispensado = Boolean(dispensadoAte && Date.now() < Number(dispensadoAte));
 
-  // 3. Apenas em mobile
-  const ehMobile = window.innerWidth < 768;
+  // Apenas em telas/dispositivos moveis
+  const ehMobile = window.innerWidth < 768 || /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+  const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
   if (!jaInstalado && !dispensado && ehMobile) {
-    const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
     const banner = document.getElementById('bannerInstalar');
     const btnInstalar = document.getElementById('btnInstalar');
     const btnFechar = document.getElementById('btnFecharBanner');
-    const instrucaoIOS = document.getElementById('instrucaoIOS');
-    const overlayIOS = document.getElementById('overlayIOS');
-    const btnFecharIOS = document.getElementById('btnFecharIOS');
-
-    // Guarda o evento nativo do Android (BeforeInstallPromptEvent nao e padrao no TS)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let eventoInstalacao: any = null;
+    const instrucaoModal = document.getElementById('instrucaoInstalacao');
+    const overlayModal = document.getElementById('overlayInstalacao');
+    const btnFecharModal = document.getElementById('btnFecharModalInstalacao');
+    const passosIOS = document.getElementById('passosIOS');
+    const passosGeral = document.getElementById('passosGeral');
 
     function exibirBanner() {
       banner?.classList.remove('hidden');
@@ -134,42 +151,63 @@
 
     function fecharBanner() {
       banner?.classList.add('hidden');
-      const ate = Date.now() + DIAS_SUPRIMIR * 24 * 60 * 60 * 1000;
-      localStorage.setItem(CHAVE_STORAGE, String(ate));
+
+      // Lê e incrementa a contagem de vezes dispensado
+      const contagem = parseInt(localStorage.getItem(CHAVE_CONTAGEM) || '0', 10);
+      const novaContagem = contagem + 1;
+      localStorage.setItem(CHAVE_CONTAGEM, String(novaContagem));
+
+      // Busca a pausa correspondente (usa a ultima se ultrapassar o array)
+      const pausaHoras = PAUSAS_HORAS[Math.min(contagem, PAUSAS_HORAS.length - 1)];
+      const ate = Date.now() + pausaHoras * 60 * 60 * 1000;
+      localStorage.setItem(CHAVE_DISPENSADO, String(ate));
     }
 
-    function abrirInstrucaoIOS() {
-      instrucaoIOS?.classList.remove('hidden');
+    function abrirModalInstrucao() {
+      if (ehIOS) {
+        passosIOS?.classList.remove('hidden');
+        passosGeral?.classList.add('hidden');
+      } else {
+        passosGeral?.classList.remove('hidden');
+        passosIOS?.classList.add('hidden');
+      }
+      instrucaoModal?.classList.remove('hidden');
     }
 
-    function fecharInstrucaoIOS() {
-      instrucaoIOS?.classList.add('hidden');
+    function fecharModalInstrucao() {
+      instrucaoModal?.classList.add('hidden');
     }
 
-    // Android: intercepta o evento nativo e exibe nosso banner
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      eventoInstalacao = e;
-      exibirBanner();
+    // Exibe o banner sempre que as condicoes forem satisfeitas
+    exibirBanner();
+
+    btnInstalar?.addEventListener('click', async () => {
+      const deferredPrompt = (window as any).deferredInstallPrompt;
+
+      if (deferredPrompt) {
+        // Dispara a caixa nativa de instalação diretamente no celular
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          // Zera o historico apos instalacao confirmada
+          localStorage.removeItem(CHAVE_DISPENSADO);
+          localStorage.removeItem(CHAVE_CONTAGEM);
+          fecharBanner();
+        }
+        (window as any).deferredInstallPrompt = null;
+      } else {
+        // No iOS ou fallback (DEV/HTTP), abre o modal com o passo a passo
+        abrirModalInstrucao();
+      }
     });
 
-    if (ehIOS) {
-      exibirBanner();
-      btnInstalar?.addEventListener('click', abrirInstrucaoIOS);
-      btnFecharIOS?.addEventListener('click', fecharInstrucaoIOS);
-      overlayIOS?.addEventListener('click', fecharInstrucaoIOS);
-    } else {
-      // Android/Chrome: aciona o prompt nativo
-      btnInstalar?.addEventListener('click', async () => {
-        if (!eventoInstalacao) return;
-        eventoInstalacao.prompt();
-        const { outcome } = await eventoInstalacao.userChoice;
-        if (outcome === 'accepted') fecharBanner();
-        eventoInstalacao = null;
-      });
-    }
-
+    btnFecharModal?.addEventListener('click', fecharModalInstrucao);
+    overlayModal?.addEventListener('click', fecharModalInstrucao);
     btnFechar?.addEventListener('click', fecharBanner);
-    window.addEventListener('appinstalled', fecharBanner);
+    window.addEventListener('appinstalled', () => {
+      localStorage.removeItem(CHAVE_DISPENSADO);
+      localStorage.removeItem(CHAVE_CONTAGEM);
+      banner?.classList.add('hidden');
+    });
   }
 </script>
