@@ -1,4 +1,4 @@
-export type TipoAtalhoData = 'hoje' | 'esta_semana' | 'semana_passada' | 'este_mes' | 'mes_passado' | 'personalizado';
+export type TipoAtalhoData = 'hoje' | 'esta_semana' | 'semana_passada' | 'este_mes' | 'mes_passado' | 'todo_periodo' | 'personalizado';
 
 export interface IntervaloData {
   inicio: string; // Formato YYYY-MM-DD
@@ -69,6 +69,14 @@ export function obterIntervaloPorAtalho(atalho: TipoAtalhoData, refData: Date = 
       return {
         inicio: formatarDataISO(primeiroDiaMesPassado),
         fim: formatarDataISO(ultimoDiaMesPassado),
+      };
+    }
+
+    case 'todo_periodo': {
+      // Desde a fundação / base histórica da ONG até hoje
+      return {
+        inicio: '2020-01-01',
+        fim: formatarDataISO(hoje),
       };
     }
 

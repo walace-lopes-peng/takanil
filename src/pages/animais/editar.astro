@@ -163,6 +163,26 @@ import Layout from '../../layouts/Layout.astro';
       const spinner = document.getElementById('loadingSpinner')!;
       const statusMessage = document.getElementById('statusMessage')!;
 
+      const inputPeso = form.querySelector('input[name="peso"]') as HTMLInputElement;
+      if (inputPeso) {
+        inputPeso.addEventListener('input', () => {
+          if (inputPeso.value.includes('.')) {
+            const [inteiro, decimal] = inputPeso.value.split('.');
+            if (decimal && decimal.length > 2) {
+              inputPeso.value = `${inteiro}.${decimal.slice(0, 2)}`;
+            }
+          }
+        });
+        inputPeso.addEventListener('blur', () => {
+          if (inputPeso.value) {
+            const num = parseFloat(inputPeso.value);
+            if (!isNaN(num) && num > 0) {
+              inputPeso.value = (Math.round(num * 100) / 100).toString();
+            }
+          }
+        });
+      }
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const fd = new FormData(form);

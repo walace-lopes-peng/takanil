@@ -596,5 +596,24 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     inputPeso.addEventListener('focus', () => {
       inputPeso.select();
     });
+
+    // Trava de no máximo 2 casas decimais no peso durante a digitação
+    inputPeso.addEventListener('input', () => {
+      if (inputPeso.value.includes('.')) {
+        const [inteiro, decimal] = inputPeso.value.split('.');
+        if (decimal && decimal.length > 2) {
+          inputPeso.value = `${inteiro}.${decimal.slice(0, 2)}`;
+        }
+      }
+    });
+
+    inputPeso.addEventListener('blur', () => {
+      if (inputPeso.value) {
+        const num = parseFloat(inputPeso.value);
+        if (!isNaN(num) && num > 0) {
+          inputPeso.value = (Math.round(num * 100) / 100).toString();
+        }
+      }
+    });
   }
 </script>
