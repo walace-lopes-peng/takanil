@@ -178,6 +178,7 @@ import Layout from '../../layouts/Layout.astro';
         if (!fase_vida || !sexo || isNaN(peso) || peso <= 0) {
           statusMessage.textContent = 'Por favor, preencha todos os campos obrigatórios.';
           statusMessage.className = 'text-center text-sm font-medium p-3 rounded-xl bg-red-50 text-red-700';
+          (window as any).mostrarToast?.('Por favor, preencha todos os campos obrigatórios.', 'erro');
           return;
         }
 
@@ -198,9 +199,11 @@ import Layout from '../../layouts/Layout.astro';
         if (dbError) {
           statusMessage.textContent = 'Erro ao salvar: ' + dbError.message;
           statusMessage.className = 'text-center text-sm font-medium p-3 rounded-xl bg-red-50 text-red-700';
+          (window as any).mostrarToast?.('Erro ao salvar: ' + dbError.message, 'erro');
         } else {
           statusMessage.textContent = '✅ Dados atualizados com sucesso!';
           statusMessage.className = 'text-center text-sm font-medium p-3 rounded-xl bg-green-50 text-green-700';
+          (window as any).mostrarToast?.('Dados atualizados com sucesso!', 'sucesso');
           setTimeout(() => { window.location.href = '/'; }, 1500);
         }
       });
