@@ -39,7 +39,7 @@
       <button
         id="btnFecharBanner"
         aria-label="Fechar banner de instalação"
-        class="flex-shrink-0 min-w-[36px] min-h-[36px] flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+        class="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 active:scale-90 transition-all rounded-full"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -129,9 +129,7 @@
     window.matchMedia('(display-mode: standalone)').matches;
 
   const dispensadoAte = localStorage.getItem(CHAVE_DISPENSADO);
-  // Em DEV, ignora o timer para facilitar testes visuais
-  const ehDev = import.meta.env.DEV;
-  const dispensado = !ehDev && dispensadoAte && Date.now() < Number(dispensadoAte);
+  const dispensado = Boolean(dispensadoAte && Date.now() < Number(dispensadoAte));
 
   // Apenas em telas/dispositivos moveis
   const ehMobile = window.innerWidth < 768 || /iphone|ipad|ipod|android/i.test(navigator.userAgent);

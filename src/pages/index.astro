@@ -34,26 +34,58 @@ import Layout from '../layouts/Layout.astro';
 
     <!-- Todos os Animais -->
     <div>
-      <div class="flex justify-between items-center mb-4 gap-2">
-        <div class="min-w-0 flex-1">
-          <h3 class="text-base sm:text-lg font-bold text-gray-800 truncate" id="tituloSecao">Animais Cadastrados</h3>
-          <p class="text-xs text-gray-500 font-medium mt-0.5"><span id="totalAnimais" class="font-bold text-gray-700">0</span> amiguinhos registrados</p>
+      <div class="flex items-center justify-between mb-4 gap-2">
+        <div class="min-w-0">
+          <p class="text-sm sm:text-base font-bold text-gray-700 truncate"><span id="totalAnimais" class="text-gray-900">0</span> <span id="labelTotalAnimais">Animais</span></p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
+          <!-- Alternador de Visualização (Grade vs Lista) -->
+          <div class="flex items-center p-1 bg-white rounded-xl border border-gray-200 shadow-xs" role="group" aria-label="Modo de visualização dos animais">
+            <button
+              type="button"
+              onclick="definirModoVisualizacao('grid')"
+              id="btnModoGrid"
+              aria-label="Visualizar em grade de 2 colunas"
+              title="Visualização em Grade"
+              class="h-10 w-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all bg-taka-green-50 text-taka-green-700 shadow-xs border border-taka-green-200"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onclick="definirModoVisualizacao('list')"
+              id="btnModoList"
+              aria-label="Visualizar em lista compacta"
+              title="Visualização em Lista Compacta"
+              class="h-10 w-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all text-gray-500 hover:text-gray-800"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Botão Filtrar -->
           <button
             onclick="abrirModalFiltros()"
             id="btnAbrirFiltros"
-            class="px-3 py-2 rounded-xl border border-taka-green-300 bg-taka-green-50 text-taka-green-700 font-bold text-sm hover:bg-taka-green-100 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm min-h-[44px]"
+            aria-label="Abrir modal de filtros"
+            class="px-3.5 py-2 rounded-xl border border-taka-green-300 bg-taka-green-50 text-taka-green-700 font-bold text-sm hover:bg-taka-green-100 active:scale-95 transition-all flex items-center gap-1.5 shadow-xs min-h-[44px]"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
             <span>Filtrar</span>
           </button>
+
+          <!-- Botão Finais Felizes -->
           <button
             onclick="alternarFinaisFelizes()"
-            title="Ver finais felizes"
-            class="h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 hover:bg-pink-50 hover:text-pink-500 active:scale-95 transition-all shadow-sm shrink-0"
+            title="Ver finais felizes (adotados)"
+            aria-label="Ver animais com finais felizes"
+            class="h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-pink-50 hover:text-pink-600 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]"
             id="btnFinaisFelizes"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform-gpu" viewBox="0 0 20 20" fill="currentColor" id="svgFinaisFelizes">
@@ -62,9 +94,9 @@ import Layout from '../layouts/Layout.astro';
           </button>
         </div>
       </div>
-      <div id="listaAnimais" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div class="col-span-full text-center py-8 text-gray-400 text-sm" id="loadingState">
-          <svg class="animate-spin mx-auto h-8 w-8 text-gray-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <div id="listaAnimais" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="col-span-full text-center py-8 text-gray-500 text-sm" id="loadingState">
+          <svg class="animate-spin mx-auto h-8 w-8 text-taka-green-600 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -202,16 +234,40 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </div>
 
+  <!-- Modal de Zoom da Foto do Animal -->
+  <div id="modalZoomFoto" class="fixed inset-0 z-50 bg-black/85 hidden flex items-center justify-center p-3 sm:p-4 backdrop-blur-md transition-opacity duration-200 opacity-0" role="dialog" aria-modal="true" aria-labelledby="modalZoomTitulo">
+    <div id="modalZoomCard" class="relative max-w-2xl w-full flex flex-col items-center bg-gray-950 rounded-2xl overflow-hidden shadow-2xl border border-white/15 transform transition-transform duration-200 scale-95">
+      <!-- Botão Fechar -->
+      <button onclick="fecharModalZoom()" aria-label="Fechar zoom da foto" class="absolute top-3 right-3 text-white/90 hover:text-white bg-black/60 hover:bg-black/90 rounded-full p-2.5 transition-colors z-10 min-w-[44px] min-h-[44px] flex items-center justify-center border border-white/10 shadow-md">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      <!-- Imagem Principal -->
+      <div class="w-full flex items-center justify-center bg-black min-h-[220px] max-h-[70vh] overflow-hidden">
+        <img id="modalZoomImg" src="" alt="Foto do animal ampliada" class="max-w-full max-h-[70vh] object-contain" />
+      </div>
+
+      <!-- Legenda com Nome e Detalhes -->
+      <div class="w-full p-4 bg-gray-900 border-t border-white/10 text-white flex justify-between items-center gap-3">
+        <div class="min-w-0 flex-1">
+          <h3 id="modalZoomTitulo" class="font-bold text-base sm:text-lg text-white truncate"></h3>
+          <p id="modalZoomSubtitulo" class="text-xs sm:text-sm text-gray-300 truncate mt-0.5"></p>
+        </div>
+        <button onclick="fecharModalZoom()" class="px-4 py-2 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-sm font-semibold transition-all min-h-[44px] shrink-0">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Botões Flutuantes (FABs) -->
   <div class="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-30" id="fabsContainer">
     <!-- FAB Associar -->
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" id="fabAssociar" target="_blank" rel="noopener noreferrer" class="backdrop-blur-md text-white border border-pink-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-50 hover:opacity-100" style="background-color: rgba(236, 72, 153, 0.85);" title="Quero ser um associado">
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeiYK6dKhgITc7oCZjOw5_u6G_5QWOKnL6TkA-EFwJGskpNUw/viewform" id="fabAssociar" target="_blank" rel="noopener noreferrer" aria-label="Quero ser um associado da ONG Takanil" class="backdrop-blur-md text-white border border-pink-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-60 hover:opacity-100 min-h-[44px]" style="background-color: rgba(236, 72, 153, 0.9);" title="Quero ser um associado">
       <span class="text-xl">💖</span>
       <span id="fabAssociarText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[0px] opacity-0">ASSOCIAR</span>
     </a>
     
     <!-- FAB Sugerir/Novo Animal -->
-    <a href="/sugerir-animal" id="fabAddAnimal" class="backdrop-blur-md text-white border border-taka-green-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-50 hover:opacity-100 shadow-taka-green-600/30" style="background-color: rgba(55, 176, 141, 0.85);" title="Sugerir novo animal">
+    <a href="/sugerir-animal" id="fabAddAnimal" aria-label="Sugerir novo animal para cadastro" class="backdrop-blur-md text-white border border-taka-green-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-60 hover:opacity-100 shadow-taka-green-600/30 min-h-[44px]" style="background-color: rgba(55, 176, 141, 0.9);" title="Sugerir novo animal">
       <span id="fabIcon" class="text-xl drop-shadow-sm">🐾</span>
       <span id="fabText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[0px] opacity-0">SUGERIR</span>
     </a>
@@ -232,11 +288,103 @@ import Layout from '../layouts/Layout.astro';
   // Estado local
   let animaisGlobais: any[] = [];
   let isAdminGlob = false;
+  let modoVisualizacao: 'grid' | 'list' = (localStorage.getItem('takanil_view_mode') as any) || 'grid';
+
   // Variáveis de Filtro do Modal
   let filtroUrgencia = 'Todos';
   let filtroLocalizacao = 'Todas';
   let filtroEspecie = 'Todas';
   let mostrarFinaisFelizes = false;
+
+  // Sincronização e alternância do Modo de Visualização (Grade vs Lista)
+  function sincronizarUIModoVisualizacao() {
+    const btnGrid = document.getElementById('btnModoGrid');
+    const btnList = document.getElementById('btnModoList');
+    const container = document.getElementById('listaAnimais');
+
+    if (btnGrid && btnList) {
+      if (modoVisualizacao === 'grid') {
+        btnGrid.className = 'h-10 w-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all bg-taka-green-50 text-taka-green-700 shadow-xs border border-taka-green-200';
+        btnList.className = 'h-10 w-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all text-gray-500 hover:text-gray-800';
+      } else {
+        btnList.className = 'h-10 w-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all bg-taka-green-50 text-taka-green-700 shadow-xs border border-taka-green-200';
+        btnGrid.className = 'h-10 w-10 flex items-center justify-center rounded-lg text-sm font-bold transition-all text-gray-500 hover:text-gray-800';
+      }
+    }
+
+    if (container) {
+      if (modoVisualizacao === 'grid') {
+        container.className = 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4';
+      } else {
+        container.className = 'flex flex-col gap-3 w-full';
+      }
+    }
+  }
+
+  (window as any).definirModoVisualizacao = (novoModo: 'grid' | 'list') => {
+    modoVisualizacao = novoModo;
+    try {
+      localStorage.setItem('takanil_view_mode', novoModo);
+    } catch (_) {}
+    sincronizarUIModoVisualizacao();
+    renderLista(animaisGlobais);
+  };
+
+  // Funções do Modal de Zoom de Fotos
+  (window as any).abrirModalZoom = (url: string, nome: string, subtitulo: string) => {
+    const modal = document.getElementById('modalZoomFoto');
+    const card = document.getElementById('modalZoomCard');
+    const img = document.getElementById('modalZoomImg') as HTMLImageElement;
+    const titulo = document.getElementById('modalZoomTitulo');
+    const sub = document.getElementById('modalZoomSubtitulo');
+
+    if (!modal || !card || !img || !titulo || !sub) return;
+
+    img.src = url || '/assets/takanil-icon-png.png';
+    titulo.textContent = nome || 'Animal';
+    sub.textContent = subtitulo || '';
+
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modal.classList.remove('opacity-0');
+      modal.classList.add('opacity-100');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    });
+  };
+
+  (window as any).fecharModalZoom = () => {
+    const modal = document.getElementById('modalZoomFoto');
+    const card = document.getElementById('modalZoomCard');
+    if (!modal || !card) return;
+
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    card.classList.remove('scale-100');
+    card.classList.add('scale-95');
+
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      const img = document.getElementById('modalZoomImg') as HTMLImageElement;
+      if (img) img.src = '';
+    }, 200);
+  };
+
+  // Fechar modals ao pressionar a tecla ESC
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      (window as any).fecharModalZoom();
+      (window as any).fecharModalFiltros();
+      (window as any).fecharModalEdicao();
+    }
+  });
+
+  // Fechar Modal Zoom ao clicar no backdrop
+  document.getElementById('modalZoomFoto')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalZoomFoto')) {
+      (window as any).fecharModalZoom();
+    }
+  });
 
   // Lógica de abertura/fechamento do Modal de Filtros
   (window as any).abrirModalFiltros = () => {
@@ -279,8 +427,8 @@ import Layout from '../layouts/Layout.astro';
 
     if (mostrarFinaisFelizes) {
       mostrarFinaisFelizes = false;
-      document.getElementById('btnFinaisFelizes')!.classList.remove('text-pink-500');
-      document.getElementById('btnFinaisFelizes')!.classList.add('text-gray-400');
+      document.getElementById('btnFinaisFelizes')!.classList.remove('text-pink-600', 'bg-pink-100');
+      document.getElementById('btnFinaisFelizes')!.classList.add('text-gray-500', 'bg-gray-100');
       document.getElementById('tituloSecao')!.innerText = 'Animais Cadastrados';
     }
 
@@ -357,7 +505,7 @@ import Layout from '../layouts/Layout.astro';
   });
 
   function renderLista(animais: any[]) {
-    let htmlNormal = '';
+    let htmlOutput = '';
     
     // Filtro base: Remover óbitos de todas as views públicas
     let baseAnimais = animais.filter(a => a.situacao_urgencia !== 'Óbito');
@@ -393,7 +541,7 @@ import Layout from '../layouts/Layout.astro';
         listaAnimais.innerHTML = `
           <div class="col-span-full text-center py-10 px-4 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
             <span class="text-3xl mb-2 block">🐾</span>
-            <p class="text-gray-500 text-sm font-medium">Nenhum animal encontrado para este filtro.</p>
+            <p class="text-gray-600 text-sm font-medium">Nenhum animal encontrado para este filtro.</p>
           </div>`;
       }
       if (totalAnimaisEl) totalAnimaisEl.textContent = '0';
@@ -406,83 +554,196 @@ import Layout from '../layouts/Layout.astro';
       const dataCadastro = new Date(animal.created_at);
       const diffTime = Math.abs(hoje.getTime() - dataCadastro.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+      
       // Badges
       let badgeUrgencia = '';
       let isResolvido = false;
 
       if (animal.situacao_urgencia === 'Machucado/Risco') {
-        badgeUrgencia = `<span class="inline-block bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1">🚨 Urgência Médica</span>`;
+        badgeUrgencia = `<span class="inline-block bg-red-100 text-red-700 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-xs border border-red-200">🚨 Urgência Médica</span>`;
       } else if (animal.situacao_urgencia === 'Desaparecido' || animal.localizacao.includes('Desaparecido')) {
-        badgeUrgencia = `<span class="inline-block bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1">🔍 Desaparecido</span>`;
+        badgeUrgencia = `<span class="inline-block bg-yellow-100 text-yellow-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-xs border border-yellow-200">🔍 Desaparecido</span>`;
       } else if (animal.situacao_urgencia === 'Adotado') {
-        badgeUrgencia = `<span class="inline-block bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-sm border border-green-200">✅ Adotado</span>`;
+        badgeUrgencia = `<span class="inline-block bg-green-100 text-green-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-xs border border-green-200">✅ Adotado</span>`;
         isResolvido = true;
       } else if (animal.situacao_urgencia === 'Tutor Encontrado') {
-        badgeUrgencia = `<span class="inline-block bg-taka-green-100 text-taka-green-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-sm border border-taka-green-200">🏠 Voltou pro Tutor</span>`;
+        badgeUrgencia = `<span class="inline-block bg-taka-green-100 text-taka-green-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-xs border border-taka-green-200">🏠 Voltou pro Tutor</span>`;
         isResolvido = true;
       }
 
       // Badges Secundárias (Tags)
       let tags = '';
-      if (animal.sexo === 'Macho') tags += `<span class="bg-taka-green-50 text-taka-green-600 text-[10px] px-1.5 py-0.5 rounded">♂ Macho</span> `;
-      if (animal.sexo === 'Fêmea') tags += `<span class="bg-pink-50 text-pink-600 text-[10px] px-1.5 py-0.5 rounded">♀ Fêmea</span> `;
-      if (animal.sexo === 'Misto (Ninhada)') tags += `<span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">♂♀ Misto</span> `;
-      if (animal.quantidade > 1) tags += `<span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">📦 ${animal.quantidade} animais</span> `;
-      if (animal.vacinado === 'Sim') tags += `<span class="bg-taka-green-50 text-taka-green-600 text-[10px] px-1.5 py-0.5 rounded">💉 Vacinado</span> `;
-      if (animal.castrado === 'Sim') tags += `<span class="bg-purple-50 text-purple-600 text-[10px] px-1.5 py-0.5 rounded">✂️ Castrado</span> `;
+      if (animal.sexo === 'Macho') tags += `<span class="bg-taka-green-50 text-taka-green-700 border border-taka-green-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">♂ Macho</span> `;
+      if (animal.sexo === 'Fêmea') tags += `<span class="bg-pink-50 text-pink-700 border border-pink-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">♀ Fêmea</span> `;
+      if (animal.sexo === 'Misto (Ninhada)') tags += `<span class="bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">♂♀ Misto</span> `;
+      if (animal.quantidade > 1) tags += `<span class="bg-gray-100 text-gray-700 border border-gray-200 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">📦 ${animal.quantidade} animais</span> `;
+      if (animal.vacinado === 'Sim') tags += `<span class="bg-taka-green-50 text-taka-green-700 border border-taka-green-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">💉 Vacinado</span> `;
+      if (animal.castrado === 'Sim') tags += `<span class="bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">✂️ Castrado</span> `;
 
-      htmlNormal += `
-        <div class="bg-taka-orange-50/80 rounded-2xl shadow-xs border border-taka-orange-200/60 p-4 flex flex-col justify-between group relative hover:shadow-md transition-all ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-70' : ''}">
-          <div class="flex gap-3.5 items-start">
-            <img src="${animal.imagem_url || ''}" class="w-20 h-20 rounded-xl object-cover bg-gray-100 flex-shrink-0" alt="${animal.nome}">
-            <div class="flex-1 min-w-0 pr-8">
-              ${badgeUrgencia}
-              <h4 class="text-base sm:text-lg font-bold text-gray-800 truncate ${isResolvido ? 'line-through text-gray-400' : ''}">${animal.nome}</h4>
-              <p class="text-xs text-gray-500 truncate mt-0.5">${animal.fase_vida} • ${animal.peso}kg</p>
-              <div class="mt-1.5 flex flex-wrap gap-1">
-                ${tags}
+      const imgUrl = animal.imagem_url || '/assets/takanil-icon-png.png';
+      const subtituloZoom = `${animal.especie || 'Animal'} • ${animal.sexo || ''} • ${animal.peso ? animal.peso + 'kg' : ''} • ${animal.localizacao || ''}`;
+      const nomeSanitizado = (animal.nome || '').replace(/'/g, "\\'");
+      const subtituloSanitizado = subtituloZoom.replace(/'/g, "\\'");
+
+      if (modoVisualizacao === 'grid') {
+        // Modo Grade (2 Colunas Mobile / 3-4 Desktop)
+        htmlOutput += `
+          <div class="bg-white rounded-2xl shadow-xs border border-gray-200/90 overflow-hidden flex flex-col justify-between group relative hover:shadow-md transition-all ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-75' : ''}">
+            <!-- Foto Aspect Ratio 1:1 com Toque para Zoom -->
+            <div class="relative aspect-square w-full bg-gray-100 overflow-hidden">
+              <img 
+                src="${imgUrl}" 
+                class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
+                alt="${animal.nome}"
+                onclick="abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
+              >
+              <!-- Badges e Botão de Zoom sobrepostos -->
+              <div class="absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-none">
+                <div class="pointer-events-auto">
+                  ${badgeUrgencia}
+                </div>
+                <button 
+                  type="button"
+                  onclick="abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
+                  aria-label="Ampliar foto de ${animal.nome}"
+                  class="pointer-events-auto bg-black/60 hover:bg-black/85 text-white rounded-full p-2 backdrop-blur-xs transition-colors shadow-xs min-w-[36px] min-h-[36px] flex items-center justify-center"
+                  title="Ampliar foto"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                  </svg>
+                </button>
               </div>
-              ${!isResolvido ? `<p class="text-[11px] font-medium text-taka-green-700 mt-1.5 truncate">📍 ${animal.localizacao}</p>` : ''}
-              <p class="text-[10px] text-gray-400 mt-1">🕒 No sistema há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</p>
+            </div>
+
+            <!-- Detalhes do Animal -->
+            <div class="p-3 sm:p-3.5 flex flex-col justify-between flex-1 gap-2">
+              <div>
+                <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate ${isResolvido ? 'line-through text-gray-400' : ''}">${animal.nome}</h4>
+                <p class="text-xs sm:text-sm text-gray-600 truncate mt-0.5 font-medium">${animal.fase_vida || ''} • ${animal.peso || 0}kg</p>
+                
+                <div class="mt-1.5 flex flex-wrap gap-1">
+                  ${tags}
+                </div>
+                
+                ${!isResolvido ? `<p class="text-xs font-semibold text-taka-green-700 mt-2 truncate">📍 ${animal.localizacao}</p>` : ''}
+                <p class="text-[11px] text-gray-500 mt-1 font-medium">🕒 No sistema há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</p>
+              </div>
+
+              ${isAdminGlob ? `
+              <!-- Ações do Admin -->
+              <div class="flex items-center justify-end gap-1 pt-2 border-t border-gray-100 mt-1">
+                <button 
+                  onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${nomeSanitizado}')" 
+                  aria-label="Editar status de ${animal.nome}"
+                  title="Editar Status" 
+                  class="min-w-[40px] min-h-[40px] p-2 text-gray-500 hover:text-taka-green-700 hover:bg-taka-green-50 rounded-xl transition-colors flex items-center justify-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+                <a 
+                  href="/animais/editar?id=${animal.id}"
+                  aria-label="Editar cadastro completo de ${animal.nome}"
+                  title="Editar dados" 
+                  class="min-w-[40px] min-h-[40px] p-2 text-gray-500 hover:text-green-700 hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </a>
+                <button 
+                  onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
+                  aria-label="Excluir cadastro de ${animal.nome}"
+                  title="Excluir cadastro" 
+                  class="min-w-[40px] min-h-[40px] p-2 text-gray-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+              ` : ''}
             </div>
           </div>
-          ${isAdminGlob ? `
-          <!-- Botões Admin -->
-          <div class="absolute top-3.5 right-3.5 flex gap-1">
-            <button 
-              onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${animal.nome}')" 
-              title="Editar Status" 
-              class="p-1.5 text-gray-400 hover:text-taka-green-600 hover:bg-taka-green-50 rounded-lg transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-            </button>
-            <a 
-              href="/animais/editar?id=${animal.id}"
-              title="Editar dados do animal" 
-              class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </a>
-            <button 
-              onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${animal.nome}')" 
-              title="Excluir cadastro" 
-              class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
+        `;
+      } else {
+        // Modo Lista Compacta (Opção A - Linha dedicada para Localização e Tempo)
+        htmlOutput += `
+          <div class="bg-white rounded-2xl shadow-xs border border-gray-200/90 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-75' : ''}">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
+              <!-- Miniatura com Toque para Zoom -->
+              <div class="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100">
+                <img 
+                  src="${imgUrl}" 
+                  class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-200" 
+                  alt="${animal.nome}"
+                  onclick="abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
+                >
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                  ${badgeUrgencia}
+                  <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate ${isResolvido ? 'line-through text-gray-400' : ''}">${animal.nome}</h4>
+                  <span class="text-xs sm:text-sm text-gray-600 font-medium whitespace-nowrap">• ${animal.fase_vida || ''} (${animal.peso || 0}kg)</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1 mt-0.5">
+                  ${tags}
+                </div>
+
+                <!-- Linha Dedicada para Localização e Tempo no Sistema (Sem Cortes) -->
+                <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-medium">
+                  <span class="text-taka-green-700 font-semibold">📍 ${animal.localizacao}</span>
+                  <span class="text-gray-300">•</span>
+                  <span class="text-gray-500">🕒 No sistema há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</span>
+                </div>
+              </div>
+            </div>
+
+            ${isAdminGlob ? `
+            <!-- Ações do Admin -->
+            <div class="flex items-center justify-end gap-1 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+              <button 
+                onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${nomeSanitizado}')" 
+                aria-label="Editar status de ${animal.nome}"
+                title="Editar Status" 
+                class="min-w-[40px] min-h-[40px] p-2 text-gray-500 hover:text-taka-green-700 hover:bg-taka-green-50 rounded-xl transition-colors flex items-center justify-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+              <a 
+                href="/animais/editar?id=${animal.id}"
+                aria-label="Editar cadastro completo de ${animal.nome}"
+                title="Editar dados" 
+                class="min-w-[40px] min-h-[40px] p-2 text-gray-500 hover:text-green-700 hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </a>
+              <button 
+                onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
+                aria-label="Excluir cadastro de ${animal.nome}"
+                title="Excluir cadastro" 
+                class="min-w-[40px] min-h-[40px] p-2 text-gray-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+            ` : ''}
           </div>
-          ` : ''}
-        </div>
-      `;
+        `;
+      }
     });
 
-    if (listaAnimais) listaAnimais.innerHTML = htmlNormal;
+    if (listaAnimais) listaAnimais.innerHTML = htmlOutput;
     if (totalAnimaisEl) totalAnimaisEl.textContent = filtrados.length.toString();
   }
 
@@ -736,5 +997,6 @@ import Layout from '../layouts/Layout.astro';
   }
   
   // Iniciar
+  sincronizarUIModoVisualizacao();
   carregarDados();
 </script>
