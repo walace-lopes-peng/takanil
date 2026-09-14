@@ -1,0 +1,149 @@
+---
+import { VERSAO_ATUAL, NOVIDADES_VERSAO } from '../data/novidades';
+---
+
+<!-- Modal de Novidades da Versão -->
+<div 
+  id="modalNovidades" 
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden opacity-0 transition-opacity duration-300"
+  role="dialog"
+  aria-labelledby="modalNovidadesTitulo"
+  aria-modal="true"
+>
+  <div 
+    id="modalNovidadesCard"
+    class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-100 overflow-hidden transform scale-95 transition-transform duration-300"
+  >
+    <!-- Cabeçalho -->
+    <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-taka-green-50/50 via-white to-pink-50/30">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl" aria-hidden="true">✨</span>
+        <div>
+          <h3 id="modalNovidadesTitulo" class="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
+            Novidades nessa versão
+          </h3>
+          <p class="text-xs font-semibold text-taka-green-700">
+            Versão {VERSAO_ATUAL}
+          </p>
+        </div>
+      </div>
+      <button 
+        type="button" 
+        onclick="fecharModalNovidades()"
+        class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+        aria-label="Fechar novidades"
+      >
+        <span class="text-xl leading-none">✕</span>
+      </button>
+    </div>
+
+    <!-- Lista de Novidades (Rolável) -->
+    <div class="p-5 sm:p-6 overflow-y-auto space-y-3.5 flex-1 divide-y divide-gray-50">
+      {NOVIDADES_VERSAO.map((item) => (
+        <div class="pt-3.5 first:pt-0 flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-2xl bg-taka-green-50 border border-taka-green-200/60 flex items-center justify-center text-xl shrink-0 shadow-2xs">
+            {item.icone}
+          </div>
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm sm:text-base font-bold text-gray-900 mb-0.5">
+              {item.titulo}
+            </h4>
+            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed font-medium">
+              {item.descricao}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Rodapé com Botão Entendi -->
+    <div class="p-5 bg-gray-50/80 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span class="text-xs text-gray-400 text-center sm:text-left">
+        Você pode rever isso a qualquer momento no rodapé da página.
+      </span>
+      <button 
+        type="button" 
+        onclick="fecharModalNovidades()"
+        class="w-full sm:w-auto px-6 py-3 bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-sm transition-all min-h-[44px]"
+      >
+        ✅ Entendi!
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { VERSAO_ATUAL } from '../data/novidades';
+
+  const STORAGE_KEY = 'takanil_versao_vista';
+  const modal = document.getElementById('modalNovidades');
+  const card = document.getElementById('modalNovidadesCard');
+
+  (window as any).abrirModalNovidades = () => {
+    if (!modal || !card) return;
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modal.classList.remove('opacity-0');
+      modal.classList.add('opacity-100');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    });
+
+    // Marca como vista e remove pontinho de novidade
+    localStorage.setItem(STORAGE_KEY, VERSAO_ATUAL);
+    atualizarBadgeNovidades();
+  };
+
+  (window as any).fecharModalNovidades = () => {
+    if (!modal || !card) return;
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    card.classList.remove('scale-100');
+    card.classList.add('scale-95');
+
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 250);
+
+    localStorage.setItem(STORAGE_KEY, VERSAO_ATUAL);
+    atualizarBadgeNovidades();
+  };
+
+  function atualizarBadgeNovidades() {
+    const badge = document.getElementById('badgeNovidadesFooter');
+    const versaoVista = localStorage.getItem(STORAGE_KEY);
+    if (badge) {
+      if (versaoVista !== VERSAO_ATUAL) {
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+  }
+
+  // Fechar ao clicar no backdrop
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      (window as any).fecharModalNovidades();
+    }
+  });
+
+  // Fechar com ESC
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal?.classList.contains('hidden')) {
+      (window as any).fecharModalNovidades();
+    }
+  });
+
+  // Verificação inicial automática
+  document.addEventListener('DOMContentLoaded', () => {
+    atualizarBadgeNovidades();
+    const versaoVista = localStorage.getItem(STORAGE_KEY);
+    if (versaoVista !== VERSAO_ATUAL) {
+      // Abre automaticamente após 600ms para uma transição suave de tela
+      setTimeout(() => {
+        (window as any).abrirModalNovidades();
+      }, 600);
+    }
+  });
+</script>

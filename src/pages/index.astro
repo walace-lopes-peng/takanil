@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ModalNovidades from '../components/ModalNovidades.astro';
 ---
 
 <Layout title="Hub Takanil - Dashboard">
@@ -131,6 +132,24 @@ import Layout from '../layouts/Layout.astro';
         </div>
         <!-- Inserido via JS -->
       </div>
+
+      <!-- Rodapé Acessível com Link de Novidades da Versão -->
+      <footer class="pt-8 pb-4 text-center border-t border-gray-200/60 mt-10 space-y-2">
+        <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-500">
+          <button 
+            type="button" 
+            onclick="abrirModalNovidades()" 
+            class="inline-flex items-center gap-2 font-semibold text-taka-green-700 hover:text-taka-green-800 bg-taka-green-50 hover:bg-taka-green-100 px-3.5 py-2 rounded-xl border border-taka-green-200 transition-all active:scale-95 shadow-2xs min-h-[44px]"
+            title="Ver o que há de novo na versão atual"
+          >
+            <span>✨ Novidades da Versão (v0.10.1)</span>
+            <span id="badgeNovidadesFooter" class="hidden w-2 h-2 rounded-full bg-taka-green-500 animate-pulse"></span>
+          </button>
+        </div>
+        <p class="text-[11px] text-gray-400">
+          💡 Toque em "Novidades da Versão" para rever as dicas e novas ferramentas a qualquer momento.
+        </p>
+      </footer>
     </div>
   </div>
 
@@ -327,6 +346,9 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </div>
 
+  <!-- Modal de Novidades da Versão -->
+  <ModalNovidades />
+
   <!-- Botões Flutuantes (FABs) -->
   <div class="fixed bottom-20 right-4 flex flex-col items-end gap-3 z-30" id="fabsContainer">
     <!-- FAB Associar -->
@@ -478,6 +500,7 @@ import Layout from '../layouts/Layout.astro';
       (window as any).fecharModalZoom();
       (window as any).fecharModalFiltros();
       (window as any).fecharModalEdicao();
+      (window as any).fecharModalNovidades?.();
     }
   });
 
