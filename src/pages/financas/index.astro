@@ -217,6 +217,9 @@ import Layout from '../../layouts/Layout.astro';
       <button type="button" data-atalho="mes_passado" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
         Mês passado
       </button>
+      <button type="button" data-atalho="todo_periodo" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
+        Todo o período
+      </button>
       <button type="button" data-atalho="personalizado" class="btn-atalho px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all">
         Personalizado
       </button>
@@ -758,7 +761,11 @@ import Layout from '../../layouts/Layout.astro';
     }
 
     if (labelPeriodoAtual) {
-      labelPeriodoAtual.textContent = `${formatarDataBR(periodoAtual.inicio)} até ${formatarDataBR(periodoAtual.fim)}`;
+      if (atalhoAtivo === 'todo_periodo') {
+        labelPeriodoAtual.textContent = 'Histórico completo';
+      } else {
+        labelPeriodoAtual.textContent = `${formatarDataBR(periodoAtual.inicio)} até ${formatarDataBR(periodoAtual.fim)}`;
+      }
     }
   }
 
@@ -897,11 +904,16 @@ import Layout from '../../layouts/Layout.astro';
       loadingState.style.display = 'block';
     }
 
-    const { data: lancamentos, error } = await supabase
+    let query = supabase
       .from('financas')
-      .select('*')
-      .gte('data', periodoAtual.inicio)
-      .lte('data', periodoAtual.fim)
+      .select('*');
+
+    if (atalhoAtivo !== 'todo_periodo') {
+      if (periodoAtual.inicio) query = query.gte('data', periodoAtual.inicio);
+      if (periodoAtual.fim) query = query.lte('data', periodoAtual.fim);
+    }
+
+    const { data: lancamentos, error } = await query
       .order('data', { ascending: false })
       .order('created_at', { ascending: false });
 

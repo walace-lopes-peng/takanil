@@ -47,4 +47,12 @@ describe('filtrosData - obterIntervaloPorAtalho', () => {
       fim: '2025-09-30',
     });
   });
+
+  it('deve calcular corretamente "todo_periodo" (base histórica até hoje)', () => {
+    const intervalo = obterIntervaloPorAtalho('todo_periodo', dataReferencia);
+    expect(intervalo).toEqual({
+      inicio: '2020-01-01',
+      fim: '2025-10-15',
+    });
+  });
 });
