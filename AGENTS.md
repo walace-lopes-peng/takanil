@@ -152,6 +152,7 @@ Toda e qualquer nova feature ou alteração em tela existente DEVE priorizar ace
 ## 📌 Gestão de Versões e Release Notes
 - **RELEASE_NOTES.md:** O agente DEVE sempre registrar e manter o arquivo `RELEASE_NOTES.md` atualizado com o histórico de cada entrega/release para facilitar o acompanhamento do lançamento.
 - **package.json:** O agente DEVE sempre verificar e sincronizar o campo `"version"` no `package.json` para corresponder à versão do build/release atual (ex: `0.10.1`).
+- **Tag `[Gestão]` para Funcionalidades Restritas:** Sempre que uma funcionalidade exigir autenticação/login ou permissão administrativa (ex: painel de aprovações, lixeira de rejeitados, relatórios restritos), o agente DEVE adicionar a tag `[Gestão]` no título do item no `src/data/novidades.ts` e nas notas de versão, para que as voluntárias sem login compreendam de imediato que se trata de uma ferramenta de uso interno.
 
 ## Antes de considerar uma tarefa pronta
 - [ ] `npm run build` roda sem erro
