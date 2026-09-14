@@ -670,10 +670,10 @@ import Layout from '../layouts/Layout.astro';
           </div>
         `;
       } else {
-        // Modo Lista Compacta
+        // Modo Lista Compacta (Opção A - Linha dedicada para Localização e Tempo)
         htmlOutput += `
-          <div class="bg-white rounded-2xl shadow-xs border border-gray-200/90 p-3 sm:p-4 flex items-center justify-between gap-3 hover:shadow-md transition-all ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-75' : ''}">
-            <div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+          <div class="bg-white rounded-2xl shadow-xs border border-gray-200/90 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-75' : ''}">
+            <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
               <!-- Miniatura com Toque para Zoom -->
               <div class="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100">
                 <img 
@@ -685,21 +685,28 @@ import Layout from '../layouts/Layout.astro';
               </div>
 
               <div class="min-w-0 flex-1">
-                <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                <div class="flex flex-wrap items-center gap-1.5 mb-1">
                   ${badgeUrgencia}
                   <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate ${isResolvido ? 'line-through text-gray-400' : ''}">${animal.nome}</h4>
+                  <span class="text-xs sm:text-sm text-gray-600 font-medium whitespace-nowrap">• ${animal.fase_vida || ''} (${animal.peso || 0}kg)</span>
                 </div>
-                <p class="text-xs sm:text-sm text-gray-600 truncate font-medium">${animal.fase_vida || ''} • ${animal.peso || 0}kg • <span class="text-taka-green-700 font-semibold">📍 ${animal.localizacao}</span></p>
-                <div class="mt-1 flex flex-wrap items-center gap-1">
+
+                <div class="flex flex-wrap items-center gap-1 mt-0.5">
                   ${tags}
-                  <span class="text-[11px] text-gray-500 font-medium ml-1">🕒 ${diffDays}d</span>
+                </div>
+
+                <!-- Linha Dedicada para Localização e Tempo no Sistema (Sem Cortes) -->
+                <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-medium">
+                  <span class="text-taka-green-700 font-semibold">📍 ${animal.localizacao}</span>
+                  <span class="text-gray-300">•</span>
+                  <span class="text-gray-500">🕒 No sistema há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</span>
                 </div>
               </div>
             </div>
 
             ${isAdminGlob ? `
             <!-- Ações do Admin -->
-            <div class="flex items-center gap-1 shrink-0">
+            <div class="flex items-center justify-end gap-1 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
               <button 
                 onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${nomeSanitizado}')" 
                 aria-label="Editar status de ${animal.nome}"
