@@ -38,7 +38,7 @@ import Layout from '../../layouts/Layout.astro';
   } else {
     const { data: animal, error } = await supabase
       .from('animais')
-      .select('id, nome, fase_vida, sexo, peso')
+      .select('id, nome, fase_vida, sexo, peso, instagram_url')
       .eq('id', id)
       .single();
 
@@ -49,6 +49,7 @@ import Layout from '../../layouts/Layout.astro';
       const checked = (cond: boolean) => cond ? 'checked' : '';
       const nomeVal = (animal.nome && animal.nome !== 'Desconhecido') ? animal.nome : '';
       const pesoVal = animal.peso ?? '';
+      const instagramVal = animal.instagram_url || '';
 
       conteudo.innerHTML = `
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -139,6 +140,34 @@ import Layout from '../../layouts/Layout.astro';
               >
             </div>
 
+            <!-- Link do Post no Instagram -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Link da Postagem no Instagram <span class="text-gray-400 font-normal">(Opcional)</span>
+              </label>
+              <div class="flex gap-2">
+                <input
+                  type="url"
+                  name="instagram_url"
+                  id="instagram_url_edit"
+                  class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 sm:text-sm p-3 border bg-gray-50"
+                  placeholder="https://www.instagram.com/p/..."
+                  value="${instagramVal}"
+                />
+                <button
+                  type="button"
+                  id="btnColarInstagramEdit"
+                  class="px-4 py-3 bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 shrink-0 min-h-[44px]"
+                  title="Colar link da área de transferência"
+                >
+                  <span>📋 Colar</span>
+                </button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1.5">
+                Copie o link do post ou reel no Instagram e toque em "Colar".
+              </p>
+            </div>
+
             <!-- Submit -->
             <div class="pt-4">
               <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-taka-green-600 hover:bg-taka-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-green-500 active:scale-[0.98] transition-all disabled:opacity-70">
@@ -183,6 +212,34 @@ import Layout from '../../layouts/Layout.astro';
         });
       }
 
+      // Handler do botão Colar Link do Instagram
+      const btnColar = form.querySelector('#btnColarInstagramEdit') as HTMLButtonElement;
+      const inputInsta = form.querySelector('#instagram_url_edit') as HTMLInputElement;
+
+      btnColar?.addEventListener('click', async () => {
+        try {
+          if (!navigator.clipboard || !navigator.clipboard.readText) {
+            inputInsta?.focus();
+            (window as any).mostrarToast?.('Toque e segure no campo para colar.', 'info');
+            return;
+          }
+          const texto = await navigator.clipboard.readText();
+          const textoLimpo = (texto || '').trim();
+          if (textoLimpo.includes('instagram.com/') || textoLimpo.startsWith('http://') || textoLimpo.startsWith('https://')) {
+            if (inputInsta) {
+              inputInsta.value = textoLimpo;
+              (window as any).mostrarToast?.('Link colado com sucesso!', 'sucesso');
+            }
+          } else {
+            if (inputInsta) inputInsta.focus();
+            (window as any).mostrarToast?.('Nenhum link encontrado na área de transferência.', 'erro');
+          }
+        } catch (err) {
+          inputInsta?.focus();
+          (window as any).mostrarToast?.('Permissão de colar não concedida. Cole manualmente.', 'info');
+        }
+      });
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
@@ -192,6 +249,8 @@ import Layout from '../../layouts/Layout.astro';
         const fase_vida = fd.get('fase_vida') as string;
         const sexo = fd.get('sexo') as string;
         const peso = parseFloat(fd.get('peso') as string);
+        const instagram_url_raw = (fd.get('instagram_url') as string) || '';
+        const instagram_url = instagram_url_raw.trim() !== '' ? instagram_url_raw.trim() : null;
 
         // Somente os campos editáveis são atualizados — localização, status e outros
         // permanecem intactos no banco, garantindo extensibilidade futura.
@@ -209,7 +268,7 @@ import Layout from '../../layouts/Layout.astro';
 
         const { error: dbError } = await supabase
           .from('animais')
-          .update({ nome, fase_vida, sexo, peso })
+          .update({ nome, fase_vida, sexo, peso, instagram_url })
           .eq('id', id!);
 
         submitBtn.disabled = false;

@@ -108,10 +108,11 @@ import Layout from '../layouts/Layout.astro';
 
           <!-- Botão Finais Felizes -->
           <button
+            type="button"
             onclick="alternarFinaisFelizes()"
             title="Ver finais felizes (adotados)"
             aria-label="Ver animais com finais felizes"
-            class="h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-pink-50 hover:text-pink-600 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]"
+            class="h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]"
             id="btnFinaisFelizes"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform-gpu" viewBox="0 0 20 20" fill="currentColor" id="svgFinaisFelizes">
@@ -333,6 +334,12 @@ import Layout from '../layouts/Layout.astro';
       <span class="text-xl">💖</span>
       <span id="fabAssociarText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[0px] opacity-0">ASSOCIAR</span>
     </a>
+
+    <!-- FAB Instagram Oficial -->
+    <a href="https://www.instagram.com/takanilp4" id="fabInstagram" target="_blank" rel="noopener noreferrer" aria-label="Acompanhe o Instagram oficial da ONG Takanil" class="backdrop-blur-md text-white border border-pink-300/40 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-60 hover:opacity-100 min-h-[44px]" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);" title="Instagram Oficial @takanilp4">
+      <img src="/assets/insta-logo.png" alt="Instagram" class="w-5 h-5 object-contain" />
+      <span id="fabInstagramText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[0px] opacity-0">INSTA</span>
+    </a>
     
     <!-- FAB Sugerir/Novo Animal -->
     <a href="/sugerir-animal" id="fabAddAnimal" aria-label="Sugerir novo animal para cadastro" class="backdrop-blur-md text-white border border-taka-green-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-60 hover:opacity-100 shadow-taka-green-600/30 min-h-[44px]" style="background-color: rgba(55, 176, 141, 0.9);" title="Sugerir novo animal">
@@ -526,8 +533,11 @@ import Layout from '../layouts/Layout.astro';
 
     if (mostrarFinaisFelizes) {
       mostrarFinaisFelizes = false;
-      document.getElementById('btnFinaisFelizes')!.classList.remove('text-pink-600', 'bg-pink-100');
-      document.getElementById('btnFinaisFelizes')!.classList.add('text-gray-500', 'bg-gray-100');
+      const btnFinais = document.getElementById('btnFinaisFelizes');
+      if (btnFinais) {
+        btnFinais.className = 'h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]';
+        btnFinais.blur();
+      }
       document.getElementById('tituloSecao')!.innerText = 'Animais Cadastrados';
     }
 
@@ -681,10 +691,10 @@ import Layout from '../layouts/Layout.astro';
     const statusFinais = ['Adotado', 'Tutor Encontrado'];
 
     if (mostrarFinaisFelizes) {
-      filtrados = baseAnimais.filter(a => statusFinais.includes(a.situacao_urgencia));
+      filtrados = baseAnimais.filter(a => statusFinais.includes(a.situacao_urgencia) || a.status === 'Adotado');
     } else {
       // Normal filters on active animals
-      filtrados = baseAnimais.filter(a => !statusFinais.includes(a.situacao_urgencia));
+      filtrados = baseAnimais.filter(a => !statusFinais.includes(a.situacao_urgencia) && a.status !== 'Adotado');
       
       // Aplicar Busca Textual por Nome (Case-Insensitive)
       if (termoBusca) {
@@ -807,8 +817,22 @@ import Layout from '../layouts/Layout.astro';
                 <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate ${isResolvido ? 'line-through text-gray-400' : ''}">${animal.nome}</h4>
                 <p class="text-xs sm:text-sm text-gray-600 truncate mt-0.5 font-medium">${animal.fase_vida || ''} • ${animal.peso || 0}kg</p>
                 
-                <div class="mt-1.5 flex flex-wrap gap-1">
+                <div class="mt-1.5 flex flex-wrap items-center gap-1">
                   ${tags}
+                  ${animal.instagram_url ? `
+                    <a 
+                      href="${animal.instagram_url}" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      onclick="event.stopPropagation()" 
+                      class="inline-flex items-center gap-1 text-[11px] font-semibold text-pink-600 hover:text-pink-700 bg-pink-50 hover:bg-pink-100 px-2 py-0.5 rounded-md border border-pink-200/80 transition-all hover:scale-105 active:scale-95"
+                      title="Ver publicação no Instagram"
+                      aria-label="Ver publicação de ${animal.nome} no Instagram"
+                    >
+                      <img src="/assets/insta-logo.png" alt="" class="w-3.5 h-3.5 object-contain" />
+                      <span>Post</span>
+                    </a>
+                  ` : ''}
                 </div>
                 
                 ${!isResolvido ? `<p class="text-xs font-semibold text-taka-green-700 mt-2 truncate">📍 ${animal.localizacao}</p>` : ''}
@@ -877,6 +901,20 @@ import Layout from '../layouts/Layout.astro';
 
                 <div class="flex flex-wrap items-center gap-1 mt-0.5">
                   ${tags}
+                  ${animal.instagram_url ? `
+                    <a 
+                      href="${animal.instagram_url}" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      onclick="event.stopPropagation()" 
+                      class="inline-flex items-center gap-1 text-[11px] font-semibold text-pink-600 hover:text-pink-700 bg-pink-50 hover:bg-pink-100 px-2 py-0.5 rounded-md border border-pink-200/80 transition-all hover:scale-105 active:scale-95"
+                      title="Ver publicação no Instagram"
+                      aria-label="Ver publicação de ${animal.nome} no Instagram"
+                    >
+                      <img src="/assets/insta-logo.png" alt="" class="w-3.5 h-3.5 object-contain" />
+                      <span>Post</span>
+                    </a>
+                  ` : ''}
                 </div>
 
                 <!-- Linha Dedicada para Localização e Tempo no Sistema (Sem Cortes) -->
@@ -967,21 +1005,22 @@ import Layout from '../layouts/Layout.astro';
     mostrarFinaisFelizes = !mostrarFinaisFelizes;
     const btn = document.getElementById('btnFinaisFelizes')!;
     const titulo = document.getElementById('tituloSecao')!;
+    btn?.blur(); // Remove o foco/hover preso no toque mobile
     
     if (mostrarFinaisFelizes) {
-      btn.classList.remove('bg-gray-100', 'text-gray-400');
-      btn.classList.add('bg-pink-100', 'text-pink-600', 'border', 'border-pink-300', 'scale-105');
+      btn.className = 'h-11 w-11 flex items-center justify-center rounded-xl bg-pink-100 text-pink-600 border border-pink-300 scale-105 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]';
       titulo.innerText = 'Finais Felizes';
-      
     } else {
-      btn.classList.remove('bg-pink-100', 'text-pink-600', 'border', 'border-pink-300', 'scale-105');
-      btn.classList.add('bg-gray-100', 'text-gray-400');
+      btn.className = 'h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]';
       titulo.innerText = 'Animais Cadastrados';
       
       // Restaura os filtros padrões
       filtroUrgencia = 'Todos';
       filtroLocalizacao = 'Todas';
       filtroEspecie = 'Todas';
+      filtroSexo = 'Todos';
+      filtroClinico = 'Todos';
+      sincronizarUIModalFiltros();
       const btnFiltrar = document.getElementById('btnAbrirFiltros');
       if (btnFiltrar) {
         btnFiltrar.classList.remove('bg-taka-green-600', 'text-white', 'border-taka-green-600');
@@ -989,7 +1028,7 @@ import Layout from '../layouts/Layout.astro';
         btnFiltrar.querySelector('span')!.textContent = 'Filtrar';
       }
     }
-    carregarDados();
+    renderLista(animaisGlobais);
   };
 
   // Funções do Modal de Edição
@@ -1062,8 +1101,8 @@ import Layout from '../layouts/Layout.astro';
       .select('*')
       .order('created_at', { ascending: false });
 
-    // Filtrar localmente os que já estão resolvidos e manter apenas os aprovados na lista principal
-    const animais = animaisOriginais?.filter(a => a.status_moderacao === 'aprovado' && a.status !== 'Adotado') || [];
+    // Manter todos os animais aprovados (incluindo adotados para a visualização de Finais Felizes)
+    const animais = animaisOriginais?.filter(a => a.status_moderacao === 'aprovado') || [];
     let pendentes = animaisOriginais?.filter(a => a.status_moderacao === 'pendente') || [];
 
     const role = await getUserRole();
@@ -1101,12 +1140,15 @@ import Layout from '../layouts/Layout.astro';
     // Lógica de recolher (collapse) os FABs no scroll
     const fabAssociar = document.getElementById('fabAssociar');
     const fabAssociarText = document.getElementById('fabAssociarText');
+    const fabInstagram = document.getElementById('fabInstagram');
+    const fabInstagramText = document.getElementById('fabInstagramText');
     let scrollTimeout: number;
 
     const setFabState = (collapsed: boolean) => {
       const stateConfigs = [
         { btn: fab, text: fabText },
-        { btn: fabAssociar, text: fabAssociarText }
+        { btn: fabAssociar, text: fabAssociarText },
+        { btn: fabInstagram, text: fabInstagramText }
       ];
 
       stateConfigs.forEach(({ btn, text }) => {
@@ -1168,9 +1210,11 @@ import Layout from '../layouts/Layout.astro';
     animaisGlobais = animais;
     
     let totalRacao = 0;
+    const statusFinais = ['Adotado', 'Tutor Encontrado'];
 
     animais.forEach((animal) => {
-      if (animal.localizacao === 'Abrigo Takanil' && animal.peso) {
+      const isResolvido = animal.status === 'Adotado' || statusFinais.includes(animal.situacao_urgencia);
+      if (!isResolvido && animal.localizacao === 'Abrigo Takanil' && animal.peso) {
         totalRacao += (animal.peso * 0.015) * 30;
       }
     });

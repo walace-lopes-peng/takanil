@@ -14,6 +14,7 @@ interface Props {
     vacinado?: string;
     castrado?: string;
     temperamento?: string;
+    instagram_url?: string;
   };
 }
 
@@ -265,6 +266,36 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       </div>
     </div>
 
+    <!-- Link do Post no Instagram -->
+    <div>
+      <label for="instagram_url" class="block text-sm font-medium text-gray-700 mb-1">
+        Link da Postagem no Instagram <span class="text-gray-400 font-normal">(Opcional)</span>
+      </label>
+      <div class="flex gap-2">
+        <div class="relative flex-1">
+          <input
+            type="url"
+            name="instagram_url"
+            id="instagram_url"
+            class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 sm:text-sm p-3 border bg-gray-50"
+            placeholder="https://www.instagram.com/p/..."
+            value={dadosIniciais?.instagram_url || ''}
+          />
+        </div>
+        <button
+          type="button"
+          id="btnColarInstagram"
+          class="px-4 py-3 bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 shrink-0 min-h-[44px]"
+          title="Colar link da área de transferência"
+        >
+          <span>📋 Colar Link</span>
+        </button>
+      </div>
+      <p class="text-xs text-gray-400 mt-1.5">
+        Copie o link do post ou reel no Instagram e toque em "Colar Link".
+      </p>
+    </div>
+
     <!-- Submit -->
     <div class="pt-4">
       <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-taka-green-600 hover:bg-taka-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-green-500 active:scale-[0.98] transition-all disabled:opacity-70">
@@ -323,6 +354,34 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       fotoPreview.src = '';
       fotoContainer?.classList.remove('hidden');
       fotoPreviewContainer?.classList.add('hidden');
+    });
+
+    // Colar Link do Instagram com validação amigável
+    const btnColarInstagram = document.getElementById('btnColarInstagram');
+    const inputInstagram = document.getElementById('instagram_url') as HTMLInputElement;
+
+    btnColarInstagram?.addEventListener('click', async () => {
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.readText) {
+          inputInstagram?.focus();
+          (window as any).mostrarToast?.('Toque e segure no campo para colar.', 'info');
+          return;
+        }
+        const texto = await navigator.clipboard.readText();
+        const textoLimpo = (texto || '').trim();
+        if (textoLimpo.includes('instagram.com/') || textoLimpo.startsWith('http://') || textoLimpo.startsWith('https://')) {
+          if (inputInstagram) {
+            inputInstagram.value = textoLimpo;
+            (window as any).mostrarToast?.('Link colado com sucesso!', 'sucesso');
+          }
+        } else {
+          if (inputInstagram) inputInstagram.focus();
+          (window as any).mostrarToast?.('Nenhum link encontrado na área de transferência.', 'erro');
+        }
+      } catch (err) {
+        inputInstagram?.focus();
+        (window as any).mostrarToast?.('Permissão de colar não concedida. Cole manualmente.', 'info');
+      }
     });
 
     // Função para comprimir a imagem antes de subir
@@ -403,6 +462,8 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       const vacinado = formData.get('vacinado') as string || 'Não sei';
       const castrado = formData.get('castrado') as string || 'Não sei';
       const temperamento = formData.get('temperamento') as string || 'Não informado';
+      const instagram_url_raw = (formData.get('instagram_url') as string) || '';
+      const instagram_url = instagram_url_raw.trim() !== '' ? instagram_url_raw.trim() : null;
 
       // Validação: foto só é obrigatória no modo criação
       if (!modoEdicao) {
@@ -436,6 +497,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
           vacinado,
           castrado,
           temperamento,
+          instagram_url,
         };
 
         if (modoEdicao) {
