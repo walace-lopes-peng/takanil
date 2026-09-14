@@ -5,7 +5,7 @@
 
 <div
   id="toastContainer"
-  class="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] w-11/12 max-w-md pointer-events-none flex flex-col gap-2"
+  class="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-11/12 max-w-md pointer-events-none flex flex-col-reverse gap-2"
   aria-live="polite"
 >
   <!-- Os elementos de toast serão injetados dinamicamente via JS -->
@@ -54,10 +54,10 @@
       const c = config[tipo] || config.info;
       const duracao = opcoes.duracao !== undefined ? opcoes.duracao : c.duracaoPadrao;
 
-      // Elemento principal do Toast
+      // Elemento principal do Toast posicionado na base com animação slide-up
       const toastEl = document.createElement('div');
       toastEl.setAttribute('role', tipo === 'erro' ? 'alert' : 'status');
-      toastEl.className = 'pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-2xl shadow-2xl border ' + c.bg + ' ' + c.border + ' ' + c.text + ' transform transition-all duration-300 -translate-y-4 opacity-0';
+      toastEl.className = 'pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-2xl shadow-2xl border ' + c.bg + ' ' + c.border + ' ' + c.text + ' transform transition-all duration-300 translate-y-4 opacity-0';
 
       toastEl.innerHTML = 
         '<div class="flex items-center gap-3 min-w-0">' +
@@ -70,9 +70,9 @@
 
       container.appendChild(toastEl);
 
-      // Animação de Entrada (slide-down + fade-in)
+      // Animação de Entrada (slide-up + fade-in)
       requestAnimationFrame(function() {
-        toastEl.classList.remove('-translate-y-4', 'opacity-0');
+        toastEl.classList.remove('translate-y-4', 'opacity-0');
         toastEl.classList.add('translate-y-0', 'opacity-100');
       });
 
@@ -81,7 +81,7 @@
       function removerToast() {
         if (timer) clearTimeout(timer);
         toastEl.classList.remove('translate-y-0', 'opacity-100');
-        toastEl.classList.add('-translate-y-4', 'opacity-0');
+        toastEl.classList.add('translate-y-4', 'opacity-0');
         setTimeout(function() {
           toastEl.remove();
         }, 300);
