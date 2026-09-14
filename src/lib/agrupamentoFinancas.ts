@@ -303,6 +303,22 @@ export function agruparPorCategorias(lancamentos: LancamentoGrafico[]): Distribu
   };
 }
 
+export const PALETA_CATEGORIAS: Record<string, { nome: string; cor: string }> = {
+  racao: { nome: 'Ração', cor: '#f59e0b' },        // Laranja Âmbar
+  veterinario: { nome: 'Veterinário', cor: '#0ea5e9' }, // Azul Celeste
+  medicamento: { nome: 'Medicamento', cor: '#a855f7' }, // Roxo Violeta
+  castracao: { nome: 'Castração', cor: '#ec4899' },     // Rosa Fúcsia
+  doacao: { nome: 'Doação', cor: '#10b981' },           // Verde Esmeralda
+  bazar: { nome: 'Bazar', cor: '#f97316' },             // Laranja Coral
+  rifa: { nome: 'Rifa', cor: '#6366f1' },               // Índigo Royal
+  ajuste: { nome: 'Ajuste de Caixa', cor: '#64748b' },  // Ardósia Neutro
+  outro: { nome: 'Outro', cor: '#6b7280' }              // Cinza Neutro
+};
+
+export function obterCorCategoria(categoria: string): string {
+  return PALETA_CATEGORIAS[categoria]?.cor || '#0d9488';
+}
+
 export function gerarHtmlCategorias(dist: DistribuicaoCategorias, formatarMoeda: (v: number) => string): string {
   if (!dist.entradas.length && !dist.saidas.length) {
     return `<div class="text-center text-gray-400 text-sm py-6">Sem lançamentos para exibir neste período.</div>`;
@@ -327,14 +343,18 @@ export function gerarHtmlCategorias(dist: DistribuicaoCategorias, formatarMoeda:
   } else {
     html += '<div class="space-y-2.5">';
     dist.saidas.forEach(item => {
+      const corHex = obterCorCategoria(item.categoria);
       html += `
         <div>
-          <div class="flex justify-between text-xs text-gray-700 mb-1">
-            <span class="font-medium">${item.nome}</span>
+          <div class="flex justify-between items-center text-xs text-gray-700 mb-1">
+            <span class="font-medium flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background-color: ${corHex};"></span>
+              ${item.nome}
+            </span>
             <span class="font-semibold text-gray-800">${formatarMoeda(item.total)} <span class="text-gray-400 font-normal text-[11px]">(${item.percentual}%)</span></span>
           </div>
           <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-            <div class="bg-red-500 h-2.5 rounded-full transition-all duration-500" style="width: ${Math.max(item.percentual, 3)}%"></div>
+            <div class="h-2.5 rounded-full transition-all duration-500" style="width: ${Math.max(item.percentual, 3)}%; background-color: ${corHex};"></div>
           </div>
         </div>
       `;
@@ -360,14 +380,18 @@ export function gerarHtmlCategorias(dist: DistribuicaoCategorias, formatarMoeda:
   } else {
     html += '<div class="space-y-2.5">';
     dist.entradas.forEach(item => {
+      const corHex = obterCorCategoria(item.categoria);
       html += `
         <div>
-          <div class="flex justify-between text-xs text-gray-700 mb-1">
-            <span class="font-medium">${item.nome}</span>
+          <div class="flex justify-between items-center text-xs text-gray-700 mb-1">
+            <span class="font-medium flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background-color: ${corHex};"></span>
+              ${item.nome}
+            </span>
             <span class="font-semibold text-gray-800">${formatarMoeda(item.total)} <span class="text-gray-400 font-normal text-[11px]">(${item.percentual}%)</span></span>
           </div>
           <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-            <div class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: ${Math.max(item.percentual, 3)}%"></div>
+            <div class="h-2.5 rounded-full transition-all duration-500" style="width: ${Math.max(item.percentual, 3)}%; background-color: ${corHex};"></div>
           </div>
         </div>
       `;
