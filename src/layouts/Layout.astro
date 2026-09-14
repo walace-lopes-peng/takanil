@@ -1,6 +1,7 @@
 ---
 import BannerInstalar from '../components/BannerInstalar.astro';
 import Toast from '../components/Toast.astro';
+import ModalConfirmacao from '../components/ModalConfirmacao.astro';
 
 interface Props {
   title: string;
@@ -114,8 +115,9 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
     <!-- Banner de instalacao PWA (aparece apenas em mobile nao instalado) -->
     <BannerInstalar />
 
-    <!-- Sistema Global de Notificações (Toast) -->
+    <!-- Sistema Global de Notificações (Toast) e Diálogos de Confirmação -->
     <Toast />
+    <ModalConfirmacao />
 
     <!-- Conteúdo principal -->
 

@@ -288,13 +288,17 @@ import Layout from '../../layouts/Layout.astro';
   });
 
   const showStatus = (msg: string, type: 'success' | 'error') => {
-    if (!statusMessage) return;
-    statusMessage.textContent = msg;
-    statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
-    if (type === 'error') {
-      statusMessage.classList.add('bg-red-50', 'text-red-700');
-    } else {
-      statusMessage.classList.add('bg-green-50', 'text-green-700');
+    if (statusMessage) {
+      statusMessage.textContent = msg;
+      statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
+      if (type === 'error') {
+        statusMessage.classList.add('bg-red-50', 'text-red-700');
+      } else {
+        statusMessage.classList.add('bg-green-50', 'text-green-700');
+      }
+    }
+    if ((window as any).mostrarToast) {
+      (window as any).mostrarToast(msg, type === 'success' ? 'sucesso' : 'erro');
     }
   };
 
@@ -443,7 +447,13 @@ import Layout from '../../layouts/Layout.astro';
 
   // Expor funções globais de edição e deleção
   (window as any).deletarLancamento = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.')) return;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Excluir lançamento?',
+      mensagem: 'Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.',
+      textoConfirmar: 'Sim, Excluir',
+      tipo: 'perigo'
+    });
+    if (!confirmou) return;
     
     try {
       if (loadingState) loadingState.style.display = 'block';

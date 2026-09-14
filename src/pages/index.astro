@@ -499,7 +499,13 @@ import Layout from '../layouts/Layout.astro';
 
   // Função para deletar animal e imagem associada
   (window as any).deletarAnimal = async (id: string, imagem_url: string, nome: string) => {
-    if (!confirm(`Tem certeza que deseja excluir o cadastro de "${nome}" e apagar a foto?`)) return;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Excluir cadastro do animal?',
+      mensagem: `Tem certeza que deseja excluir o cadastro de "${nome}" e apagar a foto permanentemente?`,
+      textoConfirmar: 'Sim, Excluir',
+      tipo: 'perigo'
+    });
+    if (!confirmou) return;
     
     try {
       // 1. Tentar deletar imagem do storage
@@ -595,7 +601,13 @@ import Layout from '../layouts/Layout.astro';
 
   // Função para marcar animal como adotado/encontrado (preservando o histórico)
   (window as any).marcarResolvido = async (id: string, novoStatus: string) => {
-    if (!confirm(`Confirmar que este animal foi ${novoStatus}?`)) return;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: `Confirmar ${novoStatus}?`,
+      mensagem: `Deseja atualizar o status deste animal para "${novoStatus}"?`,
+      textoConfirmar: 'Confirmar',
+      tipo: 'padrao'
+    });
+    if (!confirmou) return;
     
     try {
       const { error } = await supabase.from('animais').update({ status: novoStatus }).eq('id', id);

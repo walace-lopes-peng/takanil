@@ -76,7 +76,13 @@ import Layout from '../layouts/Layout.astro';
 
   // Ação: Aprovar
   (window as any).aprovarAnimal = async (id: string, nome: string) => {
-    if (!confirm(`Deseja aprovar o cadastro de "${nome}"? Ele ficará visível publicamente.`)) return;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Aprovar cadastro?',
+      mensagem: `Deseja aprovar o cadastro de "${nome}"? Ele ficará visível publicamente no mural.`,
+      textoConfirmar: 'Aprovar',
+      tipo: 'padrao'
+    });
+    if (!confirmou) return;
     
     try {
       const { error } = await supabase
@@ -95,7 +101,13 @@ import Layout from '../layouts/Layout.astro';
 
   // Ação: Descartar (Reprovar/Spam)
   (window as any).descartarAnimal = async (id: string, nome: string) => {
-    if (!confirm(`Deseja descartar "${nome}"? O registro ficará oculto (rejeitado).`)) return;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Descartar sugestão?',
+      mensagem: `Deseja descartar "${nome}"? O registro ficará oculto (rejeitado).`,
+      textoConfirmar: 'Sim, Descartar',
+      tipo: 'perigo'
+    });
+    if (!confirmou) return;
     
     try {
       const { error } = await supabase
