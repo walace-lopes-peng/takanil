@@ -124,25 +124,46 @@ jobs:
               }).join('\n');
             }
 
-            // ─── Buscar dados em paralelo ─────────────────────────────────────
+            // ─── Buscar dados dinamicamente ──────────────────────────────────
 
-            core.info('Buscando milestones...');
-            const [numV101, numV110, numV120, numV110b] = await Promise.all([
-              getMilestoneNumber('v0.10.1'),
-              getMilestoneNumber('v0.11.0'),
-              getMilestoneNumber('v0.12.0'),
-              getMilestoneNumber('v1.1.0'),
-            ]);
+            core.info('Buscando todos os milestones abertos...');
+            const { data: openMilestones } = await github.rest.issues.listMilestones({
+              owner: OWNER, repo: REPO,
+              state: 'open', per_page: 100,
+            });
 
-            core.info('Buscando issues e PRs...');
-            const [issues101, issues110, issues120, issues110b, blocked, prs] = await Promise.all([
-              getIssuesByMilestone(numV101),
-              getIssuesByMilestone(numV110),
-              getIssuesByMilestone(numV120),
-              getIssuesByMilestone(numV110b),
+            // Ordena os milestones: SemVer crescente, Backlog sempre por último
+            function extrairSemVer(m) {
+              const match = m.title.match(/v?(\d+)\.(\d+)(?:\.(\d+))?/i);
+              if (!match) return [999, 999, 999];
+              return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3] || 0)];
+            }
+
+            openMilestones.sort((a, b) => {
+              const aIsBacklog = a.title.toLowerCase().includes('backlog');
+              const bIsBacklog = b.title.toLowerCase().includes('backlog');
+              if (aIsBacklog && !bIsBacklog) return 1;
+              if (!aIsBacklog && bIsBacklog) return -1;
+
+              const [majA, minA, patchA] = extrairSemVer(a);
+              const [majB, minB, patchB] = extrairSemVer(b);
+              if (majA !== majB) return majA - majB;
+              if (minA !== minB) return minA - minB;
+              return patchA - patchB;
+            });
+
+            core.info('Buscando issues dos milestones, blockers e PRs...');
+            const [blocked, prs, ...milestonesIssues] = await Promise.all([
               getBlockedIssues(),
               getOpenPRs(),
+              ...openMilestones.map(m => getIssuesByMilestone(m.number))
             ]);
+
+            const milestonesData = openMilestones.map((m, idx) => ({
+              milestone: m,
+              issues: milestonesIssues[idx],
+              isBacklog: m.title.toLowerCase().includes('backlog'),
+            }));
 
             // ─── Montar corpo da issue ────────────────────────────────────────
 
@@ -152,14 +173,12 @@ jobs:
               hour: '2-digit', minute: '2-digit',
             });
 
-            // Detecta sprint atual pelo milestone com issues abertas
-            const sprintAtual = issues101.length > 0
-              ? 'v0.10.1 — Bugs e Acessibilidade'
-              : issues110.length > 0
-                ? 'v0.11.0 — Segurança e LGPD'
-                : issues120.length > 0
-                  ? 'v0.12.0 — Vitrine Pública e Fase 4'
-                  : 'v1.1.0 — Backlog de funcionalidades';
+            // Detecta sprint atual pelo primeiro milestone não-backlog que possui issues
+            const sprintAtivoObj = milestonesData.find(m => !m.isBacklog && m.issues.length > 0)
+              || milestonesData.find(m => !m.isBacklog)
+              || milestonesData[0];
+
+            const sprintAtual = sprintAtivoObj ? sprintAtivoObj.milestone.title : 'Nenhum sprint ativo';
 
             const linhas = [
               '<!-- Atualizado automaticamente pelo GitHub Actions — nao edite manualmente -->',
@@ -187,49 +206,49 @@ jobs:
               prRows(prs),
               '',
               '---',
-              '',
-              '## Up Next — v0.10.1 Bugs e Acessibilidade',
-              '',
-              '> Sprint ativo. Fixes e polish em features existentes.',
-              '',
-              '| # | Titulo | Labels |',
-              '|---|--------|--------|',
-              issueRows(issues101),
-              '',
-              '---',
-              '',
-              '## Proximo Sprint — v0.11.0 Seguranca e LGPD',
-              '',
-              '> Nao começar antes de fechar o v0.10.1.',
-              '',
-              '| # | Titulo | Labels |',
-              '|---|--------|--------|',
-              issueRows(issues110),
-              '',
-              '---',
-              '',
-              '## v0.12.0 — Vitrine Publica e Fase 4',
-              '',
-              '> Fase 4 do plano: pagina publica, PIX, Instagram, PWA.',
-              '',
-              '| # | Titulo | Labels |',
-              '|---|--------|--------|',
-              issueRows(issues120),
-              '',
-              '---',
-              '',
-              '## Backlog — v1.1.0 Funcionalidades Futuras',
-              '',
-              '> Trabalhar somente apos v1.0.0 estar lancada.',
-              '',
-              '| # | Titulo |',
-              '|---|--------|',
-              issueRows(issues110b, true),
-              '',
-              '---',
-              '',
-              '_Atualizado automaticamente pelo sprint-board-sync · ' + agora + '_',
             ];
+
+            // Renderiza cada milestone dinamicamente
+            let encontrouSprintAtivo = false;
+            let encontrouProximo = false;
+
+            milestonesData.forEach(({ milestone, issues, isBacklog }) => {
+              let headerTitulo = '';
+              if (milestone.title === sprintAtual) {
+                headerTitulo = `## Up Next — ${milestone.title}`;
+                encontrouSprintAtivo = true;
+              } else if (isBacklog) {
+                headerTitulo = `## Backlog — ${milestone.title}`;
+              } else if (encontrouSprintAtivo && !encontrouProximo) {
+                headerTitulo = `## Proximo Sprint — ${milestone.title}`;
+                encontrouProximo = true;
+              } else {
+                headerTitulo = `## ${milestone.title}`;
+              }
+
+              linhas.push('', headerTitulo, '');
+              if (milestone.description) {
+                linhas.push(`> ${milestone.description}`, '');
+              }
+
+              if (isBacklog) {
+                linhas.push(
+                  '| # | Titulo |',
+                  '|---|--------|',
+                  issueRows(issues, true)
+                );
+              } else {
+                linhas.push(
+                  '| # | Titulo | Labels |',
+                  '|---|--------|--------|',
+                  issueRows(issues)
+                );
+              }
+
+              linhas.push('', '---');
+            });
+
+            linhas.push('', '_Atualizado automaticamente pelo sprint-board-sync · ' + agora + '_');
 
             const body = linhas.join('\n');
 
@@ -242,10 +261,9 @@ jobs:
               body,
             });
 
-            core.info('Sprint Board atualizado!');
+            core.info('Sprint Board atualizado com sucesso!');
             core.info('Blockers:  ' + blocked.length);
             core.info('PRs:       ' + prs.length);
-            core.info('v0.10.1:   ' + issues101.length + ' issues');
-            core.info('v0.11.0:   ' + issues110.length + ' issues');
-            core.info('v0.12.0:   ' + issues120.length + ' issues');
-            core.info('v1.1.0:    ' + issues110b.length + ' issues');
+            milestonesData.forEach(m => {
+              core.info(`${m.milestone.title}: ${m.issues.length} issues`);
+            });
