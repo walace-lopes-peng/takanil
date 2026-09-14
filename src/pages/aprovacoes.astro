@@ -1,78 +1,214 @@
-
 ---
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Hub Takanil - Aprovações">
+<Layout title="Hub Takanil - Moderação e Aprovações">
   <div class="space-y-6 pb-20">
     <!-- Header -->
-    <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 shadow-sm mt-4">
+    <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-5 sm:p-6 shadow-sm mt-4">
       <div class="flex items-center gap-3 mb-2">
         <span class="text-2xl">🛎️</span>
-        <h2 class="text-lg font-bold text-yellow-800">Aprovações Pendentes</h2>
+        <h1 class="text-lg sm:text-xl font-bold text-amber-900">Moderação de Cadastros</h1>
       </div>
-      <p class="text-sm text-yellow-700">Analise os animais enviados pela comunidade. Você pode aprovar para publicar na vitrine ou descartar se for spam.</p>
+      <p class="text-xs sm:text-sm text-amber-800">
+        Analise os cadastros sugeridos pela comunidade. Aprove para publicar no mural público ou gerencie os rejeitados para liberar espaço de fotos e banco.
+      </p>
     </div>
 
-    <!-- Lista de Pendentes -->
-    <div>
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-md font-bold text-gray-800">Aguardando Revisão</h3>
-        <span class="bg-yellow-200 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full" id="totalPendentes">0</span>
+    <!-- Navegação por Abas (Pendentes vs Rejeitados) -->
+    <div class="flex border-b border-gray-200 gap-2">
+      <button
+        id="abaPendentesBtn"
+        type="button"
+        class="flex items-center gap-2 px-4 py-3 font-semibold text-sm border-b-2 border-taka-green-600 text-taka-green-700 transition-colors min-h-[44px]"
+        aria-label="Ver cadastros pendentes de aprovação"
+      >
+        <span>⏳ Pendentes</span>
+        <span id="badgeContadorPendentes" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+      </button>
+
+      <button
+        id="abaRejeitadosBtn"
+        type="button"
+        class="flex items-center gap-2 px-4 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-colors min-h-[44px]"
+        aria-label="Ver cadastros rejeitados e lixeira"
+      >
+        <span>🗑️ Rejeitados</span>
+        <span id="badgeContadorRejeitados" class="bg-gray-200 text-gray-700 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+      </button>
+    </div>
+
+    <!-- Seção: Pendentes -->
+    <div id="secaoPendentes" class="space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-bold text-gray-800">Aguardando Revisão</h2>
+        <span class="text-xs text-gray-500" id="subtituloPendentes">0 pendências</span>
       </div>
-      
+
       <div id="listaPendentes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="col-span-full text-center py-8 text-gray-400 text-sm" id="loadingState">
-          <svg class="animate-spin mx-auto h-8 w-8 text-gray-300 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <div class="col-span-full text-center py-8 text-gray-400 text-sm" id="loadingStatePendentes">
+          <svg class="animate-spin mx-auto h-8 w-8 text-taka-green-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
           Carregando pendências...
         </div>
+      </div>
+    </div>
+
+    <!-- Seção: Rejeitados -->
+    <div id="secaoRejeitados" class="space-y-4 hidden">
+      <!-- Banner de Limpeza em Lote -->
+      <div id="bannerLoteRejeitados" class="bg-red-50 border border-red-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+        <div>
+          <h3 class="text-sm font-bold text-red-900 flex items-center gap-1.5">
+            <span>🗑️</span> Armazenamento e Histórico
+          </h3>
+          <p class="text-xs text-red-700 mt-0.5" id="infoRejeitadosTexto">
+            Existem registros rejeitados. Você pode restaurá-los ou esvaziar tudo para liberar o espaço de fotos do Storage.
+          </p>
+        </div>
+        <button
+          id="btnEsvaziarRejeitados"
+          type="button"
+          class="shrink-0 w-full sm:w-auto bg-red-600 hover:bg-red-700 active:scale-95 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 min-h-[44px]"
+          aria-label="Excluir permanentemente todos os cadastros rejeitados e liberar armazenamento"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span>Esvaziar Todos os Rejeitados</span>
+        </button>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-bold text-gray-800">Registros Rejeitados</h2>
+        <span class="text-xs text-gray-500" id="subtituloRejeitados">0 registros</span>
+      </div>
+
+      <div id="listaRejeitados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Inserido via JS -->
       </div>
     </div>
   </div>
 
-  <!-- Modal de Imagem (Nativo) -->
-  <div id="imageModal" class="fixed inset-0 z-50 bg-black bg-opacity-90 hidden flex flex-col items-center justify-center p-4 cursor-zoom-out transition-opacity" onclick="this.classList.add('hidden')">
-    <button class="absolute top-4 right-4 text-white/70 hover:text-white p-2">
-      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+  <!-- Modal Nativo de Imagem em Tela Cheia -->
+  <div
+    id="imageModal"
+    class="fixed inset-0 z-50 bg-black/90 hidden flex flex-col items-center justify-center p-4 cursor-zoom-out transition-opacity"
+  >
+    <button
+      id="fecharImageModalBtn"
+      aria-label="Fechar foto ampliada"
+      class="absolute top-4 right-4 text-white/80 hover:text-white p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md"
+    >
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
     </button>
-    <img id="modalImage" src="" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+    <img id="modalImage" src="" class="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl" alt="Foto ampliada">
   </div>
 </Layout>
 
 <script>
   import { supabase, getUserRole } from '../lib/supabaseClient';
 
+  // Elementos do DOM
+  const abaPendentesBtn = document.getElementById('abaPendentesBtn');
+  const abaRejeitadosBtn = document.getElementById('abaRejeitadosBtn');
+  const secaoPendentes = document.getElementById('secaoPendentes');
+  const secaoRejeitados = document.getElementById('secaoRejeitados');
+  const badgeContadorPendentes = document.getElementById('badgeContadorPendentes');
+  const badgeContadorRejeitados = document.getElementById('badgeContadorRejeitados');
+  const subtituloPendentes = document.getElementById('subtituloPendentes');
+  const subtituloRejeitados = document.getElementById('subtituloRejeitados');
   const listaPendentes = document.getElementById('listaPendentes');
-  const totalPendentesEl = document.getElementById('totalPendentes');
-  const loadingState = document.getElementById('loadingState');
+  const listaRejeitados = document.getElementById('listaRejeitados');
+  const loadingStatePendentes = document.getElementById('loadingStatePendentes');
+  const bannerLoteRejeitados = document.getElementById('bannerLoteRejeitados');
+  const infoRejeitadosTexto = document.getElementById('infoRejeitadosTexto');
+  const btnEsvaziarRejeitados = document.getElementById('btnEsvaziarRejeitados');
+
+  // Modal de imagem
+  const imageModal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage') as HTMLImageElement;
+  const fecharImageModalBtn = document.getElementById('fecharImageModalBtn');
+
+  // Estado das listas
+  let listaAnimaisPendentes: any[] = [];
+  let listaAnimaisRejeitados: any[] = [];
 
   // Proteção de rota
   async function checkAuth() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       window.location.href = '/login';
-      return;
+      return false;
     }
     const role = await getUserRole();
     if (role !== 'adm' && role !== 'dev') {
       window.location.href = '/';
+      return false;
+    }
+    return true;
+  }
+
+  // Alternar abas
+  function alternarAba(aba: 'pendentes' | 'rejeitados') {
+    if (aba === 'pendentes') {
+      secaoPendentes?.classList.remove('hidden');
+      secaoRejeitados?.classList.add('hidden');
+
+      abaPendentesBtn?.classList.remove('border-transparent', 'text-gray-500');
+      abaPendentesBtn?.classList.add('border-taka-green-600', 'text-taka-green-700');
+
+      abaRejeitadosBtn?.classList.remove('border-taka-green-600', 'text-taka-green-700');
+      abaRejeitadosBtn?.classList.add('border-transparent', 'text-gray-500');
+    } else {
+      secaoPendentes?.classList.add('hidden');
+      secaoRejeitados?.classList.remove('hidden');
+
+      abaRejeitadosBtn?.classList.remove('border-transparent', 'text-gray-500');
+      abaRejeitadosBtn?.classList.add('border-red-600', 'text-red-700');
+
+      abaPendentesBtn?.classList.remove('border-taka-green-600', 'text-taka-green-700');
+      abaPendentesBtn?.classList.add('border-transparent', 'text-gray-500');
     }
   }
 
-  // Ação: Ampliar Foto
+  abaPendentesBtn?.addEventListener('click', () => alternarAba('pendentes'));
+  abaRejeitadosBtn?.addEventListener('click', () => alternarAba('rejeitados'));
+
+  // Ampliar foto
   (window as any).ampliarFoto = (src: string) => {
-    if (!src) return;
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImage') as HTMLImageElement;
-    if (modal && modalImg) {
-      modalImg.src = src;
-      modal.classList.remove('hidden');
-    }
+    if (!src || !imageModal || !modalImage) return;
+    modalImage.src = src;
+    imageModal.classList.remove('hidden');
   };
+
+  function fecharModalFoto() {
+    imageModal?.classList.add('hidden');
+  }
+
+  fecharImageModalBtn?.addEventListener('click', fecharModalFoto);
+  imageModal?.addEventListener('click', (e) => {
+    if (e.target === imageModal) fecharModalFoto();
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') fecharModalFoto();
+  });
+
+  // Extrai nome do arquivo de imagem para deletar do Storage
+  function extrairNomeArquivoStorage(url: string): string | null {
+    if (!url) return null;
+    try {
+      const parts = url.split('/');
+      const lastPart = parts[parts.length - 1];
+      return lastPart ? decodeURIComponent(lastPart.split('?')[0]) : null;
+    } catch {
+      return null;
+    }
+  }
 
   // Ação: Aprovar
   (window as any).aprovarAnimal = async (id: string, nome: string) => {
@@ -83,15 +219,15 @@ import Layout from '../layouts/Layout.astro';
       tipo: 'padrao'
     });
     if (!confirmou) return;
-    
+
     try {
       const { error } = await supabase
         .from('animais')
         .update({ status_moderacao: 'aprovado' })
         .eq('id', id);
-        
+
       if (error) throw error;
-      carregarPendentes();
+      await carregarDados();
       (window as any).mostrarToast(`Registro "${nome}" aprovado com sucesso!`, 'sucesso');
     } catch (err) {
       console.error(err);
@@ -99,102 +235,324 @@ import Layout from '../layouts/Layout.astro';
     }
   };
 
-  // Ação: Descartar (Reprovar/Spam)
+  // Ação: Descartar (Soft Reject)
   (window as any).descartarAnimal = async (id: string, nome: string) => {
     const confirmou = await (window as any).confirmarAcao({
       titulo: 'Descartar sugestão?',
-      mensagem: `Deseja descartar "${nome}"? O registro ficará oculto (rejeitado).`,
+      mensagem: `Deseja descartar "${nome}"? O registro será movido para a aba de Rejeitados.`,
       textoConfirmar: 'Sim, Descartar',
       tipo: 'perigo'
     });
     if (!confirmou) return;
-    
+
     try {
       const { error } = await supabase
         .from('animais')
         .update({ status_moderacao: 'rejeitado' })
         .eq('id', id);
-        
+
       if (error) throw error;
-      carregarPendentes();
-      (window as any).mostrarToast(`Registro "${nome}" descartado.`, 'info');
+      await carregarDados();
+      (window as any).mostrarToast(`Registro "${nome}" movido para Rejeitados.`, 'info');
     } catch (err) {
       console.error(err);
       (window as any).mostrarToast('Erro ao descartar o registro.', 'erro');
     }
   };
 
-  async function carregarPendentes() {
-    const { data: pendentes, error } = await supabase
-      .from('animais')
-      .select('*')
-      .eq('status_moderacao', 'pendente')
-      .order('created_at', { ascending: false });
+  // Ação: Restaurar (volta para Pendente)
+  (window as any).restaurarAnimal = async (id: string, nome: string) => {
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Restaurar cadastro?',
+      mensagem: `Deseja restaurar "${nome}" para a fila de aprovações pendentes?`,
+      textoConfirmar: 'Restaurar',
+      tipo: 'padrao'
+    });
+    if (!confirmou) return;
 
-    if (error) {
-      console.error(error);
-      if (loadingState) loadingState.innerHTML = '<span class="text-red-500">Erro ao carregar dados.</span>';
+    try {
+      const { error } = await supabase
+        .from('animais')
+        .update({ status_moderacao: 'pendente' })
+        .eq('id', id);
+
+      if (error) throw error;
+      await carregarDados();
+      (window as any).mostrarToast(`Registro "${nome}" restaurado com sucesso!`, 'sucesso');
+    } catch (err) {
+      console.error(err);
+      (window as any).mostrarToast('Erro ao restaurar o registro.', 'erro');
+    }
+  };
+
+  // Ação: Excluir Definitivo Individual (Hard Delete + Delete do Storage)
+  (window as any).excluirDefinitivo = async (id: string, nome: string, imagem_url?: string) => {
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Excluir definitivamente?',
+      mensagem: `Tem certeza que deseja apagar "${nome}" para sempre? Essa ação excluirá a foto do Storage e o registro do banco.`,
+      textoConfirmar: 'Excluir Para Sempre',
+      tipo: 'perigo'
+    });
+    if (!confirmou) return;
+
+    try {
+      // 1. Deletar foto do storage se houver
+      if (imagem_url) {
+        const fileName = extrairNomeArquivoStorage(imagem_url);
+        if (fileName) {
+          await supabase.storage.from('animais').remove([fileName]);
+        }
+      }
+
+      // 2. Deletar registro do banco
+      const { error } = await supabase
+        .from('animais')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      await carregarDados();
+      (window as any).mostrarToast(`Registro "${nome}" excluído definitivamente!`, 'sucesso');
+    } catch (err) {
+      console.error(err);
+      (window as any).mostrarToast('Erro ao excluir definitivamente o registro.', 'erro');
+    }
+  };
+
+  // Ação: Esvaziar Todos os Rejeitados em Lote
+  btnEsvaziarRejeitados?.addEventListener('click', async () => {
+    if (listaAnimaisRejeitados.length === 0) return;
+
+    const total = listaAnimaisRejeitados.length;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Esvaziar todos os rejeitados?',
+      mensagem: `Deseja excluir permanentemente todos os ${total} registros rejeitados e liberar o espaço de armazenamento de todas as fotos no Storage? Esta ação não pode ser desfeita.`,
+      textoConfirmar: `Sim, Esvaziar (${total})`,
+      tipo: 'perigo'
+    });
+    if (!confirmou) return;
+
+    try {
+      // 1. Coletar nomes de arquivos para deletar do storage
+      const fileNamesParaDeletar: string[] = [];
+      listaAnimaisRejeitados.forEach((animal) => {
+        if (animal.imagem_url) {
+          const fn = extrairNomeArquivoStorage(animal.imagem_url);
+          if (fn) fileNamesParaDeletar.push(fn);
+        }
+      });
+
+      if (fileNamesParaDeletar.length > 0) {
+        await supabase.storage.from('animais').remove(fileNamesParaDeletar);
+      }
+
+      // 2. Deletar todos os rejeitados da tabela
+      const { error } = await supabase
+        .from('animais')
+        .delete()
+        .eq('status_moderacao', 'rejeitado');
+
+      if (error) throw error;
+      await carregarDados();
+      (window as any).mostrarToast(`${total} registros rejeitados foram excluídos e o armazenamento foi liberado!`, 'sucesso');
+    } catch (err) {
+      console.error(err);
+      (window as any).mostrarToast('Erro ao esvaziar os rejeitados.', 'erro');
+    }
+  });
+
+  // Renderiza a lista de Pendentes
+  function renderizarPendentes() {
+    if (!listaPendentes) return;
+
+    if (listaAnimaisPendentes.length === 0) {
+      listaPendentes.innerHTML = `
+        <div class="col-span-full text-center py-10 bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center shadow-xs">
+          <span class="text-4xl mb-3">🎉</span>
+          <h3 class="text-base font-bold text-gray-800">Tudo limpo por aqui!</h3>
+          <p class="text-xs text-gray-500 mt-1">Nenhum animal aguardando moderação no momento.</p>
+          <a href="/" class="mt-4 inline-flex items-center gap-1 text-xs text-taka-green-600 font-bold hover:underline min-h-[44px] px-3 py-2">
+            Voltar ao Início
+          </a>
+        </div>`;
       return;
     }
-
-    if (loadingState) loadingState.style.display = 'none';
 
     let html = '';
-
-    if (!pendentes || pendentes.length === 0) {
-      if (listaPendentes) {
-        listaPendentes.innerHTML = `
-          <div class="col-span-full text-center py-10 bg-white rounded-xl border border-gray-100 flex flex-col items-center justify-center shadow-xs">
-            <span class="text-4xl mb-3">🎉</span>
-            <h3 class="text-lg font-medium text-gray-800">Tudo limpo!</h3>
-            <p class="text-sm text-gray-500">Nenhum animal aguardando aprovação no momento.</p>
-            <a href="/" class="mt-4 text-sm text-taka-green-600 font-bold hover:underline">Voltar ao Início</a>
-          </div>`;
-      }
-      if (totalPendentesEl) totalPendentesEl.textContent = '0';
-      return;
-    }
-
-    pendentes.forEach((animal) => {
+    listaAnimaisPendentes.forEach((animal) => {
       const dataEnvio = new Date(animal.created_at).toLocaleDateString('pt-BR');
-      
+      const tagsClinicas = [
+        animal.castrado ? 'Castrado(a)' : null,
+        animal.vacinado ? 'Vacinado(a)' : null
+      ].filter(Boolean).join(' • ');
+
       html += `
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden text-sm">
-          <div class="p-3 flex gap-3 items-center">
-            <div class="relative flex-shrink-0 cursor-pointer group" onclick="ampliarFoto('${animal.imagem_url || ''}')" title="Clique para ampliar a foto">
-              <img src="${animal.imagem_url || ''}" class="w-16 h-16 rounded object-cover bg-gray-100 group-hover:opacity-80 transition-opacity" alt="${animal.nome}">
-              <div class="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white rounded p-0.5 pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                </svg>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col justify-between">
+          <div class="p-3.5 flex gap-3.5 items-start">
+            <div
+              class="relative shrink-0 cursor-pointer group rounded-xl overflow-hidden"
+              onclick="ampliarFoto('${animal.imagem_url || ''}')"
+              title="Clique para ampliar a foto"
+            >
+              <img
+                src="${animal.imagem_url || '/assets/placeholder-pet.png'}"
+                class="w-18 h-18 sm:w-20 sm:h-20 rounded-xl object-cover bg-gray-100 group-hover:scale-105 transition-transform"
+                alt="${animal.nome || 'Animal'}"
+              />
+              <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                <span class="text-white text-xs font-bold bg-black/60 px-1.5 py-0.5 rounded">🔍 Zoom</span>
               </div>
             </div>
+
             <div class="flex-1 min-w-0">
-              <div class="flex justify-between items-start">
-                <h4 class="text-base font-bold text-gray-800 truncate">${animal.nome}</h4>
-                <p class="text-[10px] text-gray-400">Enviado em ${dataEnvio}</p>
+              <div class="flex items-start justify-between gap-1">
+                <h3 class="text-base font-bold text-gray-900 truncate">${animal.nome || 'Sem nome'}</h3>
+                <span class="text-[10px] text-gray-400 shrink-0">${dataEnvio}</span>
               </div>
-              <p class="text-xs text-gray-500 truncate mt-0.5">${animal.especie} • ${animal.fase_vida} • ${animal.peso}kg</p>
-              <p class="text-[10px] text-taka-green-600 truncate mt-1">📍 ${animal.localizacao}</p>
+              <p class="text-xs text-gray-600 mt-0.5">
+                ${animal.especie || 'Animal'} • ${animal.sexo || 'Indefinido'} • ${animal.peso ? animal.peso + 'kg' : 'Peso não inf.'}
+              </p>
+              ${tagsClinicas ? `<p class="text-[11px] text-gray-500 mt-0.5">🩺 ${tagsClinicas}</p>` : ''}
+              <p class="text-[11px] font-medium text-taka-green-700 mt-1 truncate">
+                📍 ${animal.localizacao || 'Passa Quatro'}
+              </p>
             </div>
           </div>
-          
-          <div class="bg-gray-50 px-3 py-2 border-t border-gray-100 flex justify-end gap-3 items-center">
-            <button onclick="descartarAnimal('${animal.id}', '${animal.nome}')" class="text-xs font-medium text-red-500 hover:text-red-700 transition-colors">
-              Descartar (Spam)
+
+          <div class="bg-gray-50 px-3.5 py-2.5 border-t border-gray-100 flex items-center justify-end gap-2">
+            <button
+              onclick="descartarAnimal('${animal.id}', '${animal.nome || 'Animal'}')"
+              class="px-3.5 py-2 text-xs font-semibold text-red-600 hover:text-red-800 hover:bg-red-50 rounded-xl transition-colors min-h-[44px] flex items-center justify-center"
+              aria-label="Descartar animal ${animal.nome}"
+            >
+              Descartar
             </button>
-            <button onclick="aprovarAnimal('${animal.id}', '${animal.nome}')" class="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 transition-colors shadow-sm">
-              Aprovar
+            <button
+              onclick="aprovarAnimal('${animal.id}', '${animal.nome || 'Animal'}')"
+              class="px-4 py-2 text-xs font-bold text-white bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 rounded-xl transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1"
+              aria-label="Aprovar animal ${animal.nome}"
+            >
+              <span>✅ Aprovar</span>
             </button>
           </div>
         </div>
       `;
     });
 
-    if (listaPendentes) listaPendentes.innerHTML = html;
-    if (totalPendentesEl) totalPendentesEl.textContent = pendentes.length.toString();
+    listaPendentes.innerHTML = html;
   }
 
-  // Inicializa
-  checkAuth().then(() => carregarPendentes());
+  // Renderiza a lista de Rejeitados
+  function renderizarRejeitados() {
+    if (!listaRejeitados) return;
+
+    if (listaAnimaisRejeitados.length === 0) {
+      bannerLoteRejeitados?.classList.add('hidden');
+      listaRejeitados.innerHTML = `
+        <div class="col-span-full text-center py-10 bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center shadow-xs">
+          <span class="text-4xl mb-3">✨</span>
+          <h3 class="text-base font-bold text-gray-800">Lixeira vazia!</h3>
+          <p class="text-xs text-gray-500 mt-1">Nenhum registro rejeitado ocupando espaço de banco ou fotos.</p>
+        </div>`;
+      return;
+    }
+
+    bannerLoteRejeitados?.classList.remove('hidden');
+    if (infoRejeitadosTexto) {
+      infoRejeitadosTexto.textContent = `${listaAnimaisRejeitados.length} registros rejeitados ocupando espaço no banco e fotos no Storage.`;
+    }
+
+    let html = '';
+    listaAnimaisRejeitados.forEach((animal) => {
+      const dataEnvio = new Date(animal.created_at).toLocaleDateString('pt-BR');
+
+      html += `
+        <div class="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden flex flex-col justify-between opacity-90 hover:opacity-100 transition-opacity">
+          <div class="p-3.5 flex gap-3.5 items-start">
+            <div
+              class="relative shrink-0 cursor-pointer group rounded-xl overflow-hidden"
+              onclick="ampliarFoto('${animal.imagem_url || ''}')"
+              title="Clique para ampliar a foto"
+            >
+              <img
+                src="${animal.imagem_url || '/assets/placeholder-pet.png'}"
+                class="w-18 h-18 sm:w-20 sm:h-20 rounded-xl object-cover bg-gray-100 grayscale group-hover:grayscale-0 transition-all"
+                alt="${animal.nome || 'Animal'}"
+              />
+              <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                <span class="text-white text-xs font-bold bg-black/60 px-1.5 py-0.5 rounded">🔍 Zoom</span>
+              </div>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-1">
+                <h3 class="text-base font-bold text-gray-800 truncate line-through decoration-red-400">${animal.nome || 'Sem nome'}</h3>
+                <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">Rejeitado</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-0.5">
+                ${animal.especie || 'Animal'} • ${animal.sexo || 'Indefinido'} • ${animal.peso ? animal.peso + 'kg' : 'Peso não inf.'}
+              </p>
+              <p class="text-[10px] text-gray-400 mt-1">Enviado em ${dataEnvio}</p>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 px-3.5 py-2.5 border-t border-gray-100 flex items-center justify-between gap-2">
+            <button
+              onclick="restaurarAnimal('${animal.id}', '${animal.nome || 'Animal'}')"
+              class="px-3 py-2 text-xs font-semibold text-taka-green-700 hover:bg-taka-green-50 rounded-xl transition-colors min-h-[44px] flex items-center gap-1"
+              aria-label="Restaurar animal ${animal.nome}"
+            >
+              <span>♻️ Restaurar</span>
+            </button>
+            <button
+              onclick="excluirDefinitivo('${animal.id}', '${animal.nome || 'Animal'}', '${animal.imagem_url || ''}')"
+              class="px-3 py-2 text-xs font-bold text-red-600 hover:text-white hover:bg-red-600 rounded-xl transition-all border border-red-200 hover:border-transparent min-h-[44px] flex items-center gap-1 shadow-xs"
+              aria-label="Excluir animal ${animal.nome} permanentemente"
+            >
+              <span>❌ Excluir Definitivo</span>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    listaRejeitados.innerHTML = html;
+  }
+
+  // Carrega os dados do Supabase
+  async function carregarDados() {
+    try {
+      const { data, error } = await supabase
+        .from('animais')
+        .select('*')
+        .in('status_moderacao', ['pendente', 'rejeitado'])
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      listaAnimaisPendentes = (data || []).filter((a) => a.status_moderacao === 'pendente');
+      listaAnimaisRejeitados = (data || []).filter((a) => a.status_moderacao === 'rejeitado');
+
+      // Atualiza badges e contadores
+      if (badgeContadorPendentes) badgeContadorPendentes.textContent = listaAnimaisPendentes.length.toString();
+      if (badgeContadorRejeitados) badgeContadorRejeitados.textContent = listaAnimaisRejeitados.length.toString();
+      if (subtituloPendentes) subtituloPendentes.textContent = `${listaAnimaisPendentes.length} pendências`;
+      if (subtituloRejeitados) subtituloRejeitados.textContent = `${listaAnimaisRejeitados.length} registros`;
+
+      if (loadingStatePendentes) loadingStatePendentes.style.display = 'none';
+
+      renderizarPendentes();
+      renderizarRejeitados();
+    } catch (err) {
+      console.error('Erro ao carregar dados de moderação:', err);
+      if (loadingStatePendentes) {
+        loadingStatePendentes.innerHTML = '<span class="text-red-500 font-medium">Erro ao carregar registros do servidor.</span>';
+      }
+    }
+  }
+
+  // Inicialização
+  checkAuth().then((autenticado) => {
+    if (autenticado) carregarDados();
+  });
 </script>
