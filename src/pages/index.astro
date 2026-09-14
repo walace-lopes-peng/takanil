@@ -153,15 +153,15 @@ import Layout from '../layouts/Layout.astro';
         <div>
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Situação / Urgência</label>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Todos">
+            <button type="button" onclick="selecionarFiltroUrgencia('Todos')" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Todos">
               <span>Todos</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Machucados">
+            <button type="button" onclick="selecionarFiltroUrgencia('Machucados')" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Machucados">
               <span>🚨 Machucados</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Desaparecidos">
+            <button type="button" onclick="selecionarFiltroUrgencia('Desaparecidos')" class="opt-filtro-urgencia p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-urgencia="Desaparecidos">
               <span>🔍 Sumidos</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
@@ -172,19 +172,19 @@ import Layout from '../layouts/Layout.astro';
         <div>
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Localização</label>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Todas">
+            <button type="button" onclick="selecionarFiltroLocalizacao('Todas')" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Todas">
               <span>Todas</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Abrigo Takanil">
+            <button type="button" onclick="selecionarFiltroLocalizacao('Abrigo Takanil')" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Abrigo Takanil">
               <span>🏡 No Abrigo</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Na rua">
+            <button type="button" onclick="selecionarFiltroLocalizacao('Na rua')" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Na rua">
               <span>🐾 Na Rua</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Lar Temporário">
+            <button type="button" onclick="selecionarFiltroLocalizacao('Lar Temporário')" class="opt-filtro-loc p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-loc="Lar Temporário">
               <span>🚧 Lar Temp.</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
@@ -195,15 +195,15 @@ import Layout from '../layouts/Layout.astro';
         <div>
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Espécie</label>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Todas">
+            <button type="button" onclick="selecionarFiltroEspecie('Todas')" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Todas">
               <span>Todas</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Cão">
+            <button type="button" onclick="selecionarFiltroEspecie('Cão')" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Cão">
               <span>🐶 Cães</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Gato">
+            <button type="button" onclick="selecionarFiltroEspecie('Gato')" class="opt-filtro-especie p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-especie="Gato">
               <span>🐱 Gatos</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
@@ -214,19 +214,19 @@ import Layout from '../layouts/Layout.astro';
         <div>
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Sexo</label>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Todos">
+            <button type="button" onclick="selecionarFiltroSexo('Todos')" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Todos">
               <span>Todos</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Macho">
+            <button type="button" onclick="selecionarFiltroSexo('Macho')" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Macho">
               <span>♂️ Machos</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Fêmea">
+            <button type="button" onclick="selecionarFiltroSexo('Fêmea')" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Fêmea">
               <span>♀️ Fêmeas</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Misto (Ninhada)">
+            <button type="button" onclick="selecionarFiltroSexo('Misto (Ninhada)')" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Misto (Ninhada)">
               <span>📦 Misto / Ninhada</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
@@ -237,15 +237,15 @@ import Layout from '../layouts/Layout.astro';
         <div>
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Status Clínico / Tags</label>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="Todos">
+            <button type="button" onclick="selecionarFiltroClinico('Todos')" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="Todos">
               <span>Todos</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="castrado">
+            <button type="button" onclick="selecionarFiltroClinico('castrado')" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="castrado">
               <span>✂️ Apenas Castrados</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
-            <button type="button" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="vacinado">
+            <button type="button" onclick="selecionarFiltroClinico('vacinado')" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="vacinado">
               <span>💉 Apenas Vacinados</span>
               <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
             </button>
@@ -612,38 +612,63 @@ import Layout from '../layouts/Layout.astro';
   }
 
   // Handlers de seleção dos botões dentro do Modal
+  (window as any).selecionarFiltroUrgencia = (val: string) => {
+    filtroUrgencia = val;
+    sincronizarUIModalFiltros();
+  };
+
+  (window as any).selecionarFiltroLocalizacao = (val: string) => {
+    filtroLocalizacao = val;
+    sincronizarUIModalFiltros();
+  };
+
+  (window as any).selecionarFiltroEspecie = (val: string) => {
+    filtroEspecie = val;
+    sincronizarUIModalFiltros();
+  };
+
+  (window as any).selecionarFiltroSexo = (val: string) => {
+    filtroSexo = val;
+    sincronizarUIModalFiltros();
+  };
+
+  (window as any).selecionarFiltroClinico = (val: string) => {
+    filtroClinico = val;
+    sincronizarUIModalFiltros();
+  };
+
   document.querySelectorAll('.opt-filtro-urgencia').forEach(btn => {
     btn.addEventListener('click', () => {
-      filtroUrgencia = btn.getAttribute('data-urgencia') || 'Todos';
-      sincronizarUIModalFiltros();
+      const val = btn.getAttribute('data-urgencia') || 'Todos';
+      (window as any).selecionarFiltroUrgencia(val);
     });
   });
 
   document.querySelectorAll('.opt-filtro-loc').forEach(btn => {
     btn.addEventListener('click', () => {
-      filtroLocalizacao = btn.getAttribute('data-loc') || 'Todas';
-      sincronizarUIModalFiltros();
+      const val = btn.getAttribute('data-loc') || 'Todas';
+      (window as any).selecionarFiltroLocalizacao(val);
     });
   });
 
   document.querySelectorAll('.opt-filtro-especie').forEach(btn => {
     btn.addEventListener('click', () => {
-      filtroEspecie = btn.getAttribute('data-especie') || 'Todas';
-      sincronizarUIModalFiltros();
+      const val = btn.getAttribute('data-especie') || 'Todas';
+      (window as any).selecionarFiltroEspecie(val);
     });
   });
 
   document.querySelectorAll('.opt-filtro-sexo').forEach(btn => {
     btn.addEventListener('click', () => {
-      filtroSexo = btn.getAttribute('data-sexo') || 'Todos';
-      sincronizarUIModalFiltros();
+      const val = btn.getAttribute('data-sexo') || 'Todos';
+      (window as any).selecionarFiltroSexo(val);
     });
   });
 
   document.querySelectorAll('.opt-filtro-clinico').forEach(btn => {
     btn.addEventListener('click', () => {
-      filtroClinico = btn.getAttribute('data-clinico') || 'Todos';
-      sincronizarUIModalFiltros();
+      const val = btn.getAttribute('data-clinico') || 'Todos';
+      (window as any).selecionarFiltroClinico(val);
     });
   });
 
