@@ -34,12 +34,11 @@ import Layout from '../layouts/Layout.astro';
 
     <!-- Todos os Animais -->
     <div>
-      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
-        <div class="min-w-0 flex-1">
-          <h3 class="text-lg sm:text-xl font-bold text-gray-800 truncate" id="tituloSecao">Animais Cadastrados</h3>
-          <p class="text-xs sm:text-sm text-gray-600 font-medium mt-0.5"><span id="totalAnimais" class="font-bold text-gray-800">0</span> amiguinhos registrados</p>
+      <div class="flex items-center justify-between mb-4 gap-2">
+        <div class="min-w-0">
+          <p class="text-sm sm:text-base font-bold text-gray-700 truncate"><span id="totalAnimais" class="text-gray-900">0</span> <span id="labelTotalAnimais">Animais</span></p>
         </div>
-        <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+        <div class="flex items-center gap-2 shrink-0">
           <!-- Alternador de Visualização (Grade vs Lista) -->
           <div class="flex items-center p-1 bg-white rounded-xl border border-gray-200 shadow-xs" role="group" aria-label="Modo de visualização dos animais">
             <button
