@@ -32,6 +32,32 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </a>
 
+    <!-- Barra de Busca Textual por Nome -->
+    <div class="relative w-full mb-3">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <input
+        type="text"
+        id="inputBuscaNome"
+        placeholder="Buscar por nome do animal..."
+        class="w-full pl-10 pr-10 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-2xl shadow-xs text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-taka-green-500 focus:border-transparent transition-all min-h-[44px]"
+        aria-label="Buscar animal por nome"
+      />
+      <button
+        type="button"
+        id="btnLimparBusca"
+        aria-label="Limpar busca por nome"
+        class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors min-w-[44px] min-h-[44px] justify-center"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 bg-gray-200 hover:bg-gray-300 rounded-full p-0.5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
     <!-- Todos os Animais -->
     <div>
       <div class="flex items-center justify-between mb-4 gap-2">
@@ -183,6 +209,48 @@ import Layout from '../layouts/Layout.astro';
             </button>
           </div>
         </div>
+
+        <!-- Categoria 4: Sexo -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Sexo</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Todos">
+              <span>Todos</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Macho">
+              <span>♂️ Machos</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Fêmea">
+              <span>♀️ Fêmeas</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-sexo p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-sexo="Misto (Ninhada)">
+              <span>📦 Misto / Ninhada</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Categoria 5: Status Clínico / Tags -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Status Clínico / Tags</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="Todos">
+              <span>Todos</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="castrado">
+              <span>✂️ Apenas Castrados</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+            <button type="button" class="opt-filtro-clinico p-3 text-left rounded-xl border text-sm font-semibold transition-all h-12 flex items-center justify-between" data-clinico="vacinado">
+              <span>💉 Apenas Vacinados</span>
+              <span class="check-icon hidden text-taka-green-600 font-bold">✓</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="p-4 border-t border-gray-100 bg-gray-50 flex gap-2">
@@ -290,11 +358,38 @@ import Layout from '../layouts/Layout.astro';
   let isAdminGlob = false;
   let modoVisualizacao: 'grid' | 'list' = (localStorage.getItem('takanil_view_mode') as any) || 'grid';
 
-  // Variáveis de Filtro do Modal
+  // Variáveis de Filtro do Modal e Busca
+  let termoBusca = '';
   let filtroUrgencia = 'Todos';
   let filtroLocalizacao = 'Todas';
   let filtroEspecie = 'Todas';
+  let filtroSexo = 'Todos';
+  let filtroClinico = 'Todos';
   let mostrarFinaisFelizes = false;
+
+  // Handler da Barra de Busca por Nome
+  const inputBusca = document.getElementById('inputBuscaNome') as HTMLInputElement;
+  const btnLimparBusca = document.getElementById('btnLimparBusca');
+
+  inputBusca?.addEventListener('input', () => {
+    termoBusca = inputBusca.value.trim().toLowerCase();
+    if (termoBusca.length > 0) {
+      btnLimparBusca?.classList.remove('hidden');
+    } else {
+      btnLimparBusca?.classList.add('hidden');
+    }
+    renderLista(animaisGlobais);
+  });
+
+  btnLimparBusca?.addEventListener('click', () => {
+    if (inputBusca) {
+      inputBusca.value = '';
+      termoBusca = '';
+      btnLimparBusca.classList.add('hidden');
+      inputBusca.focus();
+      renderLista(animaisGlobais);
+    }
+  });
 
   // Sincronização e alternância do Modo de Visualização (Grade vs Lista)
   function sincronizarUIModoVisualizacao() {
@@ -400,6 +495,8 @@ import Layout from '../layouts/Layout.astro';
     filtroUrgencia = 'Todos';
     filtroLocalizacao = 'Todas';
     filtroEspecie = 'Todas';
+    filtroSexo = 'Todos';
+    filtroClinico = 'Todos';
     sincronizarUIModalFiltros();
     (window as any).aplicarFiltrosModal();
   };
@@ -411,7 +508,9 @@ import Layout from '../layouts/Layout.astro';
     const btnFiltrar = document.getElementById('btnAbrirFiltros');
     const totalFiltrosAtivos = (filtroUrgencia !== 'Todos' ? 1 : 0) + 
                               (filtroLocalizacao !== 'Todas' ? 1 : 0) + 
-                              (filtroEspecie !== 'Todas' ? 1 : 0);
+                              (filtroEspecie !== 'Todas' ? 1 : 0) +
+                              (filtroSexo !== 'Todos' ? 1 : 0) +
+                              (filtroClinico !== 'Todos' ? 1 : 0);
 
     if (btnFiltrar) {
       if (totalFiltrosAtivos > 0) {
@@ -480,6 +579,36 @@ import Layout from '../layouts/Layout.astro';
         check?.classList.add('hidden');
       }
     });
+
+    // Categoria Sexo
+    document.querySelectorAll('.opt-filtro-sexo').forEach(btn => {
+      const val = btn.getAttribute('data-sexo');
+      const check = btn.querySelector('.check-icon');
+      if (val === filtroSexo) {
+        btn.classList.add('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.remove('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.remove('hidden');
+      } else {
+        btn.classList.remove('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.add('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.add('hidden');
+      }
+    });
+
+    // Categoria Status Clínico / Tags
+    document.querySelectorAll('.opt-filtro-clinico').forEach(btn => {
+      const val = btn.getAttribute('data-clinico');
+      const check = btn.querySelector('.check-icon');
+      if (val === filtroClinico) {
+        btn.classList.add('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.remove('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.remove('hidden');
+      } else {
+        btn.classList.remove('bg-taka-green-50', 'border-taka-green-500', 'text-taka-green-700');
+        btn.classList.add('bg-gray-50', 'border-gray-200', 'text-gray-700');
+        check?.classList.add('hidden');
+      }
+    });
   }
 
   // Handlers de seleção dos botões dentro do Modal
@@ -504,6 +633,20 @@ import Layout from '../layouts/Layout.astro';
     });
   });
 
+  document.querySelectorAll('.opt-filtro-sexo').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtroSexo = btn.getAttribute('data-sexo') || 'Todos';
+      sincronizarUIModalFiltros();
+    });
+  });
+
+  document.querySelectorAll('.opt-filtro-clinico').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtroClinico = btn.getAttribute('data-clinico') || 'Todos';
+      sincronizarUIModalFiltros();
+    });
+  });
+
   function renderLista(animais: any[]) {
     let htmlOutput = '';
     
@@ -518,6 +661,11 @@ import Layout from '../layouts/Layout.astro';
       // Normal filters on active animals
       filtrados = baseAnimais.filter(a => !statusFinais.includes(a.situacao_urgencia));
       
+      // Aplicar Busca Textual por Nome (Case-Insensitive)
+      if (termoBusca) {
+        filtrados = filtrados.filter(a => (a.nome || '').toLowerCase().includes(termoBusca));
+      }
+
       // Aplicar Filtro de Urgência
       if (filtroUrgencia === 'Machucados') {
         filtrados = filtrados.filter(a => a.situacao_urgencia === 'Machucado/Risco');
@@ -533,6 +681,18 @@ import Layout from '../layouts/Layout.astro';
       // Aplicar Filtro de Espécie
       if (filtroEspecie !== 'Todas') {
         filtrados = filtrados.filter(a => a.especie === filtroEspecie);
+      }
+
+      // Aplicar Filtro de Sexo
+      if (filtroSexo !== 'Todos') {
+        filtrados = filtrados.filter(a => a.sexo === filtroSexo);
+      }
+
+      // Aplicar Filtro de Status Clínico
+      if (filtroClinico === 'castrado') {
+        filtrados = filtrados.filter(a => a.castrado === 'Sim' || a.castrado === true);
+      } else if (filtroClinico === 'vacinado') {
+        filtrados = filtrados.filter(a => a.vacinado === 'Sim' || a.vacinado === true);
       }
     }
 
