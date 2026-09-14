@@ -369,13 +369,17 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     }
 
     const showStatus = (msg: string, type: 'success' | 'error') => {
-      if(!statusMessage) return;
-      statusMessage.textContent = msg;
-      statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
-      if (type === 'error') {
-        statusMessage.classList.add('bg-red-50', 'text-red-700');
-      } else {
-        statusMessage.classList.add('bg-green-50', 'text-green-700');
+      if (statusMessage) {
+        statusMessage.textContent = msg;
+        statusMessage.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
+        if (type === 'error') {
+          statusMessage.classList.add('bg-red-50', 'text-red-700');
+        } else {
+          statusMessage.classList.add('bg-green-50', 'text-green-700');
+        }
+      }
+      if ((window as any).mostrarToast) {
+        (window as any).mostrarToast(msg, type === 'success' ? 'sucesso' : 'erro');
       }
     };
 

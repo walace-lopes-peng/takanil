@@ -1,5 +1,7 @@
 ---
 import BannerInstalar from '../components/BannerInstalar.astro';
+import Toast from '../components/Toast.astro';
+import ModalConfirmacao from '../components/ModalConfirmacao.astro';
 
 interface Props {
   title: string;
@@ -32,6 +34,18 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Takanil" />
     <title>{title}</title>
+
+    <script is:inline>
+      // Captura antecipada do evento beforeinstallprompt no Android/Chrome
+      window.deferredInstallPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        window.deferredInstallPrompt = e;
+        if (window.onPwaInstallable) {
+          window.onPwaInstallable();
+        }
+      });
+    </script>
   </head>
   <body class="bg-taka-green-50 text-gray-900 font-sans min-h-screen antialiased flex flex-col">
     <!-- Navbar simples provisória -->
@@ -101,7 +115,12 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
     <!-- Banner de instalacao PWA (aparece apenas em mobile nao instalado) -->
     <BannerInstalar />
 
+    <!-- Sistema Global de Notificações (Toast) e Diálogos de Confirmação -->
+    <Toast />
+    <ModalConfirmacao />
+
     <!-- Conteúdo principal -->
+
     <main class="flex-1 w-full max-w-md mx-auto p-4 flex flex-col pb-24">
       <slot />
     </main>
@@ -181,7 +200,7 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
             }
           } catch (err) {
             console.error('Falha ao copiar:', err);
-            alert('Falha ao copiar. Chave: 35998687395');
+            (window as any).mostrarToast('Falha ao copiar a chave. Chave: 35998687395', 'erro');
           }
         });
       }
@@ -234,6 +253,15 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
       supabase.auth.onAuthStateChange(() => {
         renderAuthStatus();
       });
+
+      // Registra Service Worker para suporte PWA e prompt de instalação no celular
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.error('Erro ao registrar Service Worker:', err);
+          });
+        });
+      }
     </script>
   </body>
 </html>

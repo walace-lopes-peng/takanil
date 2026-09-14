@@ -1,3 +1,4 @@
+
 ---
 import Layout from '../layouts/Layout.astro';
 ---
@@ -75,7 +76,13 @@ import Layout from '../layouts/Layout.astro';
 
   // Ação: Aprovar
   (window as any).aprovarAnimal = async (id: string, nome: string) => {
-    if (!confirm(`Deseja aprovar o cadastro de "${nome}"? Ele ficará visível publicamente.`)) return;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Aprovar cadastro?',
+      mensagem: `Deseja aprovar o cadastro de "${nome}"? Ele ficará visível publicamente no mural.`,
+      textoConfirmar: 'Aprovar',
+      tipo: 'padrao'
+    });
+    if (!confirmou) return;
     
     try {
       const { error } = await supabase
@@ -85,15 +92,22 @@ import Layout from '../layouts/Layout.astro';
         
       if (error) throw error;
       carregarPendentes();
+      (window as any).mostrarToast(`Registro "${nome}" aprovado com sucesso!`, 'sucesso');
     } catch (err) {
       console.error(err);
-      alert('Erro ao aprovar o registro.');
+      (window as any).mostrarToast('Erro ao aprovar o registro.', 'erro');
     }
   };
 
   // Ação: Descartar (Reprovar/Spam)
   (window as any).descartarAnimal = async (id: string, nome: string) => {
-    if (!confirm(`Deseja descartar "${nome}"? O registro ficará oculto (rejeitado).`)) return;
+    const confirmou = await (window as any).confirmarAcao({
+      titulo: 'Descartar sugestão?',
+      mensagem: `Deseja descartar "${nome}"? O registro ficará oculto (rejeitado).`,
+      textoConfirmar: 'Sim, Descartar',
+      tipo: 'perigo'
+    });
+    if (!confirmou) return;
     
     try {
       const { error } = await supabase
@@ -103,9 +117,10 @@ import Layout from '../layouts/Layout.astro';
         
       if (error) throw error;
       carregarPendentes();
+      (window as any).mostrarToast(`Registro "${nome}" descartado.`, 'info');
     } catch (err) {
       console.error(err);
-      alert('Erro ao descartar o registro.');
+      (window as any).mostrarToast('Erro ao descartar o registro.', 'erro');
     }
   };
 
