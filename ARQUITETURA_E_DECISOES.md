@@ -45,3 +45,38 @@ Cada nova decisão arquitetural ou técnica importante deve ser adicionada abaix
   1. O ecossistema Node.js (O que é NPM? O que é o `package.json` vs `package-lock.json`?)
   2. Tipos de Dependências (O que é uma `dependency` vs `devDependency` vs `peerDependency`?)
   3. Continuous Integration e Cloud Deployments (Por que o ambiente local costuma ser diferente do ambiente de produção?)
+
+### 3. Segregação de Ambientes Dev e Piloto via Schemas PostgreSQL (Schema-based Multi-tenancy)
+* **Data:** Setembro de 2026
+* **Contexto:** A ONG Takanil opera no plano gratuito (free-tier) do Supabase, que permite apenas 2 projetos ativos. Criar múltiplos projetos dedicados para cada ambiente (Local, Dev, Staging, Piloto, Produção) esgotaria a cota gratuita ou geraria custos desnecessários. Ao mesmo tempo, utilizar um único banco com a mesma tabela para testes locais e atendimentos reais causaria contaminação de dados (ex: voluntárias visualizando animais falsos de teste, como "Rex Teste 123", ou gráficos financeiros corrompidos por lançamentos fictícios).
+* **Decisão:** Adotar a arquitetura de **Isolamento por Schema no PostgreSQL**:
+  * O schema `public` é reservado para **desenvolvimento local, testes automatizados e deploy previews de PRs**.
+  * O schema `piloto` é reservado para os **dados reais da ONG em produção**.
+  * O client do Supabase (`src/lib/supabaseClient.ts`) foi configurado para ler dinamicamente a variável `PUBLIC_SUPABASE_SCHEMA` (com fallback seguro para `'public'` caso a variável não exista).
+  * No provedor de hospedagem de produção (Vercel), a variável de ambiente é configurada como `PUBLIC_SUPABASE_SCHEMA=piloto`.
+* **Por quê? (Justificativa Didática e Visão de Mercado):**
+  * *Arquitetura Multi-Tenancy no PostgreSQL:* No mundo corporativo e em plataformas SaaS (ex: Salesforce, Shopify, Slack), existem três modelos clássicos de segregação de dados:
+    1. **Database-per-tenant (Banco por cliente/ambiente):** Isolamento total, mas alto custo de infraestrutura e sobrecarga de conexões/memória.
+    2. **Row-level isolation (Coluna `tenant_id` ou `ambiente` com RLS):** Custo mínimo, mas risco constante de vazamento acidental de dados por falha em cláusula `WHERE` ou bug de política.
+    3. **Schema-per-tenant / Schema-per-environment (Schema dedicado no mesmo banco):** O *sweet spot* da engenharia de dados. Os schemas funcionam como "pastas lógicas" ou namespaces totalmente isolados dentro da mesma instância do PostgreSQL. As tabelas têm o mesmo nome (`perfis`, `animais`, `financas`), mas residem em namespaces distintos (`public.animais` vs `piloto.animais`), compartilhando o mesmo pool de conexões e cache do banco com custo de infraestrutura zero.
+  * *Como o PostgREST / Supabase lida com Schemas:* O Supabase utiliza o PostgREST por baixo dos panos. Quando informamos `db: { schema: 'piloto' }` no SDK, o client passa automaticamente o cabeçalho HTTP `Accept-Profile: piloto` (para consultas) e `Content-Profile: piloto` (para mutations). O PostgREST altera o `search_path` do PostgreSQL naquela transação de forma transparente, garantindo que queries nunca toquem o schema errado.
+  * *Prevenção de Schema Drift e Automação de Migrações (Supabase CLI & CI/CD):*
+    * **O Risco de "Espelhar na Mão":** Criar ou alterar tabelas manualmente em `public` e esquecer de reproduzir em `piloto` gera o temido *Schema Drift* (quando dois ambientes que deveriam ser idênticos divergem silenciosamente, quebrando deploys em produção).
+    * **Supabase DB Diff:** Para auditar diferenças de DDL entre schemas sem intervenção manual, utiliza-se a ferramenta de diff declarativo do Supabase CLI:
+      ```bash
+      # Gera o SQL com as diferenças exatas entre o schema local/public e o piloto
+      supabase db diff --schema public,piloto
+      ```
+    * **Estratégia de CI/CD (GitHub Actions):** Em pipelines automatizados de banco de dados (Database Reliability Engineering - DBRE), as migrações são versionadas em arquivos `.sql` sequenciais (ex: `supabase/migrations/YYYYMMDDHHMMSS_nome_da_migracao.sql`). Em vez de rodar SQL no painel web, a Action executa o runner aplicando a migração tanto no schema `public` quanto no schema `piloto`, garantindo paridade contínua e eliminando o erro humano:
+      ```yaml
+      # Exemplo conceitual de pipeline de migração espelhada
+      - name: Aplicar migrações nos Schemas
+        run: |
+          supabase db push --schema public
+          supabase db push --schema piloto
+      ```
+* **Pré-requisitos de Estudo:**
+  1. Conceito de Schemas e `search_path` no PostgreSQL (`CREATE SCHEMA`, `SET search_path TO ...`)
+  2. Multi-tenancy Patterns (Database-per-tenant vs Schema-per-tenant vs Shared-database)
+  3. PostgREST Architecture & Header Profiles (`Accept-Profile`, `Content-Profile`)
+  4. Database Reliability Engineering (DBRE): Schema Drift, Migrações Declarativas vs Imperativas e Supabase CLI (`supabase db diff`, `supabase db push`)
