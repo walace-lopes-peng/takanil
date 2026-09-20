@@ -1,0 +1,394 @@
+---
+// Componente de Modal da Ficha Detalhada do Animal
+---
+
+<!-- Modal de Ficha Detalhada do Animal -->
+<div 
+  id="modalFichaAnimal" 
+  class="fixed inset-0 z-50 bg-black/75 hidden flex items-center justify-center p-3 sm:p-4 backdrop-blur-xs transition-opacity duration-200 opacity-0 overflow-y-auto" 
+  role="dialog" 
+  aria-modal="true" 
+  aria-labelledby="fichaNomeAnimal"
+>
+  <div 
+    id="modalFichaCard" 
+    class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[92vh] transform transition-transform duration-200 scale-95 border border-gray-100"
+  >
+    
+    <!-- Topo com Foto e Ações Rápidas -->
+    <div class="relative aspect-[4/3] sm:aspect-video w-full bg-gray-900 shrink-0 overflow-hidden">
+      <img id="fichaFotoImg" src="" alt="Foto do animal" class="w-full h-full object-cover" />
+      
+      <!-- Gradiente escuro para legibilidade -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/40 pointer-events-none"></div>
+
+      <!-- Botão Fechar e Badge de Situação no topo -->
+      <div class="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
+        <div id="fichaBadgeUrgencia" class="pointer-events-auto"></div>
+        <button 
+          type="button" 
+          onclick="fecharModalFicha()" 
+          aria-label="Fechar ficha do animal" 
+          class="bg-black/60 hover:bg-black/90 text-white rounded-full p-2.5 backdrop-blur-md transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center border border-white/15 shadow-md active:scale-95"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Botão Ampliar Foto Flutuante na Imagem -->
+      <div class="absolute bottom-3 right-3 z-10">
+        <button 
+          type="button" 
+          id="btnFichaAmpliarFoto"
+          class="bg-black/60 hover:bg-black/90 text-white text-xs font-semibold px-3 py-1.5 rounded-xl backdrop-blur-md transition-colors flex items-center gap-1.5 border border-white/20 shadow-md active:scale-95 min-h-[36px]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+          </svg>
+          <span>Ampliar foto</span>
+        </button>
+      </div>
+
+      <!-- Nome e Localização sobrepostos na foto -->
+      <div class="absolute bottom-3 left-3.5 right-32 z-10 text-white">
+        <h3 id="fichaNomeAnimal" class="text-2xl sm:text-3xl font-black drop-shadow-md truncate"></h3>
+        <p id="fichaLocalizacao" class="text-xs sm:text-sm font-semibold text-emerald-300 drop-shadow-sm flex items-center gap-1 mt-0.5 truncate"></p>
+      </div>
+    </div>
+
+    <!-- Corpo da Ficha (Scrollable) -->
+    <div class="p-5 space-y-4 overflow-y-auto flex-1 bg-white">
+      
+      <!-- Características Principais (Grid 2x2 de Pílulas) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+        <div class="p-2.5 bg-gray-50 rounded-2xl border border-gray-100">
+          <span class="text-[10px] uppercase font-bold text-gray-400 block">Espécie & Sexo</span>
+          <span id="fichaEspecieSexo" class="text-xs sm:text-sm font-bold text-gray-800 block mt-0.5"></span>
+        </div>
+        <div class="p-2.5 bg-gray-50 rounded-2xl border border-gray-100">
+          <span class="text-[10px] uppercase font-bold text-gray-400 block">Fase & Idade</span>
+          <span id="fichaFaseIdade" class="text-xs sm:text-sm font-bold text-gray-800 block mt-0.5"></span>
+        </div>
+        <div class="p-2.5 bg-gray-50 rounded-2xl border border-gray-100">
+          <span class="text-[10px] uppercase font-bold text-gray-400 block">Porte & Peso</span>
+          <span id="fichaPortePeso" class="text-xs sm:text-sm font-bold text-gray-800 block mt-0.5"></span>
+        </div>
+        <div class="p-2.5 bg-gray-50 rounded-2xl border border-gray-100">
+          <span class="text-[10px] uppercase font-bold text-gray-400 block">Raça</span>
+          <span id="fichaRaca" class="text-xs sm:text-sm font-bold text-gray-800 block mt-0.5 truncate"></span>
+        </div>
+      </div>
+
+      <!-- Saúde, Cuidados Clínicos e Temperamento -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+          <span>🩺</span> Cuidados Clínicos & Temperamento
+        </h4>
+        <div class="flex flex-wrap gap-1.5" id="fichaBadgesClinicas">
+          <!-- Renderizado dinamicamente: Castrado, Vacinas, Temperamento -->
+        </div>
+      </div>
+
+      <!-- História e Legenda de Divulgação -->
+      <div class="space-y-1.5 pt-1" id="fichaContainerLegenda">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+            <span>📝</span> História & Divulgação
+          </h4>
+          <button 
+            type="button" 
+            id="btnCopiarLegendaFicha"
+            class="text-xs font-bold text-taka-green-700 bg-taka-green-50 hover:bg-taka-green-100 px-2.5 py-1 rounded-lg border border-taka-green-200 transition-colors flex items-center gap-1 min-h-[36px] active:scale-95"
+            title="Copiar texto para WhatsApp / Instagram"
+          >
+            <span>📋 Copiar Texto</span>
+          </button>
+        </div>
+        <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200/80 text-xs sm:text-sm text-gray-700 leading-relaxed italic whitespace-pre-line" id="fichaTextoLegenda"></div>
+      </div>
+
+      <!-- Tempo no Sistema / Data de Cadastro -->
+      <div class="pt-2 text-[11px] text-gray-400 flex items-center justify-between border-t border-gray-100">
+        <span id="fichaTempoSistema">🕒 No sistema há -- dias</span>
+        <span id="fichaDataCadastro">Cadastrado em --/--/----</span>
+      </div>
+    </div>
+
+    <!-- Rodapé com Botões de Ação (Adoção, Compartilhar, Instagram) -->
+    <div class="p-4 bg-gray-50/90 border-t border-gray-100 flex flex-col sm:flex-row gap-2.5">
+      <a 
+        id="btnAdotarWhatsApp" 
+        href="#" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex-[2] py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm active:scale-98 transition-all min-h-[48px]"
+      >
+        <span class="text-lg">💚</span>
+        <span id="txtBtnAdotar">Quero Adotar!</span>
+      </a>
+      <button 
+        type="button" 
+        id="btnCompartilharFicha" 
+        class="flex-1 py-3.5 px-4 bg-white hover:bg-gray-100 text-gray-800 border border-gray-200 rounded-2xl font-bold text-sm flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 transition-all min-h-[48px]"
+      >
+        <span>📤 Compartilhar</span>
+      </button>
+      <a 
+        id="btnFichaInstagram" 
+        href="#" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="hidden py-3.5 px-4 bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 rounded-2xl font-bold text-sm flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 transition-all min-h-[48px]"
+        title="Ver postagem no Instagram"
+      >
+        <img src="/assets/insta-logo.png" alt="" class="w-4 h-4 object-contain" />
+        <span>Instagram</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { gerarLegendaAnimal } from '../lib/geradorLegenda';
+
+  (window as any).abrirFichaAnimal = (id: string) => {
+    const animaisGlobais = (window as any).animaisGlobais || [];
+    const animal = animaisGlobais.find((a: any) => a.id === id);
+    if (!animal) return;
+
+    const modal = document.getElementById('modalFichaAnimal');
+    const card = document.getElementById('modalFichaCard');
+    if (!modal || !card) return;
+
+    // Elementos da Ficha
+    const img = document.getElementById('fichaFotoImg') as HTMLImageElement;
+    const nomeEl = document.getElementById('fichaNomeAnimal');
+    const locEl = document.getElementById('fichaLocalizacao');
+    const badgeUrgenciaEl = document.getElementById('fichaBadgeUrgencia');
+    const btnAmpliar = document.getElementById('btnFichaAmpliarFoto');
+    const especieSexoEl = document.getElementById('fichaEspecieSexo');
+    const faseIdadeEl = document.getElementById('fichaFaseIdade');
+    const portePesoEl = document.getElementById('fichaPortePeso');
+    const racaEl = document.getElementById('fichaRaca');
+    const badgesClinicasEl = document.getElementById('fichaBadgesClinicas');
+    const textoLegendaEl = document.getElementById('fichaTextoLegenda');
+    const btnCopiarLegenda = document.getElementById('btnCopiarLegendaFicha');
+    const tempoSistemaEl = document.getElementById('fichaTempoSistema');
+    const dataCadastroEl = document.getElementById('fichaDataCadastro');
+    const btnAdotar = document.getElementById('btnAdotarWhatsApp') as HTMLAnchorElement;
+    const txtBtnAdotar = document.getElementById('txtBtnAdotar');
+    const btnCompartilhar = document.getElementById('btnCompartilharFicha');
+    const btnInstagram = document.getElementById('btnFichaInstagram') as HTMLAnchorElement;
+
+    const nomeSanitizado = animal.nome && animal.nome.trim() !== '' ? animal.nome : 'Sem Nome';
+    const fotoUrl = animal.imagem_url || '/assets/takanil-icon-png.png';
+    const subtituloZoom = `${animal.especie || 'Animal'} • ${animal.sexo || ''} • ${animal.peso ? animal.peso + 'kg' : ''} • ${animal.localizacao || ''}`;
+
+    // Foto e Cabeçalho
+    if (img) img.src = fotoUrl;
+    if (nomeEl) nomeEl.textContent = nomeSanitizado;
+    if (locEl) {
+      const bairroStr = animal.bairro ? ` (${animal.bairro})` : '';
+      locEl.textContent = `📍 ${animal.localizacao || 'Passa Quatro/MG'}${bairroStr}`;
+    }
+
+    // Badge de Urgência / Status
+    if (badgeUrgenciaEl) {
+      if (animal.situacao_urgencia === 'Machucado/Risco') {
+        badgeUrgenciaEl.innerHTML = `<span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1">🚨 Machucado / Risco</span>`;
+      } else if (animal.situacao_urgencia === 'Desaparecido') {
+        badgeUrgenciaEl.innerHTML = `<span class="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1">🔍 Desaparecido / Sumiu</span>`;
+      } else if (animal.situacao_urgencia === 'Achado na Rua') {
+        badgeUrgenciaEl.innerHTML = `<span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1">🧭 Achado na Rua</span>`;
+      } else if (animal.status === 'Adotado' || animal.situacao_urgencia === 'Adotado') {
+        badgeUrgenciaEl.innerHTML = `<span class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1">🏠 Adotado!</span>`;
+      } else {
+        badgeUrgenciaEl.innerHTML = `<span class="bg-emerald-600/90 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1">✅ Disponível para Adoção</span>`;
+      }
+    }
+
+    // Botão Ampliar Foto
+    if (btnAmpliar) {
+      btnAmpliar.onclick = () => {
+        (window as any).abrirModalZoom(fotoUrl, nomeSanitizado, subtituloZoom);
+      };
+    }
+
+    // Características Principais
+    if (especieSexoEl) {
+      const icone = animal.especie === 'Gato' ? '🐱' : '🐶';
+      especieSexoEl.textContent = `${icone} ${animal.especie || 'Animal'} • ${animal.sexo || 'Não informado'}`;
+    }
+
+    if (faseIdadeEl) {
+      const idadeStr = animal.idade_aprox ? ` (${animal.idade_aprox})` : '';
+      faseIdadeEl.textContent = `${animal.fase_vida || 'Adulto'}${idadeStr}`;
+    }
+
+    if (portePesoEl) {
+      const pesoStr = animal.peso ? ` (${animal.peso}kg)` : '';
+      portePesoEl.textContent = `${animal.porte || 'Médio'}${pesoStr}`;
+    }
+
+    if (racaEl) {
+      racaEl.textContent = animal.raca || 'SRD (Sem Raça)';
+    }
+
+    // Badges Clínicas (Castrado, Vacinas, Temperamento)
+    if (badgesClinicasEl) {
+      let badgesHtml = '';
+
+      // Castração
+      if (animal.castrado === 'Sim') {
+        badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl">✅ Castrado(a)</span>`;
+      } else if (animal.castrado === 'Não') {
+        badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-xl">⏳ Não castrado(a)</span>`;
+      } else {
+        badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1 rounded-xl">❓ Castração não informada</span>`;
+      }
+
+      // Vacinação
+      if (animal.vacinado && animal.vacinado.startsWith('Sim')) {
+        const detalheVacinas = animal.vacinado.includes('(') ? animal.vacinado.replace('Sim', 'Vacinado(a):') : 'Vacinado(a)';
+        badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl">💉 ${detalheVacinas}</span>`;
+      } else if (animal.vacinado === 'Não') {
+        badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-xl">⏳ Não vacinado(a)</span>`;
+      } else {
+        badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1 rounded-xl">❓ Vacinação não informada</span>`;
+      }
+
+      // Temperamento
+      if (animal.temperamento && animal.temperamento !== 'Não informado') {
+        badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200 px-3 py-1 rounded-xl">😊 ${animal.temperamento}</span>`;
+      }
+
+      badgesClinicasEl.innerHTML = badgesHtml;
+    }
+
+    // História e Legenda
+    const legendaFinal = animal.legenda && animal.legenda.trim() !== '' 
+      ? animal.legenda 
+      : gerarLegendaAnimal({
+          nome: animal.nome,
+          especie: animal.especie,
+          fase_vida: animal.fase_vida,
+          sexo: animal.sexo,
+          porte: animal.porte,
+          bairro: animal.bairro,
+          situacao: animal.situacao_urgencia,
+          castrado: animal.castrado,
+          vacinado: animal.vacinado,
+          temperamento: animal.temperamento
+        }, 0);
+
+    if (textoLegendaEl) {
+      textoLegendaEl.textContent = legendaFinal;
+    }
+
+    if (btnCopiarLegenda) {
+      btnCopiarLegenda.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(legendaFinal);
+          (window as any).mostrarToast?.('Texto da legenda copiado para a área de transferência!', 'sucesso');
+        } catch (err) {
+          (window as any).mostrarToast?.('Erro ao copiar texto automaticamente.', 'erro');
+        }
+      };
+    }
+
+    // Datas e Tempo no Sistema
+    const createdDate = animal.created_at ? new Date(animal.created_at) : new Date();
+    const diffTime = Math.abs(new Date().getTime() - createdDate.getTime());
+    const diffDays = Math.max(1, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+
+    if (tempoSistemaEl) tempoSistemaEl.textContent = `🕒 No sistema há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}`;
+    if (dataCadastroEl) {
+      const dataFormatada = createdDate.toLocaleDateString('pt-BR');
+      dataCadastroEl.textContent = `Cadastrado em ${dataFormatada}`;
+    }
+
+    // Botão de Adoção via WhatsApp
+    if (btnAdotar) {
+      const mensagemWhats = `Olá! Vi o cadastro de *${nomeSanitizado}* no Hub Takanil e gostaria de mais informações para adoção/apadrinhamento!`;
+      btnAdotar.href = `https://wa.me/553598687395?text=${encodeURIComponent(mensagemWhats)}`;
+    }
+    if (txtBtnAdotar) {
+      txtBtnAdotar.textContent = `Quero Adotar o(a) ${nomeSanitizado}!`;
+    }
+
+    // Botão Compartilhar Ficha (Web Share API)
+    if (btnCompartilhar) {
+      btnCompartilhar.onclick = async () => {
+        const shareData = {
+          title: `Conheça ${nomeSanitizado} - ONG Takanil`,
+          text: `Olha que amor! Conheça ${nomeSanitizado}, disponível para adoção responsável na ONG Takanil em Passa Quatro/MG:\n\n${legendaFinal.slice(0, 200)}...`,
+          url: window.location.href
+        };
+        if (navigator.share) {
+          try {
+            await navigator.share(shareData);
+          } catch (err) {
+            // Compartilhamento cancelado pelo usuário
+          }
+        } else {
+          try {
+            await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+            (window as any).mostrarToast?.('Link e resumo do animal copiados!', 'sucesso');
+          } catch (e) {
+            (window as any).mostrarToast?.('Não foi possível compartilhar.', 'erro');
+          }
+        }
+      };
+    }
+
+    // Botão Post do Instagram
+    if (btnInstagram) {
+      if (animal.instagram_url && animal.instagram_url.trim() !== '') {
+        btnInstagram.href = animal.instagram_url;
+        btnInstagram.classList.remove('hidden');
+      } else {
+        btnInstagram.classList.add('hidden');
+      }
+    }
+
+    // Animação de Abertura
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modal.classList.remove('opacity-0');
+      modal.classList.add('opacity-100');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    });
+  };
+
+  (window as any).fecharModalFicha = () => {
+    const modal = document.getElementById('modalFichaAnimal');
+    const card = document.getElementById('modalFichaCard');
+    if (!modal || !card) return;
+
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    card.classList.remove('scale-100');
+    card.classList.add('scale-95');
+
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 200);
+  };
+
+  // Fechar Modal Ficha ao clicar no backdrop
+  document.getElementById('modalFichaAnimal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalFichaAnimal')) {
+      (window as any).fecharModalFicha();
+    }
+  });
+
+  // Fechar com ESC
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      (window as any).fecharModalFicha();
+    }
+  });
+</script>
