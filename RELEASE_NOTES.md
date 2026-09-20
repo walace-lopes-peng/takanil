@@ -4,6 +4,18 @@ Histórico de melhorias, novidades e correções entregues em cada versão do Hu
 
 ---
 
+## 🚀 Versão 0.12.0 — Gestão Ágil de Status, Catálogo Integrado & WhatsApp Contextual (Em Breve)
+
+### ✨ Novidades da Versão
+
+- **✨ `[Gestão]` Menu Rápido de Status com Botão "Desfazer":** Os botões antigos dos cards foram substituídos por um menu discreto `[ ⋮ ]`. Ao mudar o status do animal (Adotado, Voltou pro Tutor, Urgência Médica, etc.), uma notificação surge na tela com o botão **"Desfazer"** por 5 segundos para reverter qualquer toque acidental imediatamente sem confirmações burocráticas.
+- **🐾 Catálogo Integrado com Visualização de Todos os Status:** Todos os animais aprovados agora permanecem visíveis na tela inicial, incluindo os pets adotados identificados com o badge verde `[✅ Adotado]`. Assim, qualquer voluntária ou visitante consegue consultar a situação atual do pet com facilidade. O botão de coração no topo continua disponível como filtro exclusivo para comemorar os Finais Felizes.
+- **💬 Mensagens Humanizadas no WhatsApp:** O texto enviado ao clicar em conversar no WhatsApp agora inclui o nome do animal em destaque em negrito e o link direto da postagem do Instagram (quando houver). Para quem administra o app, o botão de WhatsApp foi ocultado para manter a barra de ferramentas focada nas ações de gestão (`[ ⋮ Status ]`, `[ ✏️ Editar ]` e `[ 🗑️ Excluir ]`).
+- **✂️ Enquadramento Vertical de Fotos:** Nova ferramenta com corte na proporção vertical padronizada (500x680) para garantir que as fotos dos animais fiquem sempre bem centralizadas e sem distorções nos cards.
+- **💉 Registro Detalhado de Vacinas:** Seleção das vacinas específicas aplicadas (V8/V10, Antirrábica, etc.), facilitando o acompanhamento da saúde do pet.
+
+---
+
 ## 🚀 Versão 0.11.0 — Formulário Inteligente & Legendas da Rita (19/09/2026)
 
 ### ✨ Novidades da Versão
