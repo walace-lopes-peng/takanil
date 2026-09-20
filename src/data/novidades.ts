@@ -9,32 +9,32 @@ export const VERSAO_ATUAL = '0.11.0';
 export const NOVIDADES_VERSAO: ItemNovidade[] = [
   {
     icone: '📝',
-    titulo: '1. Gerador de Legendas para Divulgação',
-    descricao: 'Cria legendas automáticas para redes sociais conforme você preenche o cadastro, com botão para sortear novos textos.'
+    titulo: '1. Gerador Automático de Legendas',
+    descricao: 'Cria textos prontos e personalizados para redes sociais (Instagram/WhatsApp) conforme você preenche o cadastro, com botão para sortear diferentes modelos de divulgação.'
   },
   {
     icone: '⚡',
-    titulo: '2. Formulário Rápido com Sanfona',
-    descricao: 'Campos principais visíveis de imediato e detalhes adicionais organizados dentro de uma sanfona expansível.'
-  },
-  {
-    icone: '📍',
-    titulo: '3. Campo de Bairro para Desaparecidos e Resgates',
-    descricao: 'Aparece automaticamente ao selecionar as opções Sumiu ou Achado na Rua.'
+    titulo: '2. Cadastro Rápido com Sanfona de Detalhes',
+    descricao: 'O formulário inicial agora tem apenas os dados essenciais para preenchimento em segundos. Informações adicionais (porte, raça, idade e cuidados) ficam organizadas em uma sanfona expansível.'
   },
   {
     icone: '🎯',
-    titulo: '4. Seleção de Situação em Grade',
-    descricao: 'Botões diretos para Adoção, Sumiu, Machucado e Achado na Rua.'
+    titulo: '3. Nova Seleção de Situação do Animal',
+    descricao: 'Botões diretos para escolher entre Para Adoção, Sumiu (Desaparecido), Machucado ou Achado na Rua.'
+  },
+  {
+    icone: '📍',
+    titulo: '4. Bairro Automático para Resgates',
+    descricao: 'Ao marcar que o animal sumiu ou foi encontrado na rua, um campo de bairro surge automaticamente para facilitar a localização pelos tutores e voluntárias.'
   },
   {
     icone: '🐾',
-    titulo: '5. Suporte para Ninhadas e Grupos',
-    descricao: 'Opção para cadastrar múltiplos animais de uma vez.'
+    titulo: '5. Suporte para Ninhadas e Múltiplos Animais',
+    descricao: 'Opção dedicada para registrar grupos de filhotes ou múltiplos animais de uma só vez, informando a quantidade exata.'
   },
   {
     icone: '🛡️',
-    titulo: '6. [Gestão] Base de Dados Oficial',
-    descricao: 'Isolamento total dos cadastros reais da ONG contra testes de desenvolvimento.'
+    titulo: '6. [Gestão] Proteção e Isolamento da Base de Dados',
+    descricao: 'Os cadastros reais da ONG agora funcionam em uma base oficial protegida, sem qualquer risco de contaminação por testes internos.'
   }
 ];
