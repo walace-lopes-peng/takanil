@@ -30,7 +30,7 @@ function formatarReferenciaAnimal(animal: AnimalWhatsAppInfo): string {
 
   if (temNome) {
     const artigo = (sexo === 'fêmea' || sexo === 'femea') ? 'a' : 'o';
-    return `${artigo} ${nomeTrim}`;
+    return `${artigo} *${nomeTrim}*`;
   }
 
   const detalhes: string[] = [];

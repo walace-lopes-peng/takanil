@@ -18,7 +18,7 @@ describe('whatsappContextual', () => {
     const msg = obterMensagemWhatsAppContextual(animal);
     const link = obterLinkWhatsAppContextual(animal);
 
-    expect(msg).toContain('Olá, equipe Takanil! Vi o Rex no app e gostaria de saber sobre a adoção.');
+    expect(msg).toContain('Olá, equipe Takanil! Vi o *Rex* no app e gostaria de saber sobre a adoção.');
     expect(msg).toContain('Post no Instagram: https://instagram.com/p/rex123');
     expect(msg).not.toContain('Foto:');
     // Garantir que não contenha emojis
@@ -55,7 +55,7 @@ describe('whatsappContextual', () => {
     };
 
     const msg = obterMensagemWhatsAppContextual(animal);
-    expect(msg).toContain('Olá, equipe Takanil! Vi no app que a Mel precisa de cuidados médicos e gostaria de ajudar com o tratamento.');
+    expect(msg).toContain('Olá, equipe Takanil! Vi no app que a *Mel* precisa de cuidados médicos e gostaria de ajudar com o tratamento.');
   });
 
   it('deve gerar mensagem clara para animal Desaparecido', () => {
@@ -67,7 +67,7 @@ describe('whatsappContextual', () => {
     };
 
     const msg = obterMensagemWhatsAppContextual(animal);
-    expect(msg).toContain('Olá, equipe Takanil! Vi o aviso no app sobre o Bob que está desaparecido(a) e tenho informações.');
+    expect(msg).toContain('Olá, equipe Takanil! Vi o aviso no app sobre o *Bob* que está desaparecido(a) e tenho informações.');
   });
 
   it('deve retornar rótulo e ícone contextual adequados', () => {
