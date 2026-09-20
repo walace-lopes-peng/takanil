@@ -80,3 +80,54 @@ Cada nova decisão arquitetural ou técnica importante deve ser adicionada abaix
   2. Multi-tenancy Patterns (Database-per-tenant vs Schema-per-tenant vs Shared-database)
   3. PostgREST Architecture & Header Profiles (`Accept-Profile`, `Content-Profile`)
   4. Database Reliability Engineering (DBRE): Schema Drift, Migrações Declarativas vs Imperativas e Supabase CLI (`supabase db diff`, `supabase db push`)
+
+### 4. Automação de Migrações com Supabase CLI (Fim das Tabelas Criadas "na Unha")
+* **Data:** Setembro de 2026
+* **Contexto:** Em projetos iniciantes ou protótipos, é comum desenvolvedores criarem tabelas e colunas diretamente no painel web (Dashboard) do banco de dados. No entanto, à medida que o sistema cresce e adota ambientes segregados (`public` e `piloto`), essa abordagem "na unha" torna-se perigosa: esquecem-se comandos, não há histórico rastreável no Git, testes locais divergem de produção (Schema Drift) e recriar o ambiente do zero vira um pesadelo manual.
+* **Decisão:** Adotar o fluxo oficial de **Database Migrations automatizadas e versionadas via Supabase CLI**. Nenhuma tabela, coluna, view, trigger ou política de segurança (RLS) deve ser alterada manualmente na Dashboard sem que exista um arquivo `.sql` correspondente versionado em `supabase/migrations/`.
+* **Por quê? (Justificativa Didática e Prática de Mercado):**
+  * *O que é uma Migration (Migração de Banco de Dados)?*
+    Uma migration é como um "commit do Git", mas para a estrutura (DDL) do seu banco de dados. Cada migration é um arquivo `.sql` imutável com timestamp (ex: `20260919213000_criar_tabela_vacinas.sql`). Quando o time roda o comando de migração, o sistema lê a tabela de controle de histórico do banco e aplica apenas as alterações que ainda não foram executadas, na ordem cronológica exata.
+  * *Fluxo de Trabalho Recomendado com Supabase CLI:*
+    1. **Criar uma nova migração vazia:**
+       ```bash
+       npx supabase migration new adicionar_campo_vacinas
+       ```
+       *Isso gera um arquivo `supabase/migrations/<timestamp>_adicionar_campo_vacinas.sql` onde você escreve o DDL (`ALTER TABLE ...`, `CREATE TABLE ...`).*
+    2. **Gerar migração automaticamente por comparação (Diff Declarativo):**
+       Se você fez alterações em um banco local de testes (via Studio local) e quer que o CLI gere o script SQL exato para você sem digitar SQL na mão:
+       ```bash
+       npx supabase db diff -f adicionar_campo_vacinas
+       ```
+    3. **Aplicar as migrações localmente / resetar ambiente limpo:**
+       ```bash
+       npx supabase db reset
+       ```
+       *O comando reseta o banco local, roda todas as migrations da pasta `supabase/migrations/` em ordem e reexecuta o `supabase/seed.sql` com dados fictícios de teste.*
+    4. **Sincronizar com o banco remoto (Dev e Produção):**
+       ```bash
+       # Aplica as migrations pendentes no banco remoto vinculado
+       npx supabase db push
+       ```
+    5. **Auditar e garantir paridade entre schemas (`public` e `piloto`):**
+       ```bash
+       # Compara se os schemas public e piloto têm exatamente a mesma estrutura DDL
+       npx supabase db diff --schema public,piloto
+       ```
+  * *Analogia do Mundo Real:* Fazer alterações no banco pelo painel web é como editar código diretamente no servidor de produção por FTP sem salvar no Git: funciona na hora, mas na primeira pane ninguém sabe o que foi mudado. As migrations garantem que qualquer pessoa da equipe consiga subir uma cópia idêntica do banco em segundos rodando um único comando.
+* **Pré-requisitos de Estudo:**
+  1. DDL (Data Definition Language) vs DML (Data Manipulation Language) em SQL
+  2. Versionamento de Esquemas e Estado de Banco de Dados (Evolutionary Database Design)
+  3. Supabase CLI e Docker (Execução de contêineres locais do Postgres)
+
+### 5. Separação de Comunicação: Release Notes do Usuário vs Documentação de Engenharia
+* **Data:** Setembro de 2026
+* **Contexto:** Ao lançar versões, desenvolvedores tendem a escrever notas de lançamento com jargões de engenharia (ex: "Configurado schema multi-tenant piloto no Supabase", "Implementado CI/CD no GitHub Actions", "Ajustada migration SQL de RLS"). Para as voluntárias da ONG, essas informações geram confusão, poluição visual e não comunicam o valor real do sistema.
+* **Decisão:** Separar estritamente os canais de documentação:
+  * **Público Externo (Voluntárias da ONG):** `RELEASE_NOTES.md` e o modal de novidades (`src/data/novidades.ts`) recebem exclusivamente mensagens em português direto e claro sobre funcionalidades, melhorias práticas e correções de bugs percebidas no uso do aplicativo. É proibido citar termos técnicos como schemas, public/piloto, migrations, APIs, CI/CD ou pacotes.
+  * **Público Interno (Desenvolvedores e Engenharia):** Mudanças de infraestrutura, decisões de arquitetura, configurações de build e scripts de banco de dados são documentados exclusivamente neste arquivo (`ARQUITETURA_E_DECISOES.md`), nas issues de gestão/tarefas técnicas e nas mensagens dos commits.
+* **Por quê? (Justificativa Didática e Visão de Mercado):**
+  * *Comunicação Orientada ao Usuário (Product-Led Communication):* Grandes produtos de tecnologia (Apple, Nubank, Notion) mantêm dois registros distintos: os *Customer-facing Release Notes* (focados no benefício ao usuário e usabilidade) e os *Internal Engineering Changelogs* (focados em observabilidade, dependências e débitos técnicos). Misturar ambos desgasta a confiança do usuário não-técnico e oculta as reais novidades do produto.
+* **Pré-requisitos de Estudo:**
+  1. UX Writing e Redação Centrada no Usuário
+  2. Gestão de Produto (Product Management) e Changelog Standards (Keep a Changelog)

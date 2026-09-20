@@ -32,9 +32,4 @@ export const NOVIDADES_VERSAO: ItemNovidade[] = [
     titulo: '5. Suporte para Ninhadas e Múltiplos Animais',
     descricao: 'Opção dedicada para registrar grupos de filhotes ou múltiplos animais de uma só vez, informando a quantidade exata.'
   },
-  {
-    icone: '🛡️',
-    titulo: '6. [Gestão] Proteção e Isolamento da Base de Dados',
-    descricao: 'Os cadastros reais da ONG agora funcionam em uma base oficial protegida, sem qualquer risco de contaminação por testes internos.'
-  }
 ];
