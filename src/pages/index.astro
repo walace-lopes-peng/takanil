@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ModalNovidades from '../components/ModalNovidades.astro';
+import { VERSAO_ATUAL } from "../data/novidades.ts";
 ---
 
 <Layout title="Hub Takanil - Dashboard">
@@ -142,7 +143,7 @@ import ModalNovidades from '../components/ModalNovidades.astro';
             class="inline-flex items-center gap-2 font-semibold text-taka-green-700 hover:text-taka-green-800 bg-taka-green-50 hover:bg-taka-green-100 px-3.5 py-2 rounded-xl border border-taka-green-200 transition-all active:scale-95 shadow-2xs min-h-[44px]"
             title="Ver o que há de novo na versão atual"
           >
-            <span>✨ Novidades da Versão (v0.10.1)</span>
+            <span>✨ Novidades da Versão {VERSAO_ATUAL}</span>
             <span id="badgeNovidadesFooter" class="hidden w-2 h-2 rounded-full bg-taka-green-500 animate-pulse"></span>
           </button>
         </div>
@@ -374,6 +375,7 @@ import ModalNovidades from '../components/ModalNovidades.astro';
 
 <script>
   import { supabase, getUserRole } from '../lib/supabaseClient';
+  import { obterLinkWhatsAppContextual, obterLabelWhatsAppContextual } from '../lib/whatsappContextual';
 
   const listaAnimais = document.getElementById('listaAnimais');
   const totalRacaoEl = document.getElementById('totalRacao');
@@ -561,7 +563,8 @@ import ModalNovidades from '../components/ModalNovidades.astro';
         btnFinais.className = 'h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]';
         btnFinais.blur();
       }
-      document.getElementById('tituloSecao')!.innerText = 'Animais Cadastrados';
+      const labelAnimais = document.getElementById('labelTotalAnimais');
+      if (labelAnimais) labelAnimais.innerText = 'Animais';
     }
 
     renderLista(animaisGlobais);
@@ -803,6 +806,44 @@ import ModalNovidades from '../components/ModalNovidades.astro';
       const nomeSanitizado = (animal.nome || '').replace(/'/g, "\\'");
       const subtituloSanitizado = subtituloZoom.replace(/'/g, "\\'");
 
+      const linkWhatsApp = obterLinkWhatsAppContextual(animal);
+      const labelWhatsApp = obterLabelWhatsAppContextual(animal);
+
+      let botaoDesfechoHtml = '';
+      if (isAdminGlob && !isResolvido) {
+        if (animal.situacao_urgencia === 'Machucado/Risco') {
+          botaoDesfechoHtml = `
+            <button 
+              onclick="event.stopPropagation(); resolverStatusRapido('${animal.id}', 'sarou', '${nomeSanitizado}')" 
+              class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-teal-800 bg-teal-100 hover:bg-teal-200 border border-teal-300/80 px-2 py-0.5 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 min-h-[36px]"
+              title="Marcar que o animal sarou/curou"
+              aria-label="Marcar que ${animal.nome} sarou"
+            >
+              <span>🩺</span> <span>Sarou!</span>
+            </button>`;
+        } else if (animal.situacao_urgencia === 'Desaparecido' || animal.localizacao.includes('Desaparecido') || animal.situacao_urgencia === 'Achado na Rua') {
+          botaoDesfechoHtml = `
+            <button 
+              onclick="event.stopPropagation(); resolverStatusRapido('${animal.id}', 'encontrado', '${nomeSanitizado}')" 
+              class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 min-h-[36px]"
+              title="Marcar que foi encontrado"
+              aria-label="Marcar que ${animal.nome} foi encontrado"
+            >
+              <span>🏠</span> <span>Encontrado!</span>
+            </button>`;
+        } else {
+          botaoDesfechoHtml = `
+            <button 
+              onclick="event.stopPropagation(); resolverStatusRapido('${animal.id}', 'adotado', '${nomeSanitizado}')" 
+              class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-taka-green-800 bg-taka-green-100 hover:bg-taka-green-200 border border-taka-green-300/80 px-2 py-0.5 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 min-h-[36px]"
+              title="Marcar como adotado"
+              aria-label="Marcar que ${animal.nome} foi adotado"
+            >
+              <span>💚</span> <span>Adotado!</span>
+            </button>`;
+        }
+      }
+
       if (modoVisualizacao === 'grid') {
         // Modo Grade (2 Colunas Mobile / 3-4 Desktop)
         htmlOutput += `
@@ -862,9 +903,27 @@ import ModalNovidades from '../components/ModalNovidades.astro';
                 <p class="text-[11px] text-gray-500 mt-1 font-medium">🕒 No sistema há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</p>
               </div>
 
+              <!-- Ações Contextuais: WhatsApp (#40) + Desfecho Rápido (#88) -->
+              <div class="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between gap-1.5 flex-wrap" onclick="event.stopPropagation()">
+                <a 
+                  href="${linkWhatsApp}" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  onclick="event.stopPropagation()" 
+                  class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2 py-0.5 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 min-h-[36px]"
+                  title="Falar no WhatsApp oficial"
+                  aria-label="Falar sobre ${animal.nome} no WhatsApp"
+                >
+                  <span class="text-xs sm:text-sm">${labelWhatsApp.icone}</span>
+                  <span>${labelWhatsApp.texto}</span>
+                </a>
+
+                ${botaoDesfechoHtml}
+              </div>
+
               ${isAdminGlob ? `
               <!-- Ações do Admin -->
-              <div class="flex items-center justify-end gap-1 pt-2 border-t border-gray-100 mt-1">
+              <div class="flex items-center justify-end gap-1 pt-1.5 border-t border-gray-100 mt-1">
                 <button 
                   onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${nomeSanitizado}')" 
                   aria-label="Editar status de ${animal.nome}"
@@ -946,6 +1005,24 @@ import ModalNovidades from '../components/ModalNovidades.astro';
                   <span class="text-gray-300">•</span>
                   <span class="text-gray-500">🕒 No sistema há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</span>
                 </div>
+
+                <!-- Ações Contextuais: WhatsApp (#40) + Desfecho Rápido (#88) -->
+                <div class="mt-2 flex flex-wrap items-center gap-2" onclick="event.stopPropagation()">
+                  <a 
+                    href="${linkWhatsApp}" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    onclick="event.stopPropagation()" 
+                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2.5 py-1 rounded-xl transition-all shadow-2xs hover:scale-105 active:scale-95 min-h-[36px]"
+                    title="Falar no WhatsApp oficial"
+                    aria-label="Falar sobre ${animal.nome} no WhatsApp"
+                  >
+                    <span class="text-sm">${labelWhatsApp.icone}</span>
+                    <span>${labelWhatsApp.texto}</span>
+                  </a>
+
+                  ${botaoDesfechoHtml}
+                </div>
               </div>
             </div>
 
@@ -1026,16 +1103,16 @@ import ModalNovidades from '../components/ModalNovidades.astro';
   // Botão Finais Felizes
   (window as any).alternarFinaisFelizes = () => {
     mostrarFinaisFelizes = !mostrarFinaisFelizes;
-    const btn = document.getElementById('btnFinaisFelizes')!;
-    const titulo = document.getElementById('tituloSecao')!;
+    const btn = document.getElementById('btnFinaisFelizes');
+    const labelAnimais = document.getElementById('labelTotalAnimais');
     btn?.blur(); // Remove o foco/hover preso no toque mobile
     
     if (mostrarFinaisFelizes) {
-      btn.className = 'h-11 w-11 flex items-center justify-center rounded-xl bg-pink-100 text-pink-600 border border-pink-300 scale-105 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]';
-      titulo.innerText = 'Finais Felizes';
+      if (btn) btn.className = 'h-11 w-11 flex items-center justify-center rounded-xl bg-pink-100 text-pink-600 border border-pink-300 scale-105 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]';
+      if (labelAnimais) labelAnimais.innerText = 'Finais Felizes 💖';
     } else {
-      btn.className = 'h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]';
-      titulo.innerText = 'Animais Cadastrados';
+      if (btn) btn.className = 'h-11 w-11 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 active:scale-95 transition-all shadow-xs shrink-0 min-w-[44px] min-h-[44px]';
+      if (labelAnimais) labelAnimais.innerText = 'Animais';
       
       // Restaura os filtros padrões
       filtroUrgencia = 'Todos';
@@ -1093,6 +1170,54 @@ import ModalNovidades from '../components/ModalNovidades.astro';
     } finally {
       btn.innerHTML = 'Salvar Alterações';
       btn.removeAttribute('disabled');
+    }
+  };
+
+  // Função de Desfecho Rápido 1-Toque (#88)
+  (window as any).resolverStatusRapido = async (id: string, acao: 'adotado' | 'sarou' | 'encontrado', nome: string) => {
+    let titulo = '';
+    let mensagem = '';
+    let novosDados: any = {};
+    let toastSucesso = '';
+
+    if (acao === 'sarou') {
+      titulo = 'Confirmar Recuperação';
+      mensagem = `Confirmar que "${nome}" recebeu tratamento médico e está recuperado(a)?`;
+      novosDados = { situacao_urgencia: 'Nenhuma' };
+      toastSucesso = `✨ ${nome} está recuperado(a)!`;
+    } else if (acao === 'encontrado') {
+      titulo = 'Confirmar Reencontro';
+      mensagem = `Confirmar que "${nome}" foi encontrado(a) e está em segurança?`;
+      novosDados = { situacao_urgencia: 'Tutor Encontrado' };
+      toastSucesso = `🏠 ${nome} foi reencontrado(a)!`;
+    } else if (acao === 'adotado') {
+      titulo = 'Confirmar Adoção 🎉';
+      mensagem = `Confirmar que "${nome}" ganhou um novo lar e foi adotado(a)?`;
+      novosDados = { status: 'Adotado', situacao_urgencia: 'Adotado' };
+      toastSucesso = `🎉 Viva! ${nome} foi adotado(a)!`;
+    }
+
+    const confirmou = await (window as any).confirmarAcao({
+      titulo,
+      mensagem,
+      textoConfirmar: 'Confirmar',
+      tipo: acao === 'adotado' ? 'sucesso' : 'padrao'
+    });
+    if (!confirmou) return;
+
+    try {
+      const { error } = await supabase
+        .from('animais')
+        .update(novosDados)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      carregarDados();
+      (window as any).mostrarToast(toastSucesso, 'sucesso');
+    } catch (err: any) {
+      console.error(err);
+      (window as any).mostrarToast('Erro ao atualizar o status do animal.', 'erro');
     }
   };
 
