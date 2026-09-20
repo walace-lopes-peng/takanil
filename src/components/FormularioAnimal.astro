@@ -11,10 +11,15 @@ interface Props {
     localizacao?: string;
     quantidade?: number;
     situacao_urgencia?: string;
+    bairro?: string;
+    porte?: string;
+    raca?: string;
+    idade_aprox?: string;
     vacinado?: string;
     castrado?: string;
     temperamento?: string;
     instagram_url?: string;
+    legenda?: string;
   };
 }
 
@@ -27,13 +32,13 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-8 max-w-2xl mx-auto">
   <div class="flex items-center justify-between mb-6">
-    <a href="/" class="text-gray-500 hover:text-gray-900 transition-colors">
+    <a href="/" class="text-gray-500 hover:text-gray-900 transition-colors p-2 rounded-xl hover:bg-gray-100 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Voltar para a página inicial">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
     </a>
     <h2 class="text-xl font-bold text-gray-800 text-center flex-1">{formTitle}</h2>
-    <div class="w-6"></div> <!-- Spacer for centering -->
+    <div class="w-11"></div> <!-- Spacer for centering -->
   </div>
 
   <form id="novoAnimalForm" class="space-y-5" data-is-public={isPublic ? 'true' : 'false'} data-animal-id={animalId || ''}>
@@ -41,7 +46,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     {!modoEdicao && (
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Foto do Animal</label>
-      <label for="fotoInput" class="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-taka-green-400 hover:bg-taka-green-50/30 transition-all bg-gray-50 cursor-pointer w-full text-center group" id="fotoContainer">
+      <label for="fotoInput" class="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-taka-green-400 hover:bg-taka-green-50/30 transition-all bg-gray-50 cursor-pointer w-full text-center group min-h-[120px]" id="fotoContainer">
         <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-taka-green-500 transition-colors pointer-events-none" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -55,7 +60,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       </label>
       <div id="fotoPreviewContainer" class="hidden mt-2 relative rounded-xl overflow-hidden aspect-video bg-gray-100">
           <img id="fotoPreview" class="object-cover w-full h-full" src="" alt="Preview da foto">
-          <button type="button" id="removerFoto" class="absolute top-2 right-2 bg-taka-orange-500/70 text-white p-1.5 rounded-full backdrop-blur-sm">
+          <button type="button" id="removerFoto" class="absolute top-2 right-2 bg-taka-orange-500/80 text-white p-2 rounded-full backdrop-blur-sm hover:bg-taka-orange-600 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center" aria-label="Remover foto">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -64,11 +69,19 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     </div>
     )}
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label for="nome" class="block text-sm font-medium text-gray-700">Nome do Animal <span class="text-gray-400 font-normal">(Opcional)</span></label>
-        <input type="text" name="nome" id="nome" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50" placeholder="Ex: Rex (deixe em branco se não souber)" value={dadosIniciais?.nome && dadosIniciais.nome !== 'Desconhecido' ? dadosIniciais.nome : ''}>
-      </div>
+    <!-- Nome do Animal -->
+    <div>
+      <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">
+        Nome do Animal <span class="text-gray-400 font-normal">(Opcional)</span>
+      </label>
+      <input 
+        type="text" 
+        name="nome" 
+        id="nome" 
+        class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50 min-h-[44px]" 
+        placeholder="Ex: Rex (deixe em branco se não souber)" 
+        value={dadosIniciais?.nome && dadosIniciais.nome !== 'Desconhecido' ? dadosIniciais.nome : ''}
+      >
     </div>
 
     <!-- Espécie (Toggle) -->
@@ -76,23 +89,49 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       <label class="block text-sm font-medium text-gray-700 mb-2">Espécie</label>
       <div class="grid grid-cols-3 gap-2">
         <label class="cursor-pointer">
-          <input type="radio" name="especie" value="Cão" class="peer sr-only" required checked={dadosIniciais?.especie === 'Cão'}>
-          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all text-sm">
+          <input type="radio" name="especie" value="Cão" class="peer sr-only" required checked={!dadosIniciais?.especie || dadosIniciais.especie === 'Cão'}>
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all text-sm min-h-[44px] flex items-center justify-center">
             🐶 Cão
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="especie" value="Gato" class="peer sr-only" checked={dadosIniciais?.especie === 'Gato'}>
-          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all text-sm">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all text-sm min-h-[44px] flex items-center justify-center">
             🐱 Gato
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="especie" value="Ambos/Múltiplos" class="peer sr-only" checked={dadosIniciais?.especie === 'Ambos/Múltiplos'}>
-          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all text-sm">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all text-sm min-h-[44px] flex items-center justify-center">
             🐶🐱 Ambos
           </div>
         </label>
+      </div>
+    </div>
+
+    <!-- Toggle de Mais de um Animal (Ninhada / Grupo) -->
+    <div class="pt-1">
+      <label class="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-200 bg-gray-50/70 hover:bg-gray-100 transition-all select-none">
+        <input 
+          type="checkbox" 
+          id="chkMaisDeUm" 
+          class="h-5 w-5 rounded-md border-gray-300 text-taka-green-600 focus:ring-taka-green-500 cursor-pointer" 
+          checked={Boolean(dadosIniciais?.quantidade && dadosIniciais.quantidade > 1)}
+        >
+        <span class="text-sm font-semibold text-gray-700">Mais de um animal? (Ninhada / Grupo)</span>
+      </label>
+      
+      <!-- Container Quantidade (Revelado condicionalmente) -->
+      <div id="containerQuantidade" class={`mt-3 ${dadosIniciais?.quantidade && dadosIniciais.quantidade > 1 ? '' : 'hidden'}`}>
+        <label for="quantidade" class="block text-sm font-medium text-gray-700 mb-1">Quantidade de animais</label>
+        <input 
+          type="number" 
+          name="quantidade" 
+          id="quantidade" 
+          min="1" 
+          value={dadosIniciais?.quantidade ?? 1} 
+          class="block w-36 rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50 min-h-[44px] font-bold text-center"
+        >
       </div>
     </div>
 
@@ -102,19 +141,19 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       <div class="grid grid-cols-3 gap-2">
         <label class="cursor-pointer">
           <input type="radio" name="fase_vida" value="Filhote" class="peer sr-only" required checked={dadosIniciais?.fase_vida === 'Filhote'}>
-          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
             Filhote
           </div>
         </label>
         <label class="cursor-pointer">
-          <input type="radio" name="fase_vida" value="Adulto" class="peer sr-only" checked={dadosIniciais?.fase_vida === 'Adulto'}>
-          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">
+          <input type="radio" name="fase_vida" value="Adulto" class="peer sr-only" checked={!dadosIniciais?.fase_vida || dadosIniciais.fase_vida === 'Adulto'}>
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
             Adulto
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="fase_vida" value="Idoso" class="peer sr-only" checked={dadosIniciais?.fase_vida === 'Idoso'}>
-          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 peer-checked:font-medium transition-all">
+          <div class="text-center p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
             Idoso
           </div>
         </label>
@@ -127,44 +166,44 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       <div class="grid grid-cols-4 gap-2">
         <label class="cursor-pointer">
           <input type="radio" name="sexo" value="Macho" class="peer sr-only" required checked={dadosIniciais?.sexo === 'Macho'}>
-          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-medium transition-all">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
             ♂ Macho
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="sexo" value="Fêmea" class="peer sr-only" checked={dadosIniciais?.sexo === 'Fêmea'}>
-          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-pink-500 peer-checked:bg-pink-50 peer-checked:text-pink-700 peer-checked:font-medium transition-all">
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-pink-500 peer-checked:bg-pink-50 peer-checked:text-pink-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
             ♀ Fêmea
           </div>
         </label>
         <label class="cursor-pointer">
-          <input type="radio" name="sexo" value="Não sei" class="peer sr-only" checked={dadosIniciais?.sexo === 'Não sei'}>
-          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-gray-500 peer-checked:bg-gray-100 peer-checked:text-gray-700 peer-checked:font-medium transition-all">
+          <input type="radio" name="sexo" value="Não sei" class="peer sr-only" checked={!dadosIniciais?.sexo || dadosIniciais.sexo === 'Não sei'}>
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-gray-500 peer-checked:bg-gray-200 peer-checked:text-gray-800 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
             Não sei
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="sexo" value="Misto (Ninhada)" class="peer sr-only" checked={dadosIniciais?.sexo === 'Misto (Ninhada)'}>
-          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs flex items-center justify-center peer-checked:border-purple-500 peer-checked:bg-purple-50 peer-checked:text-purple-700 peer-checked:font-medium transition-all">
-            Misto
+          <div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-purple-500 peer-checked:bg-purple-50 peer-checked:text-purple-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
+            ♂♀ Misto
           </div>
         </label>
       </div>
     </div>
 
-    <!-- Peso -->
+    <!-- Peso Aproximado -->
     <div>
       <label for="peso" class="block text-sm font-medium text-gray-700 mb-1.5">Peso Aproximado (kg)</label>
       <div class="flex items-center gap-2">
         <button
           type="button"
           id="btnDecrementarPeso"
-          class="h-10 w-10 flex items-center justify-center text-lg font-bold bg-taka-green-50 border border-taka-green-200 rounded-xl text-taka-green-700 hover:bg-taka-green-100 active:scale-95 transition-all select-none shrink-0 leading-none shadow-sm"
+          class="h-11 w-11 flex items-center justify-center text-xl font-bold bg-taka-green-50 border border-taka-green-200 rounded-xl text-taka-green-700 hover:bg-taka-green-100 active:scale-95 transition-all select-none shrink-0 shadow-xs min-w-[44px] min-h-[44px]"
           aria-label="Diminuir peso em 0.25 kg"
         >
           −
         </button>
-        <div class="relative w-32 shrink-0 flex items-center">
+        <div class="relative w-36 shrink-0 flex items-center">
           <input
             type="number"
             name="peso"
@@ -172,16 +211,16 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
             step="0.05"
             min="0.1"
             required
-            class="block w-full text-left font-bold text-lg rounded-xl border-taka-green-200 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 pl-3 pr-8 border bg-taka-green-50/20 text-taka-green-800 h-10 tracking-tight transition-all duration-150 transform-gpu"
-            placeholder="4,5"
-            value={dadosIniciais?.peso ?? ''}
+            class="block w-full text-left font-bold text-lg rounded-xl border-taka-green-200 shadow-xs focus:border-taka-green-500 focus:ring-taka-green-500 pl-3.5 pr-8 border bg-taka-green-50/20 text-taka-green-800 h-11 tracking-tight transition-all duration-150 transform-gpu min-h-[44px]"
+            placeholder="4.5"
+            value={dadosIniciais?.peso ?? 4.5}
           >
           <span class="absolute right-3 text-xs font-bold text-taka-green-600/70 pointer-events-none select-none">kg</span>
         </div>
         <button
           type="button"
           id="btnIncrementarPeso"
-          class="h-10 w-10 flex items-center justify-center text-lg font-bold bg-taka-green-50 border border-taka-green-200 rounded-xl text-taka-green-700 hover:bg-taka-green-100 active:scale-95 transition-all select-none shrink-0 leading-none shadow-sm"
+          class="h-11 w-11 flex items-center justify-center text-xl font-bold bg-taka-green-50 border border-taka-green-200 rounded-xl text-taka-green-700 hover:bg-taka-green-100 active:scale-95 transition-all select-none shrink-0 shadow-xs min-w-[44px] min-h-[44px]"
           aria-label="Aumentar peso em 0.25 kg"
         >
           +
@@ -189,116 +228,234 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       </div>
     </div>
 
-    <!-- Localização / Situação -->
+    <!-- Situação (Grid 2x2 de Ação Rápida) -->
     <div>
-      <label for="localizacao" class="block text-sm font-medium text-gray-700">Onde o animal está?</label>
-      <select name="localizacao" id="localizacao" required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50">
-        <option value="Abrigo Takanil" selected={dadosIniciais?.localizacao === 'Abrigo Takanil'}>Abrigo Takanil (Consome Ração)</option>
-        <option value="Na rua" selected={dadosIniciais?.localizacao === 'Na rua'}>Na rua (sem abrigo)</option>
-        <option value="Lar Temporário" selected={dadosIniciais?.localizacao === 'Lar Temporário'}>Lar Temporário</option>
-        <option value="Casa de terceiros" selected={dadosIniciais?.localizacao === 'Casa de terceiros'}>Casa de terceiros</option>
-        <option value="Desaparecido" selected={dadosIniciais?.localizacao === 'Desaparecido'}>Desaparecido</option>
-      </select>
-    </div>
-
-    <!-- Situação de Urgência -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">Situação de Urgência</label>
-      <div class="grid grid-cols-3 gap-2">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Situação</label>
+      <div class="grid grid-cols-2 gap-2.5">
         <label class="cursor-pointer">
-          <input type="radio" name="situacao_urgencia" value="Nenhuma" class="peer sr-only" required checked={!dadosIniciais?.situacao_urgencia || dadosIniciais.situacao_urgencia === 'Nenhuma'}>
-          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-gray-500 peer-checked:bg-gray-100 peer-checked:text-gray-800 peer-checked:font-medium transition-all">
-            Nenhuma
-          </div>
-        </label>
-        <label class="cursor-pointer">
-          <input type="radio" name="situacao_urgencia" value="Machucado/Risco" class="peer sr-only" checked={dadosIniciais?.situacao_urgencia === 'Machucado/Risco'}>
-          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 peer-checked:font-medium transition-all">
-            🚨 Machucado
+          <input type="radio" name="situacao_urgencia" value="Nenhuma" class="peer sr-only" required checked={!dadosIniciais?.situacao_urgencia || dadosIniciais.situacao_urgencia === 'Nenhuma' || dadosIniciais.situacao_urgencia === 'Adoção'}>
+          <div class="p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-800 peer-checked:font-bold transition-all min-h-[48px] flex items-center justify-center gap-2 shadow-2xs">
+            <span>🏠</span>
+            <span>Para Adoção</span>
           </div>
         </label>
         <label class="cursor-pointer">
           <input type="radio" name="situacao_urgencia" value="Desaparecido" class="peer sr-only" checked={dadosIniciais?.situacao_urgencia === 'Desaparecido'}>
-          <div class="text-center p-2 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm peer-checked:border-yellow-500 peer-checked:bg-yellow-50 peer-checked:text-yellow-700 peer-checked:font-medium transition-all">
-            🔍 Sumiu
+          <div class="p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 text-sm peer-checked:border-yellow-500 peer-checked:bg-yellow-50 peer-checked:text-yellow-800 peer-checked:font-bold transition-all min-h-[48px] flex items-center justify-center gap-2 shadow-2xs">
+            <span>🔍</span>
+            <span>Sumiu</span>
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="situacao_urgencia" value="Machucado/Risco" class="peer sr-only" checked={dadosIniciais?.situacao_urgencia === 'Machucado/Risco'}>
+          <div class="p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 text-sm peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-800 peer-checked:font-bold transition-all min-h-[48px] flex items-center justify-center gap-2 shadow-2xs">
+            <span>🚨</span>
+            <span>Machucado</span>
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="situacao_urgencia" value="Achado na Rua" class="peer sr-only" checked={dadosIniciais?.situacao_urgencia === 'Achado na Rua'}>
+          <div class="p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 text-sm peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-800 peer-checked:font-bold transition-all min-h-[48px] flex items-center justify-center gap-2 shadow-2xs">
+            <span>🧭</span>
+            <span>Achado na Rua</span>
           </div>
         </label>
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
-      <!-- Quantidade -->
-      <div>
-        <label for="quantidade" class="block text-sm font-medium text-gray-700">Quantidade</label>
-        <input type="number" name="quantidade" id="quantidade" min="1" value={dadosIniciais?.quantidade ?? 1} required class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50">
-      </div>
-      <!-- Temperamento -->
-      <div>
-        <label for="temperamento" class="block text-sm font-medium text-gray-700">Temperamento</label>
-        <select name="temperamento" id="temperamento" class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50">
-          <option value="Não informado" selected={!dadosIniciais?.temperamento || dadosIniciais.temperamento === 'Não informado'}>Não informado</option>
-          <option value="Dócil" selected={dadosIniciais?.temperamento === 'Dócil'}>Dócil</option>
-          <option value="Brincalhão" selected={dadosIniciais?.temperamento === 'Brincalhão'}>Brincalhão</option>
-          <option value="Assustado" selected={dadosIniciais?.temperamento === 'Assustado'}>Assustado</option>
-          <option value="Bravo" selected={dadosIniciais?.temperamento === 'Bravo'}>Bravo</option>
-          <option value="Protetor" selected={dadosIniciais?.temperamento === 'Protetor'}>Protetor</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Vacinado / Castrado -->
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Vacinado?</label>
-        <div class="grid grid-cols-3 gap-1">
-          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Sim" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">Sim</div></label>
-          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">Não</div></label>
-          <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não sei" class="peer sr-only" checked><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">?</div></label>
-        </div>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Castrado?</label>
-        <div class="grid grid-cols-3 gap-1">
-          <label class="cursor-pointer"><input type="radio" name="castrado" value="Sim" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">Sim</div></label>
-          <label class="cursor-pointer"><input type="radio" name="castrado" value="Não" class="peer sr-only"><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">Não</div></label>
-          <label class="cursor-pointer"><input type="radio" name="castrado" value="Não sei" class="peer sr-only" checked><div class="text-center py-2 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 transition-all">?</div></label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Link do Post no Instagram -->
-    <div>
-      <label for="instagram_url" class="block text-sm font-medium text-gray-700 mb-1">
-        Link da Postagem no Instagram <span class="text-gray-400 font-normal">(Opcional)</span>
+    <!-- Campo Bairro Condicional (Aparece se Sumiu ou Achado na Rua) -->
+    <div id="containerBairro" class={`transition-all duration-300 ${dadosIniciais?.situacao_urgencia === 'Desaparecido' || dadosIniciais?.situacao_urgencia === 'Achado na Rua' ? '' : 'hidden'}`}>
+      <label for="bairro" class="block text-sm font-medium text-gray-700 mb-1">
+        📍 Bairro onde sumiu / foi encontrado <span class="text-gray-400 font-normal">(Opcional)</span>
       </label>
-      <div class="flex gap-2">
-        <div class="relative flex-1">
-          <input
-            type="url"
-            name="instagram_url"
-            id="instagram_url"
-            class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 sm:text-sm p-3 border bg-gray-50"
-            placeholder="https://www.instagram.com/p/..."
-            value={dadosIniciais?.instagram_url || ''}
-          />
+      <input 
+        type="text" 
+        name="bairro" 
+        id="bairro" 
+        class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50 min-h-[44px]" 
+        placeholder="Ex: Tronqueiras, Centro, Vila Carneiro..." 
+        value={dadosIniciais?.bairro || ''}
+      >
+      <p class="text-xs text-gray-400 mt-1">Ajuda no resgate e localização dos tutores.</p>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- PROGRESSIVE DISCLOSURE: Sanfona de Detalhes Adicionais (Opcionais)        -->
+    <!-- ========================================================================= -->
+    <div class="pt-2 border-t border-gray-100">
+      <button 
+        type="button" 
+        id="btnToggleDetalhes" 
+        class="w-full py-3 px-4 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-sm font-bold text-gray-700 transition-all select-none min-h-[44px]"
+        aria-expanded="false"
+      >
+        <div class="flex items-center gap-2">
+          <span id="iconeSanfona">🔽</span>
+          <span>Adicionar mais detalhes <span class="text-gray-400 font-normal text-xs">(Vacinação, Castração, Raça, etc...)</span></span>
         </div>
-        <button
-          type="button"
-          id="btnColarInstagram"
-          class="px-4 py-3 bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 shrink-0 min-h-[44px]"
-          title="Colar link da área de transferência"
-        >
-          <span>📋 Colar Link</span>
-        </button>
+        <svg id="setaSanfona" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+
+      <!-- Conteúdo da Sanfona -->
+      <div id="containerDetalhes" class="hidden space-y-4 pt-4 transition-all">
+        <!-- Localização -->
+        <div>
+          <label for="localizacao" class="block text-sm font-medium text-gray-700 mb-1">Onde o animal está?</label>
+          <select name="localizacao" id="localizacao" required class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50 min-h-[44px]">
+            {!isPublic && (
+              <option value="Abrigo Takanil" selected={dadosIniciais?.localizacao === 'Abrigo Takanil'}>Abrigo Takanil (Consome Ração)</option>
+            )}
+            <option value="Na rua" selected={!dadosIniciais?.localizacao || dadosIniciais?.localizacao === 'Na rua'}>Na rua (sem abrigo)</option>
+            <option value="Lar Temporário" selected={dadosIniciais?.localizacao === 'Lar Temporário'}>Lar Temporário</option>
+            <option value="Casa de terceiros" selected={dadosIniciais?.localizacao === 'Casa de terceiros'}>Casa de terceiros</option>
+            <option value="Desaparecido" selected={dadosIniciais?.localizacao === 'Desaparecido'}>Desaparecido</option>
+          </select>
+        </div>
+
+        <!-- Porte (Toggle) -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Porte</label>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="porte" value="Pequeno" class="peer sr-only" checked={dadosIniciais?.porte === 'Pequeno'}>
+              <div class="text-center p-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs sm:text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
+                🐕 Pequeno
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="porte" value="Médio" class="peer sr-only" checked={!dadosIniciais?.porte || dadosIniciais?.porte === 'Médio'}>
+              <div class="text-center p-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs sm:text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
+                🐕 Médio
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="porte" value="Grande" class="peer sr-only" checked={dadosIniciais?.porte === 'Grande'}>
+              <div class="text-center p-2.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs sm:text-sm peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 peer-checked:font-bold transition-all min-h-[44px] flex items-center justify-center">
+                🐕 Grande
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Raça / Tipo e Idade Aprox -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="raca" class="block text-sm font-medium text-gray-700 mb-1">Raça / Tipo</label>
+            <input 
+              type="text" 
+              name="raca" 
+              id="raca" 
+              class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50 min-h-[44px]" 
+              placeholder="Ex: SRD (Vira-lata), Poodle..." 
+              value={dadosIniciais?.raca || 'SRD (Sem Raça Definida)'}
+            >
+          </div>
+          <div>
+            <label for="idade_aprox" class="block text-sm font-medium text-gray-700 mb-1">Idade Aproximada</label>
+            <input 
+              type="text" 
+              name="idade_aprox" 
+              id="idade_aprox" 
+              class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50 min-h-[44px]" 
+              placeholder="Ex: 2 anos, 4 meses..." 
+              value={dadosIniciais?.idade_aprox || ''}
+            >
+          </div>
+        </div>
+
+        <!-- Castrado / Vacinado -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Castrado?</label>
+            <div class="grid grid-cols-3 gap-1">
+              <label class="cursor-pointer"><input type="radio" name="castrado" value="Sim" class="peer sr-only" checked={dadosIniciais?.castrado === 'Sim'}><div class="text-center py-2.5 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 font-semibold transition-all min-h-[44px] flex items-center justify-center">Sim</div></label>
+              <label class="cursor-pointer"><input type="radio" name="castrado" value="Não" class="peer sr-only" checked={dadosIniciais?.castrado === 'Não'}><div class="text-center py-2.5 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 font-semibold transition-all min-h-[44px] flex items-center justify-center">Não</div></label>
+              <label class="cursor-pointer"><input type="radio" name="castrado" value="Não sei" class="peer sr-only" checked={!dadosIniciais?.castrado || dadosIniciais?.castrado === 'Não sei'}><div class="text-center py-2.5 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 font-semibold transition-all min-h-[44px] flex items-center justify-center">?</div></label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Vacinado?</label>
+            <div class="grid grid-cols-3 gap-1">
+              <label class="cursor-pointer"><input type="radio" name="vacinado" value="Sim" class="peer sr-only" checked={dadosIniciais?.vacinado === 'Sim'}><div class="text-center py-2.5 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 font-semibold transition-all min-h-[44px] flex items-center justify-center">Sim</div></label>
+              <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não" class="peer sr-only" checked={dadosIniciais?.vacinado === 'Não'}><div class="text-center py-2.5 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 font-semibold transition-all min-h-[44px] flex items-center justify-center">Não</div></label>
+              <label class="cursor-pointer"><input type="radio" name="vacinado" value="Não sei" class="peer sr-only" checked={!dadosIniciais?.vacinado || dadosIniciais?.vacinado === 'Não sei'}><div class="text-center py-2.5 px-1 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-xs peer-checked:border-taka-green-500 peer-checked:bg-taka-green-50 peer-checked:text-taka-green-700 font-semibold transition-all min-h-[44px] flex items-center justify-center">?</div></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Temperamento -->
+        <div>
+          <label for="temperamento" class="block text-sm font-medium text-gray-700 mb-1">Temperamento</label>
+          <select name="temperamento" id="temperamento" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 sm:text-sm p-3 border bg-gray-50 min-h-[44px]">
+            <option value="Não informado" selected={!dadosIniciais?.temperamento || dadosIniciais.temperamento === 'Não informado'}>Não informado</option>
+            <option value="Dócil" selected={dadosIniciais?.temperamento === 'Dócil'}>Dócil / Carinhoso</option>
+            <option value="Brincalhão" selected={dadosIniciais?.temperamento === 'Brincalhão'}>Brincalhão / Ativo</option>
+            <option value="Assustado" selected={dadosIniciais?.temperamento === 'Assustado'}>Assustado / Tímido</option>
+            <option value="Bravo" selected={dadosIniciais?.temperamento === 'Bravo'}>Bravo / Protetor</option>
+          </select>
+        </div>
+
+        <!-- Link do Instagram -->
+        <div>
+          <label for="instagram_url" class="block text-sm font-medium text-gray-700 mb-1">
+            Link da Postagem no Instagram <span class="text-gray-400 font-normal">(Opcional)</span>
+          </label>
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <input
+                type="url"
+                name="instagram_url"
+                id="instagram_url"
+                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 sm:text-sm p-3 border bg-gray-50 min-h-[44px]"
+                placeholder="https://www.instagram.com/p/..."
+                value={dadosIniciais?.instagram_url || ''}
+              />
+            </div>
+            <button
+              type="button"
+              id="btnColarInstagram"
+              class="px-4 py-3 bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 shrink-0 min-h-[44px]"
+              title="Colar link da área de transferência"
+            >
+              <span>📋 Colar Link</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Gerador Dinâmico de Legendas da Rita -->
+        <div class="pt-2">
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="legenda" class="block text-sm font-bold text-gray-800">
+              📝 Legenda para Divulgação
+            </label>
+            <button
+              type="button"
+              id="btnSortearLegenda"
+              class="inline-flex items-center gap-1 text-xs font-bold text-taka-green-700 bg-taka-green-50 hover:bg-taka-green-100 border border-taka-green-200 px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-2xs min-h-[36px]"
+              title="Sortear outro modelo de legenda"
+            >
+              <span>🎲 Sortear Outro Texto</span>
+            </button>
+          </div>
+          <textarea
+            id="legenda"
+            name="legenda"
+            rows="5"
+            class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 text-xs sm:text-sm p-3.5 border bg-gray-50/60 leading-relaxed font-medium text-gray-700"
+            placeholder="A legenda é gerada automaticamente com base nos dados do animal..."
+          >{dadosIniciais?.legenda || ''}</textarea>
+          <p class="text-[11px] text-gray-400 mt-1">
+            Esta legenda é atualizada automaticamente conforme você preenche o formulário. Você também pode editar o texto livremente!
+          </p>
+        </div>
       </div>
-      <p class="text-xs text-gray-400 mt-1.5">
-        Copie o link do post ou reel no Instagram e toque em "Colar Link".
-      </p>
     </div>
 
     <!-- Submit -->
     <div class="pt-4">
-      <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-taka-green-600 hover:bg-taka-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-green-500 active:scale-[0.98] transition-all disabled:opacity-70">
+      <button type="submit" id="submitBtn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-base font-bold text-white bg-taka-green-600 hover:bg-taka-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-taka-green-500 active:scale-[0.98] transition-all disabled:opacity-70 min-h-[48px] items-center">
         <span>{btnText}</span>
         <svg id="loadingSpinner" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -314,12 +471,10 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
 
 <script>
   import { supabase } from '../lib/supabaseClient';
+  import { gerarLegendaAnimal } from '../lib/geradorLegenda';
 
   const form = document.getElementById('novoAnimalForm') as HTMLFormElement;
   
-  // Como o script roda apenas uma vez no cliente (Astro bundling),
-  // se houver mais de um form na mesma view (não tem, mas boa prática)
-  // seria ideal usar querySelectorAll. Aqui sabemos que há apenas 1.
   if (form) {
     const isPublic = form.getAttribute('data-is-public') === 'true';
 
@@ -334,8 +489,124 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     const spinner = document.getElementById('loadingSpinner');
     const statusMessage = document.getElementById('statusMessage');
 
+    // Elementos da UI
+    const chkMaisDeUm = document.getElementById('chkMaisDeUm') as HTMLInputElement;
+    const containerQuantidade = document.getElementById('containerQuantidade');
+    const inputQuantidade = document.getElementById('quantidade') as HTMLInputElement;
+
+    const containerBairro = document.getElementById('containerBairro');
+    const inputBairro = document.getElementById('bairro') as HTMLInputElement;
+
+    const btnToggleDetalhes = document.getElementById('btnToggleDetalhes');
+    const containerDetalhes = document.getElementById('containerDetalhes');
+    const iconeSanfona = document.getElementById('iconeSanfona');
+    const setaSanfona = document.getElementById('setaSanfona');
+
+    const textareaLegenda = document.getElementById('legenda') as HTMLTextAreaElement;
+    const btnSortearLegenda = document.getElementById('btnSortearLegenda');
+
+    let indiceModeloLegenda = 0;
+    let legendaEditadaManualmente = false;
+
+    // Toggle de Mais de Um Animal
+    chkMaisDeUm?.addEventListener('change', () => {
+      if (chkMaisDeUm.checked) {
+        containerQuantidade?.classList.remove('hidden');
+        if (inputQuantidade && parseInt(inputQuantidade.value) <= 1) {
+          inputQuantidade.value = '2';
+        }
+      } else {
+        containerQuantidade?.classList.add('hidden');
+        if (inputQuantidade) {
+          inputQuantidade.value = '1';
+        }
+      }
+      atualizarLegenda();
+    });
+
+    // Toggle da Sanfona de Detalhes
+    btnToggleDetalhes?.addEventListener('click', () => {
+      const estaAberto = !containerDetalhes?.classList.contains('hidden');
+      if (estaAberto) {
+        containerDetalhes?.classList.add('hidden');
+        btnToggleDetalhes.setAttribute('aria-expanded', 'false');
+        if (iconeSanfona) iconeSanfona.textContent = '🔽';
+        setaSanfona?.classList.remove('rotate-180');
+      } else {
+        containerDetalhes?.classList.remove('hidden');
+        btnToggleDetalhes.setAttribute('aria-expanded', 'true');
+        if (iconeSanfona) iconeSanfona.textContent = '🔼';
+        setaSanfona?.classList.add('rotate-180');
+      }
+    });
+
+    // Função de Coleta dos Dados do Form para a Legenda Dinâmica
+    function coletarDadosParaLegenda() {
+      const formData = new FormData(form);
+      return {
+        nome: (formData.get('nome') as string) || '',
+        especie: (formData.get('especie') as string) || 'Cão',
+        fase_vida: (formData.get('fase_vida') as string) || 'Adulto',
+        sexo: (formData.get('sexo') as string) || 'Não sei',
+        porte: (formData.get('porte') as string) || 'Médio',
+        bairro: (formData.get('bairro') as string) || '',
+        situacao: (formData.get('situacao_urgencia') as string) || 'Nenhuma',
+        castrado: (formData.get('castrado') as string) || 'Não sei',
+        vacinado: (formData.get('vacinado') as string) || 'Não sei',
+        temperamento: (formData.get('temperamento') as string) || 'Não informado',
+      };
+    }
+
+    // Atualiza a legenda no textarea se o usuário não editou manualmente
+    function atualizarLegenda(forcar: boolean = false) {
+      if (!textareaLegenda) return;
+      if (legendaEditadaManualmente && !forcar) return;
+
+      const dados = coletarDadosParaLegenda();
+      const novoTexto = gerarLegendaAnimal(dados, indiceModeloLegenda);
+      textareaLegenda.value = novoTexto;
+    }
+
+    // Usuário alterou manualmente o textarea
+    textareaLegenda?.addEventListener('input', () => {
+      legendaEditadaManualmente = true;
+    });
+
+    // Sorteio de novo modelo de legenda
+    btnSortearLegenda?.addEventListener('click', () => {
+      indiceModeloLegenda = (indiceModeloLegenda + 1) % 5;
+      legendaEditadaManualmente = false;
+      atualizarLegenda(true);
+      (window as any).mostrarToast?.('Novo modelo de legenda sorteado!', 'info');
+    });
+
+    // Reatividade em tempo real: Escuta mudanças em qualquer campo do formulário
+    form.addEventListener('input', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.id === 'legenda') return;
+      atualizarLegenda();
+    });
+
+    form.addEventListener('change', (e) => {
+      const target = e.target as HTMLElement;
+      
+      // Controle do Bairro condicional ao mudar a Situação
+      if ((target as HTMLInputElement).name === 'situacao_urgencia') {
+        const val = (target as HTMLInputElement).value;
+        if (val === 'Desaparecido' || val === 'Achado na Rua') {
+          containerBairro?.classList.remove('hidden');
+          inputBairro?.focus();
+        } else {
+          containerBairro?.classList.add('hidden');
+        }
+      }
+
+      if (target.id === 'legenda') return;
+      atualizarLegenda();
+    });
+
     // Preview de foto
-    fotoInput.addEventListener('change', (e) => {
+    fotoInput?.addEventListener('change', (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         const reader = new FileReader();
@@ -356,7 +627,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       fotoPreviewContainer?.classList.add('hidden');
     });
 
-    // Colar Link do Instagram com validação amigável
+    // Colar Link do Instagram
     const btnColarInstagram = document.getElementById('btnColarInstagram');
     const inputInstagram = document.getElementById('instagram_url') as HTMLInputElement;
 
@@ -384,7 +655,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       }
     });
 
-    // Função para comprimir a imagem antes de subir
+    // Compressão de Imagem
     async function comprimirImagem(file: File): Promise<File> {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -445,6 +716,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     const animalId = form.getAttribute('data-animal-id') || '';
     const modoEdicao = animalId !== '';
 
+    // Envio do formulário
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       statusMessage?.classList.add('hidden');
@@ -456,16 +728,16 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       const fase_vida = formData.get('fase_vida') as string;
       const sexo = formData.get('sexo') as string;
       const peso = parseFloat(formData.get('peso') as string);
-      const localizacao = formData.get('localizacao') as string;
+      const localizacao = (formData.get('localizacao') as string) || 'Na rua';
       const quantidade = parseInt(formData.get('quantidade') as string) || 1;
-      const situacao_urgencia = formData.get('situacao_urgencia') as string || 'Nenhuma';
-      const vacinado = formData.get('vacinado') as string || 'Não sei';
-      const castrado = formData.get('castrado') as string || 'Não sei';
-      const temperamento = formData.get('temperamento') as string || 'Não informado';
+      const situacao_urgencia = (formData.get('situacao_urgencia') as string) || 'Nenhuma';
+      const vacinado = (formData.get('vacinado') as string) || 'Não sei';
+      const castrado = (formData.get('castrado') as string) || 'Não sei';
+      const temperamento = (formData.get('temperamento') as string) || 'Não informado';
       const instagram_url_raw = (formData.get('instagram_url') as string) || '';
       const instagram_url = instagram_url_raw.trim() !== '' ? instagram_url_raw.trim() : null;
 
-      // Validação: foto só é obrigatória no modo criação
+      // Validação de foto
       if (!modoEdicao) {
         const fotoFile = formData.get('foto') as File;
         if (!fotoFile?.size) {
@@ -480,7 +752,6 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       }
 
       try {
-        // UX: Loading
         submitBtn.disabled = true;
         if(submitText) submitText.textContent = modoEdicao ? 'Salvando...' : (isPublic ? 'Enviando...' : 'Salvando...');
         spinner?.classList.remove('hidden');
@@ -501,20 +772,16 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         };
 
         if (modoEdicao) {
-          // --- MODO EDIÇÃO: UPDATE ---
           const { error: dbError } = await supabase
             .from('animais')
             .update(dadosParaSalvar)
             .eq('id', animalId);
 
           if (dbError) throw new Error('Erro ao atualizar: ' + dbError.message);
-
           showStatus('✅ Dados do animal atualizados com sucesso!', 'success');
         } else {
-          // --- MODO CRIAÇÃO: INSERT com upload de foto ---
           const fotoFile = formData.get('foto') as File;
           const fotoComprimida = await comprimirImagem(fotoFile);
-          console.log(`[Hub Takanil] 📸 Foto original: ${(fotoFile.size / 1024).toFixed(1)} KB -> Comprimida: ${(fotoComprimida.size / 1024).toFixed(1)} KB`);
           const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
 
           const { error: uploadError } = await supabase.storage
@@ -541,15 +808,11 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
           );
           form.reset();
 
-          const fotoPreview = document.getElementById('fotoPreview') as HTMLImageElement;
-          const fotoContainer = document.getElementById('fotoContainer');
-          const fotoPreviewContainer = document.getElementById('fotoPreviewContainer');
           if (fotoPreview) fotoPreview.src = '';
           fotoContainer?.classList.remove('hidden');
           fotoPreviewContainer?.classList.add('hidden');
         }
 
-        // Voltar pra home após 2s
         setTimeout(() => {
           window.location.href = '/';
         }, 2000);
@@ -558,15 +821,19 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         console.error(err);
         showStatus(err.message || 'Ocorreu um erro inesperado.', 'error');
       } finally {
-        // Restaurar botão
         submitBtn.disabled = false;
         if(submitText) submitText.textContent = isPublic ? 'Enviar Sugestão' : 'Salvar Animal';
         spinner?.classList.add('hidden');
       }
     });
+
+    // Inicialização da Legenda Dinâmica no carregamento inicial
+    if (!textareaLegenda.value) {
+      atualizarLegenda();
+    }
   }
 
-  // --- Lógica dos botões de incremento/decremento de Peso (Opção C: Híbrida) ---
+  // --- Lógica dos botões de incremento/decremento de Peso ---
   const inputPeso = document.getElementById('peso') as HTMLInputElement;
   const btnDecrementarPeso = document.getElementById('btnDecrementarPeso');
   const btnIncrementarPeso = document.getElementById('btnIncrementarPeso');
@@ -576,15 +843,13 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     let holdTimeout: any = null;
     let holdInterval: any = null;
     let isHolding = false;
-    const INTERVALO_450BPM = Math.round(60000 / 450); // ~133ms
+    const INTERVALO_450BPM = Math.round(60000 / 450);
 
     const animarTrocaPeso = () => {
       clearTimeout(animTimer);
       if (isHolding) {
-        // No modo HOLD (rolagem rápida): usa apenas destaque suave de cor sem zoom, ultra-fluido
         inputPeso.classList.add('bg-taka-green-100/80', 'border-taka-green-400');
       } else {
-        // No clique ÚNICO: pulso de zoom elegante
         inputPeso.classList.add('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
         animTimer = setTimeout(() => {
           inputPeso.classList.remove('scale-105', 'bg-taka-green-100/70', 'border-taka-green-400');
@@ -603,6 +868,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       novoValor = Math.max(0.1, novoValor);
       inputPeso.value = (Math.round(novoValor * 100) / 100).toString();
       animarTrocaPeso();
+      inputPeso.dispatchEvent(new Event('input', { bubbles: true }));
     };
 
     const incrementar = () => {
@@ -615,6 +881,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       let novoValor = Math.ceil((valorAtual + 0.001) / 0.25) * 0.25;
       inputPeso.value = (Math.round(novoValor * 100) / 100).toString();
       animarTrocaPeso();
+      inputPeso.dispatchEvent(new Event('input', { bubbles: true }));
     };
 
     const iniciarHold = (acao: () => void) => {
@@ -634,7 +901,6 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
       inputPeso.classList.remove('scale-105', 'bg-taka-green-100/80', 'bg-taka-green-100/70', 'border-taka-green-400');
     };
 
-    // Eventos do botão Decrementar (Mouse + Touch)
     btnDecrementarPeso.addEventListener('mousedown', (e) => { e.preventDefault(); iniciarHold(decrementar); });
     btnDecrementarPeso.addEventListener('mouseup', pararHold);
     btnDecrementarPeso.addEventListener('mouseleave', pararHold);
@@ -642,7 +908,6 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     btnDecrementarPeso.addEventListener('touchend', pararHold);
     btnDecrementarPeso.addEventListener('touchcancel', pararHold);
 
-    // Eventos do botão Incrementar (Mouse + Touch)
     btnIncrementarPeso.addEventListener('mousedown', (e) => { e.preventDefault(); iniciarHold(incrementar); });
     btnIncrementarPeso.addEventListener('mouseup', pararHold);
     btnIncrementarPeso.addEventListener('mouseleave', pararHold);
@@ -650,16 +915,13 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     btnIncrementarPeso.addEventListener('touchend', pararHold);
     btnIncrementarPeso.addEventListener('touchcancel', pararHold);
 
-    // Garantir que se soltar o botão fora do elemento a repetição pare
     window.addEventListener('mouseup', pararHold);
     window.addEventListener('touchend', pararHold);
 
-    // Selecionar todo o texto ao focar/clicar para facilitar a digitação manual no mobile
     inputPeso.addEventListener('focus', () => {
       inputPeso.select();
     });
 
-    // Trava de no máximo 2 casas decimais no peso durante a digitação
     inputPeso.addEventListener('input', () => {
       if (inputPeso.value.includes('.')) {
         const [inteiro, decimal] = inputPeso.value.split('.');
