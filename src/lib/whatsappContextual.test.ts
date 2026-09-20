@@ -21,7 +21,7 @@ describe('whatsappContextual', () => {
     expect(msg).toContain('Rex (Cão, Adulto)');
     expect(msg).toContain('gostaria de informações sobre como adotá-lo(a)');
     expect(label.texto).toBe('Quero Adotar');
-    expect(link).toContain('https://wa.me/5535999814421?text=');
+    expect(link).toContain('https://wa.me/5535998687395?text=');
   });
 
   it('deve gerar mensagem e rótulo corretos para Urgência Médica', () => {

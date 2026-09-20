@@ -51,7 +51,7 @@ export function obterLabelWhatsAppContextual(animal: AnimalWhatsAppInfo): { text
 /**
  * Gera o link direto wa.me com a mensagem codificada em URL.
  */
-export function obterLinkWhatsAppContextual(animal: AnimalWhatsAppInfo, telefone: string = '5535999814421'): string {
+export function obterLinkWhatsAppContextual(animal: AnimalWhatsAppInfo, telefone: string = '5535998687395'): string {
   const mensagem = obterMensagemWhatsAppContextual(animal);
   return `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
 }
