@@ -111,7 +111,6 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
   const fraseTemperamento = temperamento ? `muito ${temperamento}` : g.mansinho;
 
   const fraseCastrado = dados.castrado === 'Sim' ? `já está ${g.castrado}` : (dados.castrado === 'Não' ? `ainda não é ${g.castrado}` : '');
-  const fraseVacinado = dados.vacinado === 'Sim' ? `vacinado(a)` : '';
 
   // Modelo específico se a situação for DESAPARECIDO
   if (dados.situacao === 'Desaparecido' || dados.situacao === 'Sumiu') {
