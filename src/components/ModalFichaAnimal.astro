@@ -249,10 +249,51 @@
         badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1 rounded-xl">❓ Castração não informada</span>`;
       }
 
-      // Vacinação
+      // Vacinação com Dropdown/Popover Interativo de Doses
       if (animal.vacinado && animal.vacinado.startsWith('Sim')) {
-        const detalheVacinas = animal.vacinado.includes('(') ? animal.vacinado.replace('Sim', 'Vacinado(a):') : 'Vacinado(a)';
-        badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl">💉 ${detalheVacinas}</span>`;
+        const match = animal.vacinado.match(/\((.+)\)/);
+        const vacinasList = match ? match[1].split(',').map((v: string) => v.trim()).filter(Boolean) : [];
+
+        if (vacinasList.length > 0) {
+          badgesHtml += `
+            <div class="relative inline-block" id="containerDropdownVacinas">
+              <button 
+                type="button" 
+                onclick="event.stopPropagation(); alternarDropdownVacinas()"
+                class="inline-flex items-center gap-1.5 text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer"
+                title="Clique para ver as vacinas aplicadas"
+                aria-haspopup="true"
+              >
+                <span>💉 Vacinado(a)</span>
+                <span class="text-[10px] bg-emerald-200/80 text-emerald-900 px-1.5 py-0.2 rounded-full font-extrabold">+${vacinasList.length}</span>
+                <span class="text-[10px] text-emerald-600">▾</span>
+              </button>
+              
+              <div 
+                id="dropdownListaVacinas" 
+                class="hidden absolute left-0 top-full mt-1.5 z-30 min-w-[210px] max-w-[280px] bg-white rounded-2xl shadow-xl border border-emerald-200 p-3"
+                onclick="event.stopPropagation()"
+              >
+                <div class="flex items-center justify-between border-b border-gray-100 pb-1.5 mb-2">
+                  <span class="text-xs font-bold text-emerald-900 flex items-center gap-1">
+                    💉 Doses Aplicadas
+                  </span>
+                  <span class="text-[10px] text-gray-400 font-semibold">${vacinasList.length} ${vacinasList.length === 1 ? 'dose' : 'doses'}</span>
+                </div>
+                <div class="space-y-1">
+                  ${vacinasList.map((vac: string) => `
+                    <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-700 bg-emerald-50/50 px-2 py-1 rounded-lg border border-emerald-100/60">
+                      <span class="text-emerald-600 font-bold">✓</span>
+                      <span>${vac}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl">💉 Vacinado(a)</span>`;
+        }
       } else if (animal.vacinado === 'Não') {
         badgesHtml += `<span class="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-xl">⏳ Não vacinado(a)</span>`;
       } else {
@@ -382,6 +423,25 @@
   document.getElementById('modalFichaAnimal')?.addEventListener('click', (e) => {
     if (e.target === document.getElementById('modalFichaAnimal')) {
       (window as any).fecharModalFicha();
+    }
+  });
+
+  // Dropdown/Popover de Vacinas
+  (window as any).alternarDropdownVacinas = () => {
+    const dropdown = document.getElementById('dropdownListaVacinas');
+    if (dropdown) {
+      dropdown.classList.toggle('hidden');
+    }
+  };
+
+  // Fechar dropdown de vacinas ao clicar em qualquer lugar fora dele
+  document.addEventListener('click', (e) => {
+    const container = document.getElementById('containerDropdownVacinas');
+    const dropdown = document.getElementById('dropdownListaVacinas');
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+      if (!container || !container.contains(e.target as Node)) {
+        dropdown.classList.add('hidden');
+      }
     }
   });
 
