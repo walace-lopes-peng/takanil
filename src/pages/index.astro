@@ -281,45 +281,14 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     </div>
   </div>
 
-  <!-- Modal de Edição Rápida (Status/Localização) -->
-  <div id="modalEdicao" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
-      <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-        <h3 class="font-bold text-gray-800" id="modalEdicaoTitulo">Editar Status</h3>
-        <button onclick="fecharModalEdicao()" class="text-gray-400 hover:text-gray-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
-      <div class="p-5 space-y-4">
-        <input type="hidden" id="editAnimalId">
-        
-        <div>
-          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Localização</label>
-          <select id="editLocalizacao" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 text-sm p-3 border bg-white">
-            <option value="Abrigo Takanil">Abrigo Takanil</option>
-            <option value="Na rua">Na rua</option>
-            <option value="Lar Temporário">Lar Temporário</option>
-            <option value="Casa de terceiros">Casa de terceiros</option>
-            <option value="Desaparecido">Desaparecido</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Situação / Resolução</label>
-          <select id="editUrgencia" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-taka-green-500 focus:ring-taka-green-500 text-sm p-3 border bg-white">
-            <option value="Nenhuma">Normal (Nenhuma)</option>
-            <option value="Machucado/Risco">🚨 Machucado / Risco</option>
-            <option value="Desaparecido">🔍 Desaparecido</option>
-            <option value="Adotado">✅ Adotado</option>
-            <option value="Tutor Encontrado">🏠 Tutor Encontrado</option>
-            <option value="Óbito">✝️ Óbito</option>
-          </select>
-        </div>
-      </div>
-      <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-        <button onclick="fecharModalEdicao()" class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-xl transition-colors">Cancelar</button>
-        <button onclick="salvarEdicao()" id="btnSalvarEdicao" class="px-4 py-2 text-sm font-medium text-white bg-taka-green-600 hover:bg-taka-green-700 rounded-xl transition-colors shadow-sm">Salvar Alterações</button>
-      </div>
+  <!-- Dropdown Flutuante de Status (posição controlada via JS) -->
+  <div id="dropdownStatusBackdrop" class="fixed inset-0 z-[60] hidden" onclick="fecharDropdownStatus()"></div>
+  <div id="dropdownStatus" class="fixed z-[61] hidden bg-white rounded-2xl shadow-2xl border border-gray-200 w-[260px] overflow-hidden" style="top:0;left:0;">
+    <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+      <p class="text-xs font-bold text-gray-500 uppercase tracking-wider" id="dropdownStatusTitulo">Mudar status</p>
+    </div>
+    <div id="dropdownStatusOpcoes" class="py-1 max-h-[50vh] overflow-y-auto">
+      <!-- Opções injetadas via JS -->
     </div>
   </div>
 
@@ -501,7 +470,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     if (e.key === 'Escape') {
       (window as any).fecharModalZoom();
       (window as any).fecharModalFiltros();
-      (window as any).fecharModalEdicao();
+      (window as any).fecharDropdownStatus();
       (window as any).fecharModalNovidades?.();
     }
   });
@@ -717,10 +686,11 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     const statusFinais = ['Adotado', 'Tutor Encontrado'];
 
     if (mostrarFinaisFelizes) {
+      // Visão Finais Felizes: exibe apenas os que foram adotados ou voltaram para o tutor
       filtrados = baseAnimais.filter(a => statusFinais.includes(a.situacao_urgencia) || a.status === 'Adotado');
     } else {
-      // Normal filters on active animals
-      filtrados = baseAnimais.filter(a => !statusFinais.includes(a.situacao_urgencia) && a.status !== 'Adotado');
+      // Catálogo geral: TODOS os animais continuam no catálogo normalmente (adotados, em tratamento, etc.)
+      filtrados = [...baseAnimais];
       
       // Aplicar Busca Textual por Nome (Case-Insensitive)
       if (termoBusca) {
@@ -807,51 +777,17 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       const subtituloSanitizado = subtituloZoom.replace(/'/g, "\\'");
       const linkWhatsApp = obterLinkWhatsAppContextual(animal);
 
-      let botaoDesfechoHtml = '';
-      if (isAdminGlob && !isResolvido) {
-        if (animal.situacao_urgencia === 'Machucado/Risco') {
-          botaoDesfechoHtml = `
-            <button 
-              onclick="event.stopPropagation(); resolverStatusRapido('${animal.id}', 'sarou', '${nomeSanitizado}')" 
-              class="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 px-2 py-1 rounded-lg transition-colors shadow-2xs active:scale-95 min-h-[30px]"
-              title="Marcar que o animal sarou/curou"
-              aria-label="Marcar que ${animal.nome} sarou"
-            >
-              <span>🩺</span> <span>Marcar como curado</span>
-            </button>`;
-        } else if (animal.situacao_urgencia === 'Desaparecido' || animal.localizacao.includes('Desaparecido') || animal.situacao_urgencia === 'Achado na Rua') {
-          botaoDesfechoHtml = `
-            <button 
-              onclick="event.stopPropagation(); resolverStatusRapido('${animal.id}', 'encontrado', '${nomeSanitizado}')" 
-              class="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 px-2 py-1 rounded-lg transition-colors shadow-2xs active:scale-95 min-h-[30px]"
-              title="Marcar que foi encontrado"
-              aria-label="Marcar que ${animal.nome} foi encontrado"
-            >
-              <span>🏠</span> <span>Marcar como encontrado</span>
-            </button>`;
-        } else {
-          botaoDesfechoHtml = `
-            <button 
-              onclick="event.stopPropagation(); resolverStatusRapido('${animal.id}', 'adotado', '${nomeSanitizado}')" 
-              class="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 border border-gray-200/90 px-2 py-1 rounded-lg transition-colors shadow-2xs active:scale-95 min-h-[30px]"
-              title="Marcar como adotado"
-              aria-label="Marcar que ${animal.nome} foi adotado"
-            >
-              <span>💚</span> <span>Marcar como adotado</span>
-            </button>`;
-        }
-      }
 
       if (modoVisualizacao === 'grid') {
         // Modo Grade (2 Colunas Mobile / 3-4 Desktop)
         htmlOutput += `
-          <div class="bg-white rounded-2xl shadow-xs border border-gray-200/90 overflow-hidden flex flex-col group relative hover:shadow-md transition-all ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-75' : ''}">
+          <div class="bg-white rounded-2xl shadow-xs border border-gray-200/90 overflow-hidden flex flex-col group hover:shadow-md transition-all ${isResolvido ? 'bg-green-50/20 border-green-200/70' : ''}">
             <!-- Foto Aspect Ratio 1:1 com Toque para Zoom -->
             <div class="relative aspect-square w-full bg-gray-100 overflow-hidden">
               <img 
                 src="${imgUrl}" 
                 class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
-                alt="${animal.nome}"
+                alt="${animal.nome || 'Animal sem nome'}"
                 onclick="abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
               >
               <!-- Badges e Botão de Zoom sobrepostos -->
@@ -873,13 +809,15 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
               </div>
             </div>
 
-            <!-- Detalhes do Animal -->
-            <div class="p-3 sm:p-3.5 flex flex-col flex-1 justify-between">
-              <div>
-                <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate ${isResolvido ? 'line-through text-gray-400' : ''}">${animal.nome}</h4>
+            <!-- Área de conteúdo: flex-1 garante que todos cresçam igualmente -->
+            <div class="px-3 pt-3 sm:px-3.5 sm:pt-3.5 flex flex-col flex-1">
+              <!-- Bloco de info: ocupa todo o espaço disponível -->
+              <div class="flex-1">
+                <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate">${animal.nome || 'Sem nome'}</h4>
                 <p class="text-xs sm:text-sm text-gray-600 truncate mt-0.5 font-medium">${animal.fase_vida || ''} • ${animal.peso || 0}kg</p>
                 
-                <div class="mt-1.5 flex flex-wrap items-center gap-1">
+                <!-- min-h-[24px] garante espaço mesmo sem tags -->
+                <div class="mt-1.5 flex flex-wrap items-center gap-1 min-h-[24px]">
                   ${tags}
                   ${animal.instagram_url ? `
                     <a 
@@ -898,63 +836,74 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                 </div>
                 
                 <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
-                  ${!isResolvido ? `<span class="font-semibold text-taka-green-700 truncate">📍 ${animal.localizacao}</span>` : ''}
+                  <span class="font-semibold text-taka-green-700 truncate">📍 ${animal.localizacao || 'Passa Quatro'}</span>
                   <span class="text-gray-400 font-medium">🕒 Há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</span>
                 </div>
-
-                ${botaoDesfechoHtml ? `
-                  <div class="mt-2 pt-1.5 border-t border-gray-100/70">
-                    ${botaoDesfechoHtml}
-                  </div>
-                ` : ''}
               </div>
 
-              <!-- Rodapé de Ações Alinhado à Direita -->
-              <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+              <!-- Rodapé fixo: sempre a mesma altura em TODOS os cards -->
+              <div class="mt-2.5 pt-2 border-t border-gray-100 flex items-center min-h-[44px]" onclick="event.stopPropagation()">
                 ${isAdminGlob ? `
-                  <button 
-                    onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${nomeSanitizado}')" 
-                    aria-label="Editar status de ${animal.nome}"
-                    title="Editar Status" 
-                    class="min-w-[36px] min-h-[36px] p-1.5 text-gray-400 hover:text-taka-green-700 hover:bg-taka-green-50 rounded-xl transition-colors flex items-center justify-center"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                  </button>
-                  <a 
-                    href="/animais/editar?id=${animal.id}"
-                    aria-label="Editar cadastro completo de ${animal.nome}"
-                    title="Editar dados" 
-                    class="min-w-[36px] min-h-[36px] p-1.5 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </a>
-                  <button 
-                    onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
-                    aria-label="Excluir cadastro de ${animal.nome}"
-                    title="Excluir cadastro" 
-                    class="min-w-[36px] min-h-[36px] p-1.5 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center mr-1"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                ` : ''}
-
-                <a 
-                  href="${linkWhatsApp}" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  onclick="event.stopPropagation()" 
-                  class="p-1 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[38px] min-h-[38px]"
-                  title="Falar no WhatsApp oficial sobre ${animal.nome}"
-                  aria-label="Falar sobre ${animal.nome} no WhatsApp"
-                >
-                  <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-8 h-8 object-contain drop-shadow-xs" />
-                </a>
+                  <!-- Admin: [menu status] [editar ficha] [excluir] [whatsapp] -->
+                  <div class="flex items-center justify-between w-full">
+                    <button 
+                      onclick="event.stopPropagation(); abrirDropdownStatus('${animal.id}', '${animal.situacao_urgencia}', '${animal.status || ''}', '${nomeSanitizado}', event)" 
+                      aria-label="Menu de status de ${animal.nome}"
+                      title="Alterar status" 
+                      class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex items-center justify-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                    <a 
+                      href="/animais/editar?id=${animal.id}"
+                      aria-label="Editar cadastro completo de ${animal.nome}"
+                      title="Editar dados" 
+                      class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </a>
+                    <button 
+                      onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
+                      aria-label="Excluir cadastro de ${animal.nome}"
+                      title="Excluir cadastro" 
+                      class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                    <a 
+                      href="${linkWhatsApp}" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      onclick="event.stopPropagation()" 
+                      class="p-0.5 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[34px] min-h-[34px]"
+                      title="Falar no WhatsApp sobre ${animal.nome}"
+                      aria-label="Falar sobre ${animal.nome} no WhatsApp"
+                    >
+                      <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-8 h-8 object-contain drop-shadow-xs" />
+                    </a>
+                  </div>
+                ` : `
+                  <!-- Visitante: só o botão WhatsApp, sempre à direita -->
+                  <div class="flex items-center justify-end w-full">
+                    <a 
+                      href="${linkWhatsApp}" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      onclick="event.stopPropagation()" 
+                      class="p-1 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[40px] min-h-[40px]"
+                      title="Falar no WhatsApp sobre ${animal.nome}"
+                      aria-label="Falar sobre ${animal.nome} no WhatsApp"
+                    >
+                      <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-9 h-9 object-contain drop-shadow-xs" />
+                    </a>
+                  </div>
+                `}
               </div>
             </div>
           </div>
@@ -962,7 +911,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       } else {
         // Modo Lista Compacta
         htmlOutput += `
-          <div class="bg-white rounded-2xl shadow-xs border border-gray-200/90 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-75' : ''}">
+          <div class="bg-white rounded-2xl shadow-xs border border-gray-200/90 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all ${isResolvido ? 'bg-green-50/20 border-green-200/70' : ''}">
             <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
               <!-- Miniatura com Toque para Zoom -->
               <div class="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100">
@@ -977,7 +926,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
               <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-center gap-1.5 mb-1">
                   ${badgeUrgencia}
-                  <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate ${isResolvido ? 'line-through text-gray-400' : ''}">${animal.nome}</h4>
+                  <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate">${animal.nome}</h4>
                   <span class="text-xs sm:text-sm text-gray-600 font-medium whitespace-nowrap">• ${animal.fase_vida || ''} (${animal.peso || 0}kg)</span>
                 </div>
 
@@ -1005,48 +954,44 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                   <span class="text-gray-300">•</span>
                   <span class="text-gray-500">🕒 No sistema há ${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}</span>
                 </div>
-
-                ${botaoDesfechoHtml ? `
-                  <div class="mt-2">
-                    ${botaoDesfechoHtml}
-                  </div>
-                ` : ''}
               </div>
             </div>
 
             <!-- Ações Alinhadas à Direita -->
-            <div class="flex items-center justify-end gap-1 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100" onclick="event.stopPropagation()">
               ${isAdminGlob ? `
-                <button 
-                  onclick="abrirModalEdicao('${animal.id}', '${animal.localizacao}', '${animal.situacao_urgencia}', '${nomeSanitizado}')" 
-                  aria-label="Editar status de ${animal.nome}"
-                  title="Editar Status" 
-                  class="min-w-[36px] min-h-[36px] p-1.5 text-gray-400 hover:text-taka-green-700 hover:bg-taka-green-50 rounded-xl transition-colors flex items-center justify-center"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                </button>
-                <a 
-                  href="/animais/editar?id=${animal.id}"
-                  aria-label="Editar cadastro completo de ${animal.nome}"
-                  title="Editar dados" 
-                  class="min-w-[36px] min-h-[36px] p-1.5 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </a>
-                <button 
-                  onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
-                  aria-label="Excluir cadastro de ${animal.nome}"
-                  title="Excluir cadastro" 
-                  class="min-w-[36px] min-h-[36px] p-1.5 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center mr-1"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                <div class="flex items-center gap-1">
+                  <button 
+                    onclick="event.stopPropagation(); abrirDropdownStatus('${animal.id}', '${animal.situacao_urgencia}', '${animal.status || ''}', '${nomeSanitizado}', event)" 
+                    aria-label="Menu de status de ${animal.nome}"
+                    title="Alterar status" 
+                    class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex items-center justify-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                  </button>
+                  <a 
+                    href="/animais/editar?id=${animal.id}"
+                    aria-label="Editar cadastro completo de ${animal.nome}"
+                    title="Editar dados" 
+                    class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </a>
+                  <button 
+                    onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
+                    aria-label="Excluir cadastro de ${animal.nome}"
+                    title="Excluir cadastro" 
+                    class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center mr-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
               ` : ''}
 
               <a 
@@ -1058,7 +1003,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                 title="Falar no WhatsApp oficial sobre ${animal.nome}"
                 aria-label="Falar sobre ${animal.nome} no WhatsApp"
               >
-                <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-8 h-8 object-contain drop-shadow-xs" />
+                <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-9 h-9 object-contain drop-shadow-xs" />
               </a>
             </div>
           </div>
@@ -1131,79 +1076,172 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     renderLista(animaisGlobais);
   };
 
-  // Funções do Modal de Edição
-  (window as any).abrirModalEdicao = (id: string, localizacao: string, urgencia: string, nome: string) => {
-    (document.getElementById('editAnimalId') as HTMLInputElement).value = id;
-    (document.getElementById('editLocalizacao') as HTMLSelectElement).value = localizacao;
-    (document.getElementById('editUrgencia') as HTMLSelectElement).value = urgencia;
-    document.getElementById('modalEdicaoTitulo')!.innerText = `Editar: ${nome}`;
-    document.getElementById('modalEdicao')!.classList.remove('hidden');
+  // === Dropdown de Status (substitui o modal antigo e os botões de desfecho) ===
+
+  // Fechar dropdown de status
+  (window as any).fecharDropdownStatus = () => {
+    document.getElementById('dropdownStatus')?.classList.add('hidden');
+    document.getElementById('dropdownStatusBackdrop')?.classList.add('hidden');
   };
 
-  (window as any).fecharModalEdicao = () => {
-    document.getElementById('modalEdicao')!.classList.add('hidden');
-  };
+  // Abrir dropdown posicionado perto do botão que o disparou
+  (window as any).abrirDropdownStatus = (id: string, urgencia: string, status: string, nome: string, event: MouseEvent) => {
+    const dropdown = document.getElementById('dropdownStatus');
+    const backdrop = document.getElementById('dropdownStatusBackdrop');
+    const opcoesContainer = document.getElementById('dropdownStatusOpcoes');
+    const titulo = document.getElementById('dropdownStatusTitulo');
+    if (!dropdown || !backdrop || !opcoesContainer || !titulo) return;
 
-  (window as any).salvarEdicao = async () => {
-    const id = (document.getElementById('editAnimalId') as HTMLInputElement).value;
-    const localizacao = (document.getElementById('editLocalizacao') as HTMLSelectElement).value;
-    const situacao_urgencia = (document.getElementById('editUrgencia') as HTMLSelectElement).value;
-    const btn = document.getElementById('btnSalvarEdicao')!;
-    
-    btn.innerHTML = 'Salvando...';
-    btn.setAttribute('disabled', 'true');
+    titulo.textContent = nome || 'Mudar status';
 
-    try {
-      const { error } = await supabase
-        .from('animais')
-        .update({ localizacao, situacao_urgencia })
-        .eq('id', id);
+    // Monta as opções dinamicamente conforme o status atual do animal
+    const statusFinais = ['Adotado', 'Tutor Encontrado'];
+    const estaResolvido = statusFinais.includes(urgencia) || status === 'Adotado';
 
-      if (error) throw error;
-      
-      (window as any).fecharModalEdicao();
-      carregarDados(); // Recarrega os cards
-      (window as any).mostrarToast('Status do animal atualizado!', 'sucesso');
-    } catch (err) {
-      console.error(err);
-      (window as any).mostrarToast('Erro ao atualizar o status do animal.', 'erro');
-    } finally {
-      btn.innerHTML = 'Salvar Alterações';
-      btn.removeAttribute('disabled');
-    }
-  };
-
-  // Função de Desfecho Rápido 1-Toque (#88)
-  (window as any).resolverStatusRapido = async (id: string, acao: 'adotado' | 'sarou' | 'encontrado', nome: string) => {
-    let titulo = '';
-    let mensagem = '';
-    let novosDados: any = {};
-    let toastSucesso = '';
-
-    if (acao === 'sarou') {
-      titulo = 'Confirmar Recuperação';
-      mensagem = `Confirmar que "${nome}" recebeu tratamento médico e está recuperado(a)?`;
-      novosDados = { situacao_urgencia: 'Nenhuma' };
-      toastSucesso = `✨ ${nome} está recuperado(a)!`;
-    } else if (acao === 'encontrado') {
-      titulo = 'Confirmar Reencontro';
-      mensagem = `Confirmar que "${nome}" foi encontrado(a) e está em segurança?`;
-      novosDados = { situacao_urgencia: 'Tutor Encontrado' };
-      toastSucesso = `🏠 ${nome} foi reencontrado(a)!`;
-    } else if (acao === 'adotado') {
-      titulo = 'Confirmar Adoção 🎉';
-      mensagem = `Confirmar que "${nome}" ganhou um novo lar e foi adotado(a)?`;
-      novosDados = { status: 'Adotado', situacao_urgencia: 'Adotado' };
-      toastSucesso = `🎉 Viva! ${nome} foi adotado(a)!`;
+    interface OpcaoStatus {
+      icone: string;
+      texto: string;
+      novosDados: Record<string, string | null>;
+      toast: string;
+      cor: string;
     }
 
-    const confirmou = await (window as any).confirmarAcao({
-      titulo,
-      mensagem,
-      textoConfirmar: 'Confirmar',
-      tipo: acao === 'adotado' ? 'sucesso' : 'padrao'
-    });
-    if (!confirmou) return;
+    const opcoes: OpcaoStatus[] = [];
+
+    if (estaResolvido) {
+      // Animal resolvido (Finais Felizes): permite voltar a disponível ou retificar status
+      opcoes.push({
+        icone: '↩️', texto: 'Voltar ao normal',
+        novosDados: { situacao_urgencia: 'Nenhuma', status: 'Disponível' },
+        toast: `${nome} voltou para a lista principal como disponível`,
+        cor: 'text-gray-700 hover:bg-gray-50 font-semibold'
+      });
+      if (urgencia !== 'Tutor Encontrado') {
+        opcoes.push({
+          icone: '🏠', texto: 'Voltou pro tutor',
+          novosDados: { situacao_urgencia: 'Tutor Encontrado', status: 'Disponível' },
+          toast: `${nome} voltou para o tutor!`,
+          cor: 'text-taka-green-700 hover:bg-taka-green-50'
+        });
+      }
+      if (urgencia !== 'Adotado' && status !== 'Adotado') {
+        opcoes.push({
+          icone: '💚', texto: 'Marcar como adotado',
+          novosDados: { situacao_urgencia: 'Adotado', status: 'Adotado' },
+          toast: `${nome} foi adotado(a)!`,
+          cor: 'text-taka-green-700 hover:bg-taka-green-50'
+        });
+      }
+      opcoes.push({
+        icone: '🚨', texto: 'Urgência médica',
+        novosDados: { situacao_urgencia: 'Machucado/Risco', status: 'Disponível' },
+        toast: `${nome} marcado com urgência médica`,
+        cor: 'text-red-700 hover:bg-red-50'
+      });
+      opcoes.push({
+        icone: '✝️', texto: 'Registrar óbito',
+        novosDados: { situacao_urgencia: 'Óbito', status: 'Disponível' },
+        toast: `${nome} registrado como óbito`,
+        cor: 'text-gray-500 hover:bg-gray-50'
+      });
+    } else {
+      // Animal ativo: opções contextuais
+      opcoes.push({
+        icone: '💚', texto: 'Marcar como adotado',
+        novosDados: { situacao_urgencia: 'Adotado', status: 'Adotado' },
+        toast: `${nome} foi adotado(a)!`,
+        cor: 'text-taka-green-700 hover:bg-taka-green-50'
+      });
+      opcoes.push({
+        icone: '🏠', texto: 'Voltou pro tutor',
+        novosDados: { situacao_urgencia: 'Tutor Encontrado', status: 'Disponível' },
+        toast: `${nome} voltou para o tutor!`,
+        cor: 'text-taka-green-700 hover:bg-taka-green-50'
+      });
+
+      if (urgencia === 'Machucado/Risco') {
+        opcoes.push({
+          icone: '🩺', texto: 'Marcar como curado',
+          novosDados: { situacao_urgencia: 'Nenhuma', status: 'Disponível' },
+          toast: `${nome} está recuperado(a)!`,
+          cor: 'text-blue-700 hover:bg-blue-50'
+        });
+      } else {
+        opcoes.push({
+          icone: '🚨', texto: 'Urgência médica',
+          novosDados: { situacao_urgencia: 'Machucado/Risco', status: 'Disponível' },
+          toast: `${nome} marcado com urgência médica`,
+          cor: 'text-red-700 hover:bg-red-50'
+        });
+      }
+
+      if (urgencia !== 'Desaparecido') {
+        opcoes.push({
+          icone: '🔍', texto: 'Marcar como desaparecido',
+          novosDados: { situacao_urgencia: 'Desaparecido', status: 'Disponível' },
+          toast: `${nome} marcado como desaparecido`,
+          cor: 'text-yellow-700 hover:bg-yellow-50'
+        });
+      } else {
+        opcoes.push({
+          icone: '↩️', texto: 'Remover desaparecido',
+          novosDados: { situacao_urgencia: 'Nenhuma', status: 'Disponível' },
+          toast: `${nome} não está mais desaparecido`,
+          cor: 'text-gray-700 hover:bg-gray-50'
+        });
+      }
+
+      opcoes.push({
+        icone: '✝️', texto: 'Registrar óbito',
+        novosDados: { situacao_urgencia: 'Óbito', status: 'Disponível' },
+        toast: `${nome} registrado como óbito`,
+        cor: 'text-gray-500 hover:bg-gray-50'
+      });
+    }
+
+    // Renderizar opções como botões
+    opcoesContainer.innerHTML = opcoes.map(op => `
+      <button 
+        type="button"
+        onclick="event.stopPropagation(); mudarStatus('${id}', ${JSON.stringify(op.novosDados).replace(/'/g, "&#39;").replace(/"/g, '&quot;')}, '${urgencia}', '${status || ''}', '${nome.replace(/'/g, "\\'")}'  , '${op.toast.replace(/'/g, "\\'")}')" 
+        class="w-full text-left px-4 py-3 text-sm font-medium flex items-center gap-3 transition-colors active:scale-[0.98] min-h-[44px] ${op.cor}"
+      >
+        <span class="text-base">${op.icone}</span>
+        <span>${op.texto}</span>
+      </button>
+    `).join('');
+
+    // Posicionar dropdown perto do botão clicado
+    const btn = event.currentTarget as HTMLElement;
+    const rect = btn.getBoundingClientRect();
+    const dropdownAltura = 300; // estimativa
+    const espacoAbaixo = window.innerHeight - rect.bottom;
+
+    dropdown.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 268)) + 'px';
+    if (espacoAbaixo > dropdownAltura) {
+      dropdown.style.top = (rect.bottom + 4) + 'px';
+    } else {
+      dropdown.style.top = Math.max(8, rect.top - dropdownAltura) + 'px';
+    }
+
+    backdrop.classList.remove('hidden');
+    dropdown.classList.remove('hidden');
+  };
+
+  // Mudar status com undo via toast (sem confirm() prévio — a reversão é o safety net)
+  (window as any).mudarStatus = async (id: string, novosDadosArg: any, urgenciaAnterior: string, statusAnterior: string, nome: string, toastMsg: string) => {
+    let novosDados: Record<string, string | null>;
+    if (typeof novosDadosArg === 'object' && novosDadosArg !== null) {
+      novosDados = novosDadosArg;
+    } else {
+      try {
+        novosDados = JSON.parse(novosDadosArg);
+      } catch {
+        novosDados = JSON.parse(decodeURIComponent(novosDadosArg));
+      }
+    }
+
+    (window as any).fecharDropdownStatus();
 
     try {
       const { error } = await supabase
@@ -1214,34 +1252,40 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       if (error) throw error;
 
       carregarDados();
-      (window as any).mostrarToast(toastSucesso, 'sucesso');
+
+      // Toast com botão "Desfazer" por 5 segundos
+      (window as any).mostrarToast(toastMsg, 'sucesso', {
+        duracao: 5000,
+        acao: {
+          texto: 'Desfazer',
+          callback: async () => {
+            try {
+              // Restaurar dados anteriores
+              const dadosAnteriores: Record<string, string | null> = { situacao_urgencia: urgenciaAnterior || 'Nenhuma' };
+              dadosAnteriores.status = (statusAnterior === 'Adotado') ? 'Adotado' : 'Disponível';
+
+              const { error: errUndo } = await supabase
+                .from('animais')
+                .update(dadosAnteriores)
+                .eq('id', id);
+
+              if (errUndo) throw errUndo;
+              carregarDados();
+              (window as any).mostrarToast(`Status de ${nome} restaurado`, 'info');
+            } catch (e) {
+              console.error(e);
+              (window as any).mostrarToast('Erro ao desfazer. Tente pela ficha do animal.', 'erro');
+            }
+          }
+        }
+      });
     } catch (err: any) {
-      console.error(err);
-      (window as any).mostrarToast('Erro ao atualizar o status do animal.', 'erro');
+      console.error('Erro ao atualizar status do animal:', err);
+      (window as any).mostrarToast(err?.message || 'Erro ao atualizar o status do animal.', 'erro');
     }
   };
 
-  // Função para marcar animal como adotado/encontrado (preservando o histórico)
-  (window as any).marcarResolvido = async (id: string, novoStatus: string) => {
-    const confirmou = await (window as any).confirmarAcao({
-      titulo: `Confirmar ${novoStatus}?`,
-      mensagem: `Deseja atualizar o status deste animal para "${novoStatus}"?`,
-      textoConfirmar: 'Confirmar',
-      tipo: 'padrao'
-    });
-    if (!confirmou) return;
-    
-    try {
-      const { error } = await supabase.from('animais').update({ status: novoStatus }).eq('id', id);
-      if (error) throw error;
 
-      carregarDados();
-      (window as any).mostrarToast(`Animal marcado como ${novoStatus}!`, 'sucesso');
-    } catch (err) {
-      console.error(err);
-      (window as any).mostrarToast('Erro ao atualizar o registro.', 'erro');
-    }
-  };
 
   async function carregarDados() {
     const { data: animaisOriginais, error } = await supabase
