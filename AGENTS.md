@@ -182,7 +182,8 @@ Toda e qualquer nova feature ou alteração em tela existente DEVE priorizar ace
 - Mensagem descreve o quê e, se não for óbvio, por quê
 - Branches de Parte nascem de `dev`, não de `main`. PR fecha em `dev`.
   Detalhes completos em `CONTRIBUTING.md`.
-- **Sempre** verifique qual Issue o PR resolve e adicione a tag de fechamento (ex: Closes #123) na descrição. IMPORTANTE: O GitHub não fecha a issue automaticamente ao fazer merge na branch dev (não-default). Portanto, o agente DEVE sempre executar gh issue close <numero> manualmente no terminal após o merge do PR para garantir o fechamento da issue associada.
+- **Sempre** verifique qual Issue o PR resolve e adicione a tag de fechamento (ex: Closes #123) na descrição.
+- **Regra de Fechamento de Issues:** NUNCA fechar uma issue apenas por dar push em uma branch. Uma issue só deve ser considerada e marcada como concluída/fechada após o Pull Request correspondente ser efetivamente mergeado. Como o GitHub não fecha a issue automaticamente ao fazer merge na branch `dev` (não-default), o agente DEVE executar `gh issue close <numero>` manualmente no terminal **imediatamente após a confirmação do merge do PR**, nunca antes.
 - **Sempre** inclua uma seção `## Como testar?` com um checklist prático no corpo (body) de todo PR aberto.
 - **REGRA DE OURO: nunca execute `git commit`, `git push`, criação de `Pull Requests` ou `Merge` sem antes mostrar um resumo do que foi alterado e receber uma confirmação explícita para aquele ato especificamente.** Ter recebido a tarefa inicial não conta como essa confirmação — são duas aprovações separadas: uma para implementar, outra para commitar/enviar/mergear.
 
