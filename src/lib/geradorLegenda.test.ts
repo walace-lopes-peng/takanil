@@ -71,4 +71,16 @@ describe('geradorLegenda - Geração de Textos', () => {
       expect(legenda.length).toBeGreaterThan(30);
     }
   });
+
+  it('deve incluir vacinas aplicadas na legenda quando informadas', () => {
+    const legenda = gerarLegendaAnimal({
+      nome: 'Thor',
+      especie: 'Cão',
+      sexo: 'Macho',
+      vacinado: 'Sim',
+      vacinas: ['V10', 'Antirrábica']
+    }, 0);
+
+    expect(legenda).toContain('vacinado(a) com V10 e Antirrábica');
+  });
 });

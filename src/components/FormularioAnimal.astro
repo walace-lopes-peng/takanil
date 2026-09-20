@@ -46,25 +46,41 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     {!modoEdicao && (
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Foto do Animal</label>
-      <label for="fotoInput" class="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-taka-green-400 hover:bg-taka-green-50/30 transition-all bg-gray-50 cursor-pointer w-full text-center group min-h-[120px]" id="fotoContainer">
-        <svg class="mx-auto h-12 w-12 text-gray-400 group-hover:text-taka-green-500 transition-colors pointer-events-none" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span class="mt-2 text-sm font-medium text-taka-green-600 group-hover:text-taka-green-700 pointer-events-none">
-          Tirar Foto ou Escolher da Galeria
+      
+      <!-- Seletor inicial vertical (proporção 500x680) -->
+      <label for="fotoInput" class="mt-1 mx-auto flex flex-col items-center justify-center p-5 sm:p-6 border-2 border-gray-300 border-dashed rounded-2xl hover:border-taka-green-500 hover:bg-taka-green-50/50 transition-all bg-gray-50/80 cursor-pointer w-full max-w-[220px] sm:max-w-[240px] aspect-[500/680] text-center group shadow-xs" id="fotoContainer">
+        <div class="w-14 h-14 rounded-full bg-taka-green-50 text-taka-green-600 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-taka-green-100 transition-all">
+          <svg class="h-7 w-7 text-taka-green-600 pointer-events-none" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <span class="text-sm font-bold text-gray-800 group-hover:text-taka-green-700 pointer-events-none leading-snug">
+          Adicionar Foto
         </span>
-        <span class="text-xs text-gray-400 mt-1 pointer-events-none">
-          PNG, JPG ou WEBP (Comprimido automaticamente)
+        <span class="text-xs text-taka-green-600 font-medium mt-1 pointer-events-none">
+          Tirar ou Escolher
+        </span>
+        <span class="text-[11px] text-gray-400 mt-2 pointer-events-none leading-tight">
+          Enquadramento vertical
         </span>
         <input id="fotoInput" name="foto" type="file" accept="image/*" class="sr-only" required>
       </label>
-      <div id="fotoPreviewContainer" class="hidden mt-2 relative rounded-xl overflow-hidden aspect-video bg-gray-100">
-          <img id="fotoPreview" class="object-cover w-full h-full" src="" alt="Preview da foto">
-          <button type="button" id="removerFoto" class="absolute top-2 right-2 bg-taka-orange-500/80 text-white p-2 rounded-full backdrop-blur-sm hover:bg-taka-orange-600 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center" aria-label="Remover foto">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+
+      <!-- Preview da Foto Vertical (Proporção 500x680) -->
+      <div id="fotoPreviewContainer" class="hidden mt-2 flex flex-col items-center">
+        <div class="relative w-full max-w-[220px] sm:max-w-[240px] aspect-[500/680] rounded-2xl overflow-hidden shadow-md bg-gray-900 border-2 border-taka-green-500">
+          <img id="fotoPreview" class="object-cover w-full h-full" src="" alt="Preview da foto do animal">
+        </div>
+        
+        <!-- Botões de Ação da Foto -->
+        <div class="mt-3 flex items-center justify-center gap-2 w-full max-w-xs">
+          <button type="button" id="btnRecortarFoto" class="flex-1 py-2.5 px-3 bg-taka-green-50 hover:bg-taka-green-100 text-taka-green-800 border border-taka-green-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-2xs min-h-[44px]">
+            <span>✂️ Ajustar Corte</span>
           </button>
+          <button type="button" id="removerFoto" class="py-2.5 px-3.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-2xs min-h-[44px]">
+            <span>✕ Trocar</span>
+          </button>
+        </div>
       </div>
     </div>
     )}
@@ -385,6 +401,18 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
           </div>
         </div>
 
+        <!-- Progressive Disclosure: Vacinas Aplicadas (Aparece se Vacinado = Sim) -->
+        <div id="containerSelecaoVacinas" class={`transition-all duration-300 ${dadosIniciais?.vacinado === 'Sim' ? '' : 'hidden'}`}>
+          <div class="p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl space-y-2">
+            <label class="block text-xs font-bold text-emerald-900">
+              💉 Quais vacinas já foram aplicadas? <span class="text-emerald-700 font-normal">(Opcional)</span>
+            </label>
+            <div id="gridVacinas" class="grid grid-cols-2 gap-2">
+              <!-- Renderizado dinamicamente pelo script baseado na espécie (Cão vs Gato) -->
+            </div>
+          </div>
+        </div>
+
         <!-- Temperamento -->
         <div>
           <label for="temperamento" class="block text-sm font-medium text-gray-700 mb-1">Temperamento</label>
@@ -469,6 +497,62 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
   </form>
 </div>
 
+<!-- ========================================================================= -->
+<!-- MODAL DE AJUSTE / RECORTE DE FOTO VERTICAL (500x680)                     -->
+<!-- ========================================================================= -->
+<div id="modalCorteFoto" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+  <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in fade-in zoom-in-95 duration-200">
+    <!-- Header -->
+    <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/80">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">✂️</span>
+        <h3 class="font-bold text-gray-800 text-base">Enquadrar Foto do Animal</h3>
+      </div>
+      <button type="button" id="btnFecharModalCorte" class="p-2 text-gray-400 hover:text-gray-700 rounded-full hover:bg-gray-200 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center" aria-label="Fechar janela de recorte">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Área de Corte Interativa -->
+    <div class="p-4 bg-gray-950 flex flex-col items-center justify-center select-none overflow-hidden relative">
+      <p class="text-xs font-medium text-emerald-300 mb-3 text-center flex items-center gap-1.5">
+        <span>👆</span> Arraste com o dedo para posicionar o animal no centro:
+      </p>
+      
+      <!-- Container do Canvas Proporção 500:680 -->
+      <div class="relative aspect-[500/680] w-full max-w-[220px] sm:max-w-[240px] rounded-2xl overflow-hidden border-2 border-dashed border-emerald-400 shadow-2xl bg-black flex items-center justify-center touch-none cursor-grab active:cursor-grabbing" id="cropCanvasWrapper">
+        <canvas id="cropCanvas" width="500" height="680" class="w-full h-full block"></canvas>
+      </div>
+
+      <!-- Controles de Zoom e Rotação -->
+      <div class="w-full max-w-[250px] mt-4 flex items-center justify-between gap-2.5 text-white">
+        <button type="button" id="btnZoomOut" class="h-10 w-10 bg-gray-800 hover:bg-gray-700 text-white rounded-xl flex items-center justify-center font-bold text-lg active:scale-95 transition-all border border-gray-700 shrink-0 select-none min-h-[44px]" aria-label="Diminuir zoom">
+          −
+        </button>
+        <input type="range" id="sliderZoom" min="1" max="3" step="0.05" value="1" class="w-full accent-taka-green-500 h-2 bg-gray-700 rounded-lg cursor-pointer" aria-label="Nível de zoom da imagem">
+        <button type="button" id="btnZoomIn" class="h-10 w-10 bg-gray-800 hover:bg-gray-700 text-white rounded-xl flex items-center justify-center font-bold text-lg active:scale-95 transition-all border border-gray-700 shrink-0 select-none min-h-[44px]" aria-label="Aumentar zoom">
+          +
+        </button>
+        <button type="button" id="btnGirarFoto" class="h-10 px-3 bg-gray-800 hover:bg-gray-700 text-emerald-300 rounded-xl flex items-center justify-center font-bold text-xs active:scale-95 transition-all border border-gray-700 shrink-0 gap-1 select-none min-h-[44px]" title="Girar 90 graus">
+          <span>🔄</span> 90°
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer de Ações -->
+    <div class="p-4 bg-white border-t border-gray-100 flex flex-col sm:flex-row gap-2.5">
+      <button type="button" id="btnConfirmarCorte" class="flex-1 py-3 px-4 bg-taka-green-600 hover:bg-taka-green-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all min-h-[48px] shadow-sm">
+        <span>✅ Confirmar Enquadramento</span>
+      </button>
+      <button type="button" id="btnCancelarCorte" class="py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-sm transition-all min-h-[44px]">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
   import { supabase } from '../lib/supabaseClient';
   import { gerarLegendaAnimal } from '../lib/geradorLegenda';
@@ -502,11 +586,88 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     const iconeSanfona = document.getElementById('iconeSanfona');
     const setaSanfona = document.getElementById('setaSanfona');
 
+    const containerSelecaoVacinas = document.getElementById('containerSelecaoVacinas');
+    const gridVacinas = document.getElementById('gridVacinas');
+
     const textareaLegenda = document.getElementById('legenda') as HTMLTextAreaElement;
     const btnSortearLegenda = document.getElementById('btnSortearLegenda');
 
+    // Elementos do Modal de Recorte
+    const modalCorteFoto = document.getElementById('modalCorteFoto');
+    const btnFecharModalCorte = document.getElementById('btnFecharModalCorte');
+    const btnCancelarCorte = document.getElementById('btnCancelarCorte');
+    const btnConfirmarCorte = document.getElementById('btnConfirmarCorte');
+    const btnRecortarFoto = document.getElementById('btnRecortarFoto');
+    const cropCanvasWrapper = document.getElementById('cropCanvasWrapper');
+    const cropCanvas = document.getElementById('cropCanvas') as HTMLCanvasElement;
+    const sliderZoom = document.getElementById('sliderZoom') as HTMLInputElement;
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    const btnGirarFoto = document.getElementById('btnGirarFoto');
+
     let indiceModeloLegenda = 0;
     let legendaEditadaManualmente = false;
+
+    // Estado do Recorte
+    let imagemCarregadaParaCorte: HTMLImageElement | null = null;
+    let cropPosX = 0;
+    let cropPosY = 0;
+    let cropZoom = 1;
+    let cropRotacao = 0; // 0, 90, 180, 270
+    let isDraggingCrop = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let fotoCortadaBlob: Blob | null = null;
+
+    // Definição das vacinas por espécie
+    const vacinasPorEspecie: Record<string, string[]> = {
+      'Cão': ['V8 / V10 (Múltipla)', 'Antirrábica (Raiva)', 'Giárdia', 'Gripe Canina (Tosse)'],
+      'Gato': ['V3 / V4 / V5 (Felina)', 'Antirrábica (Raiva)', 'Gripe Felina'],
+      'Ambos/Múltiplos': ['V8 / V10 (Canina)', 'V3 / V4 / V5 (Felina)', 'Antirrábica (Raiva)']
+    };
+
+    let vacinasSelecionadas: string[] = [];
+
+    function renderizarGridVacinas() {
+      if (!gridVacinas) return;
+      const formData = new FormData(form);
+      const especie = (formData.get('especie') as string) || 'Cão';
+      const lista = vacinasPorEspecie[especie] || vacinasPorEspecie['Cão'];
+
+      gridVacinas.innerHTML = lista.map((vacina) => {
+        const isChecked = vacinasSelecionadas.includes(vacina);
+        return `
+          <label class="cursor-pointer select-none">
+            <input 
+              type="checkbox" 
+              name="vacina_item" 
+              value="${vacina}" 
+              class="chk-vacina peer sr-only" 
+              ${isChecked ? 'checked' : ''}
+            >
+            <div class="p-2.5 rounded-xl border border-emerald-200 bg-white text-emerald-900 text-xs font-semibold peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-700 transition-all min-h-[44px] flex items-center justify-between gap-1 shadow-2xs">
+              <span>${vacina}</span>
+              <span class="text-xs">${isChecked ? '✓' : '+'}</span>
+            </div>
+          </label>
+        `;
+      }).join('');
+
+      // Adiciona listener nos checkboxes
+      gridVacinas.querySelectorAll('.chk-vacina').forEach((chk) => {
+        chk.addEventListener('change', () => {
+          coletarVacinasSelecionadas();
+          atualizarLegenda();
+          renderizarGridVacinas(); // atualiza visual do check/plus
+        });
+      });
+    }
+
+    function coletarVacinasSelecionadas() {
+      if (!gridVacinas) return;
+      const marcados = Array.from(gridVacinas.querySelectorAll('.chk-vacina:checked')) as HTMLInputElement[];
+      vacinasSelecionadas = marcados.map(m => m.value);
+    }
 
     // Toggle de Mais de Um Animal
     chkMaisDeUm?.addEventListener('change', () => {
@@ -553,6 +714,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         situacao: (formData.get('situacao_urgencia') as string) || 'Nenhuma',
         castrado: (formData.get('castrado') as string) || 'Não sei',
         vacinado: (formData.get('vacinado') as string) || 'Não sei',
+        vacinas: vacinasSelecionadas,
         temperamento: (formData.get('temperamento') as string) || 'Não informado',
       };
     }
@@ -601,19 +763,236 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         }
       }
 
+      // Controle do Progressive Disclosure de Vacinas
+      if ((target as HTMLInputElement).name === 'vacinado') {
+        const val = (target as HTMLInputElement).value;
+        if (val === 'Sim') {
+          containerSelecaoVacinas?.classList.remove('hidden');
+          renderizarGridVacinas();
+        } else {
+          containerSelecaoVacinas?.classList.add('hidden');
+          vacinasSelecionadas = [];
+        }
+      }
+
+      // Se mudou espécie, atualiza a lista de vacinas
+      if ((target as HTMLInputElement).name === 'especie') {
+        renderizarGridVacinas();
+      }
+
       if (target.id === 'legenda') return;
       atualizarLegenda();
     });
 
-    // Preview de foto
+    // =========================================================================
+    // MOTOR DE ENQUADRAMENTO E RECORTE DE FOTO VERTICAL (CANVAS 500x680)
+    // =========================================================================
+    function desenharCropCanvas() {
+      if (!cropCanvas || !imagemCarregadaParaCorte) return;
+      const ctx = cropCanvas.getContext('2d');
+      if (!ctx) return;
+
+      const cw = cropCanvas.width; // 500
+      const ch = cropCanvas.height; // 680
+
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, cw, ch);
+
+      ctx.save();
+      // Ponto de ancoragem no centro do quadro
+      ctx.translate(cw / 2 + cropPosX, ch / 2 + cropPosY);
+      ctx.rotate((cropRotacao * Math.PI) / 180);
+
+      // Calcular escala base para preencher o quadro
+      const imgW = (cropRotacao === 90 || cropRotacao === 270) ? imagemCarregadaParaCorte.height : imagemCarregadaParaCorte.width;
+      const imgH = (cropRotacao === 90 || cropRotacao === 270) ? imagemCarregadaParaCorte.width : imagemCarregadaParaCorte.height;
+      
+      const escalaBase = Math.max(cw / imgW, ch / imgH);
+      const escalaFinal = escalaBase * cropZoom;
+
+      ctx.scale(escalaFinal, escalaFinal);
+
+      ctx.drawImage(
+        imagemCarregadaParaCorte,
+        -imagemCarregadaParaCorte.width / 2,
+        -imagemCarregadaParaCorte.height / 2,
+        imagemCarregadaParaCorte.width,
+        imagemCarregadaParaCorte.height
+      );
+
+      ctx.restore();
+    }
+
+    function abrirModalCorte(imgSrc: string) {
+      const img = new Image();
+      img.onload = () => {
+        imagemCarregadaParaCorte = img;
+        cropPosX = 0;
+        cropPosY = 0;
+        cropZoom = 1;
+        cropRotacao = 0;
+        if (sliderZoom) sliderZoom.value = '1';
+        modalCorteFoto?.classList.remove('hidden');
+        desenharCropCanvas();
+      };
+      img.src = imgSrc;
+    }
+
+    function fecharModalCorte() {
+      modalCorteFoto?.classList.add('hidden');
+    }
+
+    btnFecharModalCorte?.addEventListener('click', fecharModalCorte);
+    btnCancelarCorte?.addEventListener('click', () => {
+      fecharModalCorte();
+      if (!fotoCortadaBlob && fotoInput) {
+        fotoInput.value = '';
+        if (fotoPreview) fotoPreview.src = '';
+        fotoContainer?.classList.remove('hidden');
+        fotoPreviewContainer?.classList.add('hidden');
+      }
+    });
+
+    btnRecortarFoto?.addEventListener('click', () => {
+      if (imagemCarregadaParaCorte) {
+        modalCorteFoto?.classList.remove('hidden');
+        desenharCropCanvas();
+      } else if (fotoPreview?.src) {
+        abrirModalCorte(fotoPreview.src);
+      }
+    });
+
+    // Controles de Zoom
+    sliderZoom?.addEventListener('input', (e) => {
+      cropZoom = parseFloat((e.target as HTMLInputElement).value);
+      desenharCropCanvas();
+    });
+
+    btnZoomIn?.addEventListener('click', () => {
+      cropZoom = Math.min(3.5, cropZoom + 0.2);
+      if (sliderZoom) sliderZoom.value = cropZoom.toString();
+      desenharCropCanvas();
+    });
+
+    btnZoomOut?.addEventListener('click', () => {
+      cropZoom = Math.max(0.7, cropZoom - 0.2);
+      if (sliderZoom) sliderZoom.value = cropZoom.toString();
+      desenharCropCanvas();
+    });
+
+    btnGirarFoto?.addEventListener('click', () => {
+      cropRotacao = (cropRotacao + 90) % 360;
+      desenharCropCanvas();
+    });
+
+    // Arraste com Mouse e Toque (Touch)
+    function iniciarArrasto(clientX: number, clientY: number) {
+      isDraggingCrop = true;
+      dragStartX = clientX - cropPosX;
+      dragStartY = clientY - cropPosY;
+    }
+
+    function moverArrasto(clientX: number, clientY: number) {
+      if (!isDraggingCrop) return;
+      cropPosX = clientX - dragStartX;
+      cropPosY = clientY - dragStartY;
+      desenharCropCanvas();
+    }
+
+    function finalizarArrasto() {
+      isDraggingCrop = false;
+    }
+
+    cropCanvasWrapper?.addEventListener('mousedown', (e) => iniciarArrasto(e.clientX, e.clientY));
+    window.addEventListener('mousemove', (e) => moverArrasto(e.clientX, e.clientY));
+    window.addEventListener('mouseup', finalizarArrasto);
+
+    cropCanvasWrapper?.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        iniciarArrasto(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (isDraggingCrop && e.touches.length === 1) {
+        moverArrasto(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', finalizarArrasto);
+
+    // Zoom com roda do mouse (Scroll Wheel)
+    cropCanvasWrapper?.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      cropZoom = Math.max(0.7, Math.min(3.5, cropZoom + delta));
+      if (sliderZoom) sliderZoom.value = cropZoom.toString();
+      desenharCropCanvas();
+    }, { passive: false });
+
+    // Confirmar Corte
+    btnConfirmarCorte?.addEventListener('click', () => {
+      if (!cropCanvas) return;
+      
+      // Renderiza em alta resolução (750x1020 - proporção vertical exata 500:680)
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = 750;
+      exportCanvas.height = 1020;
+      const ctx = exportCanvas.getContext('2d');
+      if (ctx && imagemCarregadaParaCorte) {
+        const cw = 750;
+        const ch = 1020;
+        const escalaProporcional = 750 / 500;
+
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, cw, ch);
+
+        ctx.save();
+        ctx.translate(cw / 2 + cropPosX * escalaProporcional, ch / 2 + cropPosY * escalaProporcional);
+        ctx.rotate((cropRotacao * Math.PI) / 180);
+
+        const imgW = (cropRotacao === 90 || cropRotacao === 270) ? imagemCarregadaParaCorte.height : imagemCarregadaParaCorte.width;
+        const imgH = (cropRotacao === 90 || cropRotacao === 270) ? imagemCarregadaParaCorte.width : imagemCarregadaParaCorte.height;
+        
+        const escalaBase = Math.max(cw / imgW, ch / imgH);
+        const escalaFinal = escalaBase * cropZoom;
+
+        ctx.scale(escalaFinal, escalaFinal);
+
+        ctx.drawImage(
+          imagemCarregadaParaCorte,
+          -imagemCarregadaParaCorte.width / 2,
+          -imagemCarregadaParaCorte.height / 2,
+          imagemCarregadaParaCorte.width,
+          imagemCarregadaParaCorte.height
+        );
+
+        ctx.restore();
+
+        exportCanvas.toBlob((blob) => {
+          if (blob) {
+            fotoCortadaBlob = blob;
+            if (fotoPreview) {
+              fotoPreview.src = URL.createObjectURL(blob);
+            }
+            fotoContainer?.classList.add('hidden');
+            fotoPreviewContainer?.classList.remove('hidden');
+            fecharModalCorte();
+            (window as any).mostrarToast?.('Foto enquadrada e pronta!', 'sucesso');
+          }
+        }, 'image/jpeg', 0.85);
+      }
+    });
+
+    // Seleção de foto pelo input file -> Abre modal de corte automaticamente
     fotoInput?.addEventListener('change', (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          fotoPreview.src = e.target?.result as string;
-          fotoContainer?.classList.add('hidden');
-          fotoPreviewContainer?.classList.remove('hidden');
+        reader.onload = (ev) => {
+          const imgSrc = ev.target?.result as string;
+          abrirModalCorte(imgSrc);
         };
         reader.readAsDataURL(file);
       }
@@ -622,7 +1001,9 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
     // Remover foto
     removerFotoBtn?.addEventListener('click', () => {
       fotoInput.value = '';
-      fotoPreview.src = '';
+      if (fotoPreview) fotoPreview.src = '';
+      fotoCortadaBlob = null;
+      imagemCarregadaParaCorte = null;
       fotoContainer?.classList.remove('hidden');
       fotoPreviewContainer?.classList.add('hidden');
     });
@@ -756,6 +1137,10 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         if(submitText) submitText.textContent = modoEdicao ? 'Salvando...' : (isPublic ? 'Enviando...' : 'Salvando...');
         spinner?.classList.remove('hidden');
 
+        const valorVacinadoFinal = (vacinado === 'Sim' && vacinasSelecionadas.length > 0)
+          ? `Sim (${vacinasSelecionadas.join(', ')})`
+          : vacinado;
+
         const dadosParaSalvar = {
           nome,
           especie,
@@ -765,7 +1150,7 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
           localizacao,
           quantidade,
           situacao_urgencia,
-          vacinado,
+          vacinado: valorVacinadoFinal,
           castrado,
           temperamento,
           instagram_url,
@@ -780,13 +1165,18 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
           if (dbError) throw new Error('Erro ao atualizar: ' + dbError.message);
           showStatus('✅ Dados do animal atualizados com sucesso!', 'success');
         } else {
-          const fotoFile = formData.get('foto') as File;
-          const fotoComprimida = await comprimirImagem(fotoFile);
+          let fotoParaUpload: Blob | File;
+          if (fotoCortadaBlob) {
+            fotoParaUpload = fotoCortadaBlob;
+          } else {
+            const fotoFile = formData.get('foto') as File;
+            fotoParaUpload = await comprimirImagem(fotoFile);
+          }
           const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
 
           const { error: uploadError } = await supabase.storage
             .from('animais')
-            .upload(fileName, fotoComprimida, { cacheControl: '3600', upsert: true });
+            .upload(fileName, fotoParaUpload, { cacheControl: '3600', upsert: true, contentType: 'image/jpeg' });
 
           if (uploadError) throw new Error('Erro ao fazer upload da foto: ' + uploadError.message);
 
@@ -809,6 +1199,8 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
           form.reset();
 
           if (fotoPreview) fotoPreview.src = '';
+          fotoCortadaBlob = null;
+          imagemCarregadaParaCorte = null;
           fotoContainer?.classList.remove('hidden');
           fotoPreviewContainer?.classList.add('hidden');
         }
@@ -826,6 +1218,13 @@ const formTitle = modoEdicao ? 'Editar Animal' : (isPublic ? 'Sugerir Animal' : 
         spinner?.classList.add('hidden');
       }
     });
+
+    // Inicialização do estado de vacinas
+    const radioVacinadoSim = form.querySelector('input[name="vacinado"][value="Sim"]:checked');
+    if (radioVacinadoSim) {
+      containerSelecaoVacinas?.classList.remove('hidden');
+      renderizarGridVacinas();
+    }
 
     // Inicialização da Legenda Dinâmica no carregamento inicial
     if (!textareaLegenda.value) {

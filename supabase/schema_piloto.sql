@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS piloto.animais (
     fase_vida TEXT NOT NULL CHECK (fase_vida IN ('Filhote', 'Adulto', 'Idoso')),
     peso NUMERIC NOT NULL CHECK (peso > 0),
     imagem_url TEXT,
-    localizacao TEXT NOT NULL DEFAULT 'Abrigo Takanil' CHECK (localizacao IN ('Abrigo Takanil', 'Lar Temporário / Terceiros', 'Desaparecido / Rua')),
+    localizacao TEXT NOT NULL DEFAULT 'Abrigo Takanil' CHECK (localizacao IN ('Abrigo Takanil', 'Na rua', 'Lar Temporário', 'Casa de terceiros', 'Desaparecido', 'Lar Temporário / Terceiros', 'Desaparecido / Rua')),
     status TEXT NOT NULL DEFAULT 'Disponível' CHECK (status IN ('Disponível', 'Adotado')),
     criado_por UUID REFERENCES piloto.perfis(id),
     status_moderacao TEXT NOT NULL DEFAULT 'pendente' CHECK (status_moderacao IN ('pendente', 'aprovado', 'rejeitado')),
