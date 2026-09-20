@@ -5,6 +5,11 @@
 -- É uma operação idempotente (ON CONFLICT DO NOTHING), evitando duplicações.
 -- ==============================================================================
 
+-- 0. Ajustar a constraint de localização para aceitar todas as opções do app
+ALTER TABLE piloto.animais DROP CONSTRAINT IF EXISTS animais_localizacao_check;
+ALTER TABLE piloto.animais ADD CONSTRAINT animais_localizacao_check 
+    CHECK (localizacao IN ('Abrigo Takanil', 'Na rua', 'Lar Temporário', 'Casa de terceiros', 'Desaparecido', 'Lar Temporário / Terceiros', 'Desaparecido / Rua'));
+
 -- 1. Migrar Perfis
 INSERT INTO piloto.perfis (id, papel, created_at)
 SELECT id, papel, created_at

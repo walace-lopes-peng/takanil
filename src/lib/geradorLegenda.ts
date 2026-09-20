@@ -8,6 +8,7 @@ export interface DadosAnimalLegenda {
   situacao?: string;
   castrado?: string;
   vacinado?: string;
+  vacinas?: string[];
   temperamento?: string;
 }
 
@@ -111,6 +112,13 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
   const fraseTemperamento = temperamento ? `muito ${temperamento}` : g.mansinho;
 
   const fraseCastrado = dados.castrado === 'Sim' ? `já está ${g.castrado}` : (dados.castrado === 'Não' ? `ainda não é ${g.castrado}` : '');
+  
+  let fraseVacinado = '';
+  if (dados.vacinas && dados.vacinas.length > 0) {
+    fraseVacinado = `vacinado(a) com ${dados.vacinas.join(' e ')}`;
+  } else if (dados.vacinado === 'Sim') {
+    fraseVacinado = 'já vacinado(a)';
+  }
 
   // Modelo específico se a situação for DESAPARECIDO
   if (dados.situacao === 'Desaparecido' || dados.situacao === 'Sumiu') {
@@ -143,7 +151,7 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
   const modelos = [
     // Modelo 0: Apelo Emocional Direto ("Me tira das ruas?")
     () => {
-      const caracteristicas = [frasePorte, fraseTemperamento, fraseCastrado].filter(Boolean).join(', ');
+      const caracteristicas = [frasePorte, fraseTemperamento, fraseCastrado, fraseVacinado].filter(Boolean).join(', ');
       return [
         `"Me tira das ruas? Fui ${g.resgatado} e só quero uma chance de ser feliz..." 🐾`,
         '',
