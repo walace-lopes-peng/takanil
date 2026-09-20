@@ -161,8 +161,10 @@ Toda e qualquer nova feature ou alteração em tela existente DEVE priorizar ace
 ## 📌 Gestão de Versões e Release Notes
 
 - **RELEASE_NOTES.md:** O agente DEVE sempre registrar e manter o arquivo `RELEASE_NOTES.md` atualizado com o histórico de cada entrega/release para facilitar o acompanhamento do lançamento.
-- **package.json:** O agente DEVE sempre verificar e sincronizar o campo `"version"` no `package.json` para corresponder à versão do build/release atual (ex: `0.10.1`).
+- **Linguagem Focada no Usuário (Não-Técnica):** As notas em `RELEASE_NOTES.md` e no `src/data/novidades.ts` NÃO devem conter jargões de infraestrutura, nomes de variáveis de ambiente ou termos técnicos complexos. Devem explicar diretamente o benefício prático para as voluntárias, trazendo data de release, novidades e histórico do que existia nas versões anteriores.
+- **package.json:** O agente DEVE sempre verificar e sincronizar o campo `"version"` no `package.json` para corresponder à versão do build/release atual (ex: `0.11.0`).
 - **Tag `[Gestão]` para Funcionalidades Restritas:** Sempre que uma funcionalidade exigir autenticação/login ou permissão administrativa (ex: painel de aprovações, lixeira de rejeitados, relatórios restritos), o agente DEVE adicionar a tag `[Gestão]` no título do item no `src/data/novidades.ts` e nas notas de versão, para que as voluntárias sem login compreendam de imediato que se trata de uma ferramenta de uso interno.
+- **Publicação Obrigatória de Release no GitHub:** Sempre que for concluído um lançamento (promoção `dev` ➔ `main`), o agente DEVE criar a Release correspondente no GitHub (`gh release create vX.Y.Z`) com as notas formatadas.
 
 ## Antes de considerar uma tarefa pronta
 

@@ -1,33 +1,37 @@
 # 📜 Notas de Lançamento (Release Notes) — Hub Takanil
 
-Histórico consolidado de novidades, correções e melhorias entregues em cada versão do Hub Takanil.
+Histórico de novidades e melhorias entregues em cada versão do Hub Takanil, focado na experiência prática dos voluntários e usuários do app.
 
 ---
 
-## 🚀 Versão 0.10.1 — Bugs, Acessibilidade & Integração Social (14/09/2026)
+## 🚀 Versão 0.11.0 — Formulário Inteligente & Geração de Legendas (19/09/2026)
 
-### ✨ Novidades
-- **📱 Modo de Visualização (Grade vs Lista):** Alternador de exibição no topo permitindo escolher entre 2 colunas com fotos grandes ou lista compacta detalhada.
-- **🔍 Busca Rápida por Nome:** Barra de pesquisa em tempo real com botão `[ ✕ ]` de limpeza instantânea.
-- **🏷️ Filtros Expandidos por Sexo e Status Clínico:** Modal acessível com opções para *Machos*, *Fêmeas*, *Misto (Ninhada)*, *Apenas Castrados* e *Apenas Vacinados*.
-- **🔎 Zoom de Fotos em Tela Cheia:** Toque em qualquer foto para visualização ampliada com suporte a fechar por clique fora ou tecla `ESC`.
-- **📸 Integração Instagram & Botão Flutuante (FAB):** 
-  - Campo no cadastro com botão inteligente **`[ 📋 Colar Link ]`** que lê da área de transferência com 1 toque.
-  - Mini botão de post com logo do Instagram nos cards de animais cadastrados.
-  - FAB flutuante oficial da ONG (`@takanilp4`) com efeito suave de expansão no scroll.
-- **🗑️ Lixeira de Animais Rejeitados com Limpeza no Storage:** Painel de moderação com opção de restaurar, excluir individualmente ou esvaziar a lixeira com exclusão física de imagens no Supabase Storage.
-- **✨ Central de Novidades da Versão:** Modal ilustrado com mini-tutoriais e link de acesso permanente no rodapé.
+### ✨ Novidades da Versão
 
-### 🐛 Correções & Estabilidade
-- **Finais Felizes:** Corrigido problema de foco/hover preso no celular e restaurado o filtro de animais adotados.
-- **Interatividade no Modal de Filtros:** Handlers resilientes para resposta instantânea a toques em qualquer categoria.
-- **Acessibilidade Universal (WCAG):** Áreas de clique confortáveis (44px a 48px), contrastes aprimorados e eliminação de `alert()` nativos em favor de Toasts amigáveis.
+- **📝 Gerador Inteligente de Legendas:** Criação automática de textos persuasivos e afetuosos para postagens em redes sociais (Instagram/WhatsApp), com botão `[ 🎲 Sortear Outro Texto ]` para alternar modelos com 1 toque.
+- **⚡ Cadastro Rápido & Descomplicado:** Formulário enxuto para preenchimento em menos de 15 segundos. Detalhes secundários (porte, raça, idade, cuidados) foram organizados dentro de uma sanfona expansível.
+- **🎯 Escolha de Situação em 1 Toque:** Seleção visual direta entre _Para Adoção_, _Sumiu_, _Machucado_ e _Achado na Rua_.
+- **📍 Campo de Bairro para Resgates:** Aparece automaticamente ao indicar animais desaparecidos ou encontrados na rua, facilitando a localização.
+- **🐾 Suporte Amigável para Ninhadas:** Opção simples para registrar grupos de animais sem poluir a tela.
 
 ---
 
 ## 📦 Versões Anteriores
 
-### v0.9.2 — Fundação de Finanças & Gestão de Animais
-- Lançamento inicial do controle financeiro (entradas e saídas com filtros por data).
-- Cadastro de animais com compressão automática de fotos no navegador.
-- Painel de moderação de sugestões públicas e controle de permissões por perfil (`adm`, `voluntaria`, `dev`).
+### 🚀 Versão 0.10.1 — Bugs, Acessibilidade & Integração Social (14/09/2026)
+
+- **📱 Modo de Visualização (Grade vs Lista):** Alternador no topo entre 2 fotos grandes ou lista compacta.
+- **🔍 Busca Rápida por Nome:** Pesquisa em tempo real com botão de limpeza instantânea `[ ✕ ]`.
+- **🏷️ Filtros Expandidos:** Modal acessível para filtrar por Machos, Fêmeas, Castrados ou Vacinados.
+- **🔎 Zoom de Fotos em Tela Cheia:** Toque na foto para ampliar com qualidade em tela cheia.
+- **📸 Integração Instagram & Botão Flutuante (FAB):** Botão inteligente para colar link e botão flutuante oficial `@takanilp4`.
+- **🗑️ `[Gestão]` Lixeira de Animais Rejeitados:** Painel para restaurar animais ou esvaziar lixeira com limpeza de fotos.
+- **✨ Central de Novidades:** Janela ilustrada de boas-vindas com novidades da versão e acesso no rodapé.
+
+---
+
+### 🚀 Versão 0.9.2 — Fundação de Finanças & Gestão de Animais
+
+- Lançamento do controle financeiro com entradas, saídas e filtros por data.
+- Cadastro de animais com compressão automática de fotos no celular.
+- Painel de moderação para aprovar sugestões públicas da comunidade.
