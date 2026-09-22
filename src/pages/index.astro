@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ModalNovidades from '../components/ModalNovidades.astro';
-import { VERSAO_ATUAL } from "../data/novidades.ts";
+import ModalFichaAnimal from '../components/ModalFichaAnimal.astro';
+import { VERSAO_ATUAL } from '../data/novidades';
 ---
 
 <Layout title="Hub Takanil - Dashboard">
@@ -315,6 +316,8 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       </div>
     </div>
   </div>
+  <!-- Modal de Ficha Detalhada do Animal (Componente Modularizado) -->
+  <ModalFichaAnimal />
 
   <!-- Modal / Bottom Sheet de Opções de Compartilhamento -->
   <div id="modalCompartilharBackdrop" class="fixed inset-0 z-50 bg-black/60 hidden transition-opacity duration-200 opacity-0" onclick="fecharModalCompartilhar()"></div>
@@ -384,7 +387,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     <!-- FAB Instagram Oficial -->
     <a href="https://www.instagram.com/takanilp4" id="fabInstagram" target="_blank" rel="noopener noreferrer" aria-label="Acompanhe o Instagram oficial da ONG Takanil" class="backdrop-blur-md text-white border border-pink-300/40 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 px-3 opacity-60 hover:opacity-100 min-h-[44px]" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);" title="Instagram Oficial @takanilp4">
       <img src="/assets/insta-logo.png" alt="Instagram" class="w-5 h-5 object-contain" />
-      <span id="fabInstagramText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[0px] opacity-0">INSTA</span>
+      <span id="fabInstagramText" class="font-bold text-xs uppercase tracking-wider drop-shadow-sm overflow-hidden transition-all duration-300 max-w-[0px] opacity-0">INSTAGRAM</span>
     </a>
     
     <!-- FAB Sugerir/Novo Animal -->
@@ -521,21 +524,17 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     }, 200);
   };
 
+
+
   // Fechar modals ao pressionar a tecla ESC
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      (window as any).fecharModalFicha();
       (window as any).fecharModalZoom();
       (window as any).fecharModalCompartilhar?.();
       (window as any).fecharModalFiltros();
       (window as any).fecharDropdownStatus();
       (window as any).fecharModalNovidades?.();
-    }
-  });
-
-  // Fechar Modal Zoom ao clicar no backdrop
-  document.getElementById('modalZoomFoto')?.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('modalZoomFoto')) {
-      (window as any).fecharModalZoom();
     }
   });
 
@@ -780,7 +779,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       if (filtroClinico === 'castrado') {
         filtrados = filtrados.filter(a => a.castrado === 'Sim' || a.castrado === true);
       } else if (filtroClinico === 'vacinado') {
-        filtrados = filtrados.filter(a => a.vacinado === 'Sim' || a.vacinado === true);
+        filtrados = filtrados.filter(a => a.vacinado && (a.vacinado.startsWith('Sim') || a.vacinado === true));
       }
     }
 
@@ -819,13 +818,13 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
         isResolvido = true;
       }
 
-      // Badges Secundárias (Tags)
+      // Badges Secundárias (Tags no Card Principal)
       let tags = '';
       if (animal.sexo === 'Macho') tags += `<span class="bg-taka-green-50 text-taka-green-700 border border-taka-green-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">♂ Macho</span> `;
       if (animal.sexo === 'Fêmea') tags += `<span class="bg-pink-50 text-pink-700 border border-pink-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">♀ Fêmea</span> `;
       if (animal.sexo === 'Misto (Ninhada)') tags += `<span class="bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">♂♀ Misto</span> `;
       if (animal.quantidade > 1) tags += `<span class="bg-gray-100 text-gray-700 border border-gray-200 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">📦 ${animal.quantidade} animais</span> `;
-      if (animal.vacinado === 'Sim') tags += `<span class="bg-taka-green-50 text-taka-green-700 border border-taka-green-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">💉 Vacinado</span> `;
+      if (animal.vacinado && (animal.vacinado.startsWith('Sim') || animal.vacinado === true)) tags += `<span class="bg-taka-green-50 text-taka-green-700 border border-taka-green-200/60 text-[10px] sm:text-xs font-semibold px-1.5 py-0.5 rounded">💉 Vacinado</span> `;
       if (animal.castrado === 'Sim') tags += `<span class="bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">✂️ Castrado</span> `;
 
       const imgUrl = animal.imagem_url || '/assets/takanil-icon-png.png';
@@ -852,14 +851,20 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       if (modoVisualizacao === 'grid') {
         // Modo Grade (2 Colunas Mobile / 3-4 Desktop)
         htmlOutput += `
-          <div id="card-animal-${animal.id}" class="bg-white rounded-2xl shadow-xs border border-gray-200/90 overflow-hidden flex flex-col group hover:shadow-md transition-all ${isResolvido ? 'bg-green-50/20 border-green-200/70' : ''}">
+          <div 
+            id="card-animal-${animal.id}" 
+            class="bg-white rounded-2xl shadow-xs border border-gray-200/90 overflow-hidden flex flex-col justify-between group relative hover:shadow-md hover:border-taka-green-400 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-75' : ''}"
+            onclick="abrirFichaAnimal('${animal.id}')"
+            title="Clique no card para abrir a ficha de ${tituloExibicao}"
+          >
             <!-- Foto Aspect Ratio 1:1 com Toque para Zoom -->
             <div class="relative aspect-square w-full bg-gray-100 overflow-hidden">
               <img 
                 src="${imgUrl}" 
-                class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer" 
                 alt="${tituloExibicao}"
-                onclick="abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
+                onclick="event.stopPropagation(); abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
+                title="Clique para ampliar a foto"
               >
               <!-- Topo da foto: Badges (esquerda) e Botão Compartilhar (direita) -->
               <div class="absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-none">
@@ -928,52 +933,60 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
               </div>
 
               <!-- Rodapé fixo: sempre a mesma altura em TODOS os cards -->
-              <div class="mt-2.5 pt-2 border-t border-gray-100 flex items-center min-h-[44px]" onclick="event.stopPropagation()">
+              <div class="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between min-h-[44px]" onclick="event.stopPropagation()">
                 ${isAdminGlob ? `
-                  <!-- Admin: [menu status] [editar ficha] [excluir] -->
+                  <!-- Admin: [ficha] [menu status] [editar ficha] [excluir] -->
                   <div class="flex items-center justify-between w-full">
-                    <button 
-                      onclick="event.stopPropagation(); abrirDropdownStatus('${animal.id}', '${animal.situacao_urgencia}', '${animal.status || ''}', '${nomeSanitizado}', event)" 
-                      aria-label="Menu de status de ${animal.nome}"
-                      title="Alterar status" 
-                      class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex items-center justify-center"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-                    <a 
-                      href="/animais/editar?id=${animal.id}"
-                      aria-label="Editar cadastro completo de ${animal.nome}"
-                      title="Editar dados" 
-                      class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </a>
-                    <button 
-                      onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
-                      aria-label="Excluir cadastro de ${animal.nome}"
-                      title="Excluir cadastro" 
-                      class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    <span class="text-[11px] font-bold text-taka-green-700 cursor-pointer hover:underline" onclick="event.stopPropagation(); abrirFichaAnimal('${animal.id}')">
+                      📄 Ficha →
+                    </span>
+                    <div class="flex items-center gap-1">
+                      <button 
+                        onclick="event.stopPropagation(); abrirDropdownStatus('${animal.id}', '${animal.situacao_urgencia}', '${animal.status || ''}', '${nomeSanitizado}', event)" 
+                        aria-label="Menu de status de ${animal.nome}"
+                        title="Alterar status" 
+                        class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex items-center justify-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                        </svg>
+                      </button>
+                      <a 
+                        href="/animais/editar?id=${animal.id}"
+                        aria-label="Editar cadastro completo de ${animal.nome}"
+                        title="Editar dados" 
+                        class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-xl transition-colors flex items-center justify-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </a>
+                      <button 
+                        onclick="event.stopPropagation(); deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
+                        aria-label="Excluir cadastro de ${animal.nome}"
+                        title="Excluir cadastro" 
+                        class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 ` : `
-                  <!-- Visitante: botão WhatsApp direto para falar com a Takanil -->
-                  <div class="flex items-center justify-end w-full">
+                  <!-- Visitante: 'Ver ficha' + botão WhatsApp direto -->
+                  <div class="flex items-center justify-between w-full">
+                    <span class="text-[11px] font-bold text-taka-green-700 flex items-center gap-1 group-hover:text-taka-green-800 transition-colors">
+                      📄 Ver ficha →
+                    </span>
                     <button 
                       type="button"
                       onclick="event.stopPropagation(); falarComTakanil('${animal.id}')" 
-                      class="p-1 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[40px] min-h-[40px]"
+                      class="p-1 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[36px] min-h-[36px]"
                       title="Falar no WhatsApp oficial com a Takanil"
                       aria-label="Falar sobre ${animal.nome || 'Animal'} no WhatsApp da Takanil"
                     >
-                      <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-9 h-9 object-contain drop-shadow-xs" />
+                      <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-8 h-8 object-contain drop-shadow-xs" />
                     </button>
                   </div>
                 `}
@@ -984,16 +997,33 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       } else {
         // Modo Lista Compacta
         htmlOutput += `
-          <div id="card-animal-${animal.id}" class="bg-white rounded-2xl shadow-xs border border-gray-200/90 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all ${isResolvido ? 'bg-green-50/20 border-green-200/70' : ''}">
+          <div 
+            id="card-animal-${animal.id}" 
+            class="bg-white rounded-2xl shadow-xs border border-gray-200/90 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md hover:border-taka-green-400 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${isResolvido ? 'bg-gray-50 border-gray-200 opacity-75' : ''}"
+            onclick="abrirFichaAnimal('${animal.id}')"
+            title="Clique para abrir a ficha de ${tituloExibicao}"
+          >
             <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
               <!-- Miniatura com Toque para Zoom -->
-              <div class="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100">
+              <div class="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100 group">
                 <img 
                   src="${imgUrl}" 
-                  class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-200" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 cursor-pointer" 
                   alt="${tituloExibicao}"
-                  onclick="abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
+                  onclick="event.stopPropagation(); abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
+                  title="Clique para ampliar a foto"
                 >
+                <button 
+                  type="button"
+                  onclick="event.stopPropagation(); abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
+                  aria-label="Ampliar foto de ${tituloExibicao}"
+                  class="absolute bottom-1 right-1 bg-black/60 hover:bg-black/85 text-white rounded-full p-1 backdrop-blur-xs transition-colors shadow-xs flex items-center justify-center min-w-[24px] min-h-[24px]"
+                  title="Ampliar foto"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                  </svg>
+                </button>
               </div>
 
               <div class="min-w-0 flex-1">
@@ -1030,13 +1060,20 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
               </div>
             </div>
 
+            <!-- Indicador de Ficha no Modo Lista -->
+            <div class="flex items-center gap-2 shrink-0 pt-2 sm:pt-0">
+              <span class="inline-flex items-center gap-1 text-xs font-bold text-taka-green-700 bg-taka-green-50 border border-taka-green-200 px-3 py-1.5 rounded-xl group-hover:bg-taka-green-100 transition-colors">
+                📄 Ver ficha →
+              </span>
+            </div>
+
             <!-- Ações Alinhadas à Direita -->
             <div class="flex items-center justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100" onclick="event.stopPropagation()">
               <!-- Botão Compartilhar sempre visível (Admin e Visitante) -->
               <button 
                 type="button"
                 onclick="event.stopPropagation(); compartilharAnimal('${animal.id}', this)"
-                aria-label="Compartilhar ${animal.nome || 'Animal'}"
+                aria-label="Compartilhar ${tituloExibicao}"
                 title="Compartilhar animal"
                 class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors flex items-center justify-center active:scale-95"
               >
@@ -1068,7 +1105,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                     </svg>
                   </a>
                   <button 
-                    onclick="deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
+                    onclick="event.stopPropagation(); deletarAnimal('${animal.id}', '${animal.imagem_url || ''}', '${nomeSanitizado}')" 
                     aria-label="Excluir cadastro de ${animal.nome}"
                     title="Excluir cadastro" 
                     class="min-w-[34px] min-h-[34px] p-1 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors flex items-center justify-center"
@@ -1607,6 +1644,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     }
 
     animaisGlobais = animais;
+    (window as any).animaisGlobais = animais;
     
     let totalRacao = 0;
     const statusFinais = ['Adotado', 'Tutor Encontrado'];

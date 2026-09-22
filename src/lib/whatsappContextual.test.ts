@@ -176,5 +176,69 @@ describe('whatsappContextual', () => {
     const msg = obterMensagemWhatsAppContextual(animal, 'https://hub-takanil.vercel.app/?animal=123');
     expect(msg).toContain('Ver no app: https://hub-takanil.vercel.app/?animal=123');
   });
+
+  it('deve retornar rótulo humanizado no modo completo para ninhadas e animais individuais', () => {
+    const ninhadaGatos = {
+      especie: 'Gato',
+      sexo: 'Misto (Ninhada)',
+      situacao_urgencia: 'Nenhuma',
+    };
+    expect(obterLabelWhatsAppContextual(ninhadaGatos, 'completo')).toEqual({
+      texto: 'Quero Adotar os Gatinhos!',
+      icone: '💚'
+    });
+
+    const ninhadaCaes = {
+      especie: 'Cão',
+      sexo: 'Misto (Ninhada)',
+      situacao_urgencia: 'Nenhuma',
+    };
+    expect(obterLabelWhatsAppContextual(ninhadaCaes, 'completo')).toEqual({
+      texto: 'Quero Adotar os Cãezinhos!',
+      icone: '💚'
+    });
+
+    const caoMacho = {
+      nome: 'Rex',
+      especie: 'Cão',
+      sexo: 'Macho',
+      situacao_urgencia: 'Nenhuma',
+    };
+    expect(obterLabelWhatsAppContextual(caoMacho, 'completo')).toEqual({
+      texto: 'Quero Adotar o Rex!',
+      icone: '💚'
+    });
+
+    const gataFemea = {
+      nome: 'Mel',
+      especie: 'Gato',
+      sexo: 'Fêmea',
+      situacao_urgencia: 'Nenhuma',
+    };
+    expect(obterLabelWhatsAppContextual(gataFemea, 'completo')).toEqual({
+      texto: 'Quero Adotar a Mel!',
+      icone: '💚'
+    });
+
+    const semNome = {
+      especie: 'Cão',
+      sexo: 'Macho',
+      situacao_urgencia: 'Nenhuma',
+    };
+    expect(obterLabelWhatsAppContextual(semNome, 'completo')).toEqual({
+      texto: 'Quero Adotar!',
+      icone: '💚'
+    });
+
+    const urgente = {
+      nome: 'Rex',
+      especie: 'Cão',
+      situacao_urgencia: 'Machucado/Risco',
+    };
+    expect(obterLabelWhatsAppContextual(urgente, 'completo')).toEqual({
+      texto: 'Ajudar no Tratamento',
+      icone: '🩺'
+    });
+  });
 });
 

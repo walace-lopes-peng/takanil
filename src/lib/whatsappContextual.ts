@@ -157,26 +157,67 @@ export function gerarMensagemCompartilhamentoPublico(animal: AnimalWhatsAppInfo,
   return linhas.join('\n\n');
 }
 
+export const TAKANIL_WHATSAPP_NUMERO = '5535998687395';
+
 /**
- * Retorna o rótulo curto e ícone mais adequado para o botão de WhatsApp.
+ * Retorna o rótulo e ícone contextual mais adequado para o botão de WhatsApp.
+ * - modo 'curto': rótulo compacto para cards/listas (ex: "Ajudar Tratamento", "Quero Adotar")
+ * - modo 'completo': rótulo humanizado com suporte a ninhadas e nomes para fichas e detalhes (ex: "Quero Adotar os Gatinhos!", "Quero Adotar o Rex!")
  */
-export function obterLabelWhatsAppContextual(animal: AnimalWhatsAppInfo): { texto: string; icone: string } {
+export function obterLabelWhatsAppContextual(
+  animal: AnimalWhatsAppInfo,
+  modo: 'curto' | 'completo' = 'curto'
+): { texto: string; icone: string } {
   if (animal.situacao_urgencia === 'Machucado/Risco') {
-    return { texto: 'Ajudar Tratamento', icone: '🩺' };
+    return { 
+      texto: modo === 'completo' ? 'Ajudar no Tratamento' : 'Ajudar Tratamento', 
+      icone: '🩺' 
+    };
   }
   if (animal.situacao_urgencia === 'Desaparecido' || (animal.localizacao && animal.localizacao.includes('Desaparecido'))) {
     return { texto: 'Tenho Informações', icone: '🔍' };
   }
   if (animal.situacao_urgencia === 'Achado na Rua') {
-    return { texto: 'Informações', icone: '🧭' };
+    return { texto: modo === 'completo' ? 'Tenho Informações' : 'Informações', icone: '🧭' };
   }
+  if (animal.status === 'Adotado' || animal.situacao_urgencia === 'Adotado') {
+    return { texto: 'Já Adotado!', icone: '🏠' };
+  }
+
+  if (modo === 'completo') {
+    const especie = animal.especie?.toLowerCase() || '';
+    const sexo = animal.sexo?.toLowerCase() || '';
+    const isPlural = (sexo.includes('misto') || sexo.includes('ninhada')) || (especie.includes('múltiplos') || especie.includes('multiplos'));
+
+    if (isPlural) {
+      if (especie.includes('gato') || especie.includes('felin')) {
+        return { texto: 'Quero Adotar os Gatinhos!', icone: '💚' };
+      }
+      if (especie.includes('cão') || especie.includes('cao') || especie.includes('cachorr')) {
+        return { texto: 'Quero Adotar os Cãezinhos!', icone: '💚' };
+      }
+      return { texto: 'Quero Adotar os Filhotinhos!', icone: '💚' };
+    }
+
+    const nomeTrim = animal.nome?.trim();
+    const nomesInvalidos = ['desconhecido', 'sem nome', 'animal', 'não identificado', 'nao identificado'];
+    const temNome = nomeTrim && !nomesInvalidos.includes(nomeTrim.toLowerCase());
+
+    if (temNome) {
+      const artigo = (sexo === 'fêmea' || sexo === 'femea') ? 'a' : 'o';
+      return { texto: `Quero Adotar ${artigo} ${nomeTrim}!`, icone: '💚' };
+    }
+
+    return { texto: 'Quero Adotar!', icone: '💚' };
+  }
+
   return { texto: 'Quero Adotar', icone: '💬' };
 }
 
 /**
  * Gera o link direto wa.me com a mensagem codificada em URL para a Takanil.
  */
-export function obterLinkWhatsAppContextual(animal: AnimalWhatsAppInfo, telefone: string = '5535998687395', linkApp?: string): string {
+export function obterLinkWhatsAppContextual(animal: AnimalWhatsAppInfo, telefone: string = TAKANIL_WHATSAPP_NUMERO, linkApp?: string): string {
   const mensagem = obterMensagemWhatsAppContextual(animal, linkApp);
   return `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
 }

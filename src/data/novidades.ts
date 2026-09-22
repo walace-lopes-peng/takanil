@@ -1,10 +1,12 @@
+import packageJson from '../../package.json';
+
 export interface ItemNovidade {
   icone: string;
   titulo: string;
   descricao: string;
 }
 
-export const VERSAO_ATUAL = '0.11.0';
+export const VERSAO_ATUAL = packageJson.version;
 
 export const NOVIDADES_VERSAO: ItemNovidade[] = [
   {
