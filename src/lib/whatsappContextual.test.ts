@@ -144,6 +144,28 @@ describe('whatsappContextual', () => {
     expect(msg).toContain('https://hub-takanil.vercel.app/?animal=gatinhos-456');
   });
 
+  it('não deve colocar nomes em ninhadas, usando termos como gatinhos ou cãezinhos', () => {
+    const ninhadaComNome = {
+      nome: 'Ninhada da Praça',
+      especie: 'Gato',
+      sexo: 'Misto (Ninhada)',
+      situacao_urgencia: 'Nenhuma',
+    };
+    const msgGato = obterMensagemWhatsAppContextual(ninhadaComNome);
+    expect(msgGato).toContain('Olá, Takanil! Vi esses gatinhos no app e gostaria de saber sobre a adoção.');
+    expect(msgGato).not.toContain('Ninhada da Praça');
+
+    const ninhadaCao = {
+      nome: 'Filhotes do Posto',
+      especie: 'Cão',
+      sexo: 'Misto (Ninhada)',
+      situacao_urgencia: 'Machucado/Risco',
+    };
+    const msgCao = gerarMensagemCompartilhamentoPublico(ninhadaCao);
+    expect(msgCao).toContain('🚨 AJUDA URGENTE: esses cãezinhos precisam de cuidados veterinários na ONG Takanil!');
+    expect(msgCao).not.toContain('Filhotes do Posto');
+  });
+
   it('deve incluir link do app na mensagem direta da Takanil quando fornecido', () => {
     const animal = {
       nome: 'Rex',

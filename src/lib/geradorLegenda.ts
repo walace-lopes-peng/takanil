@@ -53,6 +53,7 @@ export interface ConcordanciaGramatical {
 
 export function obterConcordancia(sexo?: string, especie?: string): ConcordanciaGramatical {
   const isGato = especie === 'Gato';
+  const isCao = especie === 'Cão' || especie === 'Cachorro';
   const isMisto = sexo === 'Misto (Ninhada)' || especie === 'Ambos/Múltiplos';
   const isFemea = sexo === 'Fêmea';
 
@@ -63,8 +64,8 @@ export function obterConcordancia(sexo?: string, especie?: string): Concordancia
       artigoDefinido: 'os',
       pronomeReto: 'Eles',
       pronomeDemonstrativo: 'Esses',
-      substantivo: isGato ? 'gatinhos' : 'filhotinhos',
-      substantivoFormal: isGato ? 'gatos' : 'filhotes',
+      substantivo: isGato ? 'gatinhos' : (isCao ? 'cãezinhos' : 'filhotinhos'),
+      substantivoFormal: isGato ? 'gatos' : (isCao ? 'cães' : 'filhotes'),
       lindo: 'lindos',
       mansinho: 'mansinhos',
       castrado: 'castrados',
@@ -93,7 +94,7 @@ export function obterConcordancia(sexo?: string, especie?: string): Concordancia
       termoQueroLar: 'Nós queremos um lar e alguém para amar! ✨',
       termoEnchelo: 'enchê-los',
       termoPraEle: 'pra eles',
-      termoSerFeliz: 'ser felizes',
+      termoSerFeliz: 'serem felizes',
     };
   }
 
@@ -187,7 +188,8 @@ export function obterConcordancia(sexo?: string, especie?: string): Concordancia
 export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: number = 0): string {
   const g = obterConcordancia(dados.sexo, dados.especie);
 
-  const temNome = dados.nome && dados.nome.trim() !== '' && dados.nome.trim().toLowerCase() !== 'desconhecido';
+  // Ninhadas/múltiplos nunca usam nome individual, mesmo se preenchido
+  const temNome = !g.isPlural && dados.nome && dados.nome.trim() !== '' && dados.nome.trim().toLowerCase() !== 'desconhecido';
   const nomeOuRef = temNome ? dados.nome!.trim() : `${g.pronomeDemonstrativo} ${g.substantivo}`;
   const bairro = dados.bairro && dados.bairro.trim() !== '' ? dados.bairro.trim() : '';
   const fraseBairro = bairro ? `lá no bairro ${bairro}` : '';
@@ -257,10 +259,13 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
     // Modelo 0: Apelo Emocional Direto ("Me tira das ruas?")
     () => {
       const caracteristicas = [frasePorte, fraseTemperamento, fraseCastrado, fraseVacinado].filter(Boolean).join(', ');
+      const refApresentacao = g.isPlural
+        ? `${nomeOuRef} ${g.lindo}`
+        : `${nomeOuRef} ${g.verboSer} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}`;
       return [
         `"${g.termoMeTira} ${g.verboFui} ${g.resgatado} e ${g.verboQuer} uma chance de ${g.termoSerFeliz}..." 🐾`,
         '',
-        `${nomeOuRef} ${g.verboSer} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}${bairro ? ` que ${g.verboEstava} ${fraseBairro}` : ''}.`,
+        `${refApresentacao}${bairro ? ` que ${g.verboEstava} ${fraseBairro}` : ''}.`,
         caracteristicas ? `🐾 ${g.pronomeReto} ${g.verboSer} ${caracteristicas}.` : '',
         '',
         `Um cantinho seguro e com carinho já muda tudo ${g.termoPraEle}! Você pode ser a virada nessa história?`,
@@ -270,10 +275,13 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
 
     // Modelo 1: Pós-Clínica / Castração ("Não merece voltar pras ruas")
     () => {
+      const refApresentacao = g.isPlural
+        ? `${nomeOuRef} ${g.lindo}`
+        : `${nomeOuRef} ${g.verboSer} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}`;
       return [
         `${g.anjinho} de quatro patas passou por cuidados, ${g.verboFoi} ${g.castrado} e não ${g.verboMerece} voltar para as ruas! 🐾`,
         '',
-        `${nomeOuRef} ${g.verboSer} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}${bairro ? ` ${g.resgatado} ${fraseBairroResgate}` : ''}. ${g.pronomeReto} ${g.verboSer} ${fraseTemperamento}${frasePorte ? ` e de ${frasePorte}` : ''}.`,
+        `${refApresentacao}${bairro ? ` ${g.resgatado} ${fraseBairroResgate}` : ''}. ${g.pronomeReto} ${g.verboSer} ${fraseTemperamento}${frasePorte ? ` e de ${frasePorte}` : ''}.`,
         '',
         `Pedimos que ajudem compartilhando a foto na busca de um lar responsável e cheio de amor. Podemos transformar essa vida juntos!`,
         `Ajude compartilhando essa publicação! ✨🐶🐱`

@@ -26,12 +26,14 @@ export function formatarReferenciaAnimal(animal: AnimalWhatsAppInfo): string {
   const isPlural = (sexo.includes('misto') || sexo.includes('ninhada')) || (especie.includes('múltiplos') || especie.includes('multiplos'));
 
   if (isPlural) {
-    if (temNome) {
-      return `os *${nomeTrim}*`;
+    let termoBase = 'esses filhotinhos';
+    if (especie.includes('gato') || especie.includes('felin')) {
+      termoBase = 'esses gatinhos';
+    } else if (especie.includes('cão') || especie.includes('cao') || especie.includes('cachorr')) {
+      termoBase = 'esses cãezinhos';
     }
-    const termoBase = (especie.includes('gato') || especie.includes('felin')) ? 'esses gatinhos' : 'esses filhotinhos';
     let fase = animal.fase_vida?.trim().toLowerCase();
-    let termoCompleto = fase === 'filhote' ? `${termoBase} filhotes` : termoBase;
+    let termoCompleto = (fase === 'filhote' && !termoBase.includes('filhot')) ? `${termoBase} filhotes` : termoBase;
 
     if (animal.localizacao && animal.localizacao.trim() !== '') {
       const loc = animal.localizacao.trim();

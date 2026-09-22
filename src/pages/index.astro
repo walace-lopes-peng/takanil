@@ -829,8 +829,23 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       if (animal.castrado === 'Sim') tags += `<span class="bg-purple-50 text-purple-700 border border-purple-200/60 text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded">✂️ Castrado</span> `;
 
       const imgUrl = animal.imagem_url || '/assets/takanil-icon-png.png';
+      const esp = animal.especie?.toLowerCase() || '';
+      const sex = animal.sexo?.toLowerCase() || '';
+      const isPlural = (sex.includes('misto') || sex.includes('ninhada')) || (esp.includes('múltiplos') || esp.includes('multiplos')) || (animal.quantidade > 1);
+
+      let tituloExibicao = animal.nome || 'Sem nome';
+      if (isPlural) {
+        if (esp.includes('gato') || esp.includes('felin')) {
+          tituloExibicao = 'Gatinhos';
+        } else if (esp.includes('cão') || esp.includes('cao') || esp.includes('cachorr')) {
+          tituloExibicao = 'Cãezinhos';
+        } else {
+          tituloExibicao = 'Filhotinhos';
+        }
+      }
+
       const subtituloZoom = `${animal.especie || 'Animal'} • ${animal.sexo || ''} • ${animal.peso ? animal.peso + 'kg' : ''} • ${animal.localizacao || ''}`;
-      const nomeSanitizado = (animal.nome || 'Animal').replace(/'/g, "\\'");
+      const nomeSanitizado = tituloExibicao.replace(/'/g, "\\'");
       const subtituloSanitizado = subtituloZoom.replace(/'/g, "\\'");
 
 
@@ -843,7 +858,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
               <img 
                 src="${imgUrl}" 
                 class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" 
-                alt="${animal.nome || 'Animal sem nome'}"
+                alt="${tituloExibicao}"
                 onclick="abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
               >
               <!-- Topo da foto: Badges (esquerda) e Botão Compartilhar (direita) -->
@@ -854,7 +869,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                 <button 
                   type="button"
                   onclick="event.stopPropagation(); compartilharAnimal('${animal.id}', this)"
-                  aria-label="Compartilhar ${animal.nome || 'Animal'}"
+                  aria-label="Compartilhar ${tituloExibicao}"
                   class="pointer-events-auto bg-black/60 hover:bg-black/85 active:scale-95 text-white rounded-full p-2 backdrop-blur-xs transition-all shadow-xs min-w-[36px] min-h-[36px] flex items-center justify-center"
                   title="Compartilhar animal"
                 >
@@ -869,7 +884,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                 <button 
                   type="button"
                   onclick="event.stopPropagation(); abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
-                  aria-label="Ampliar foto de ${animal.nome}"
+                  aria-label="Ampliar foto de ${tituloExibicao}"
                   class="pointer-events-auto bg-black/60 hover:bg-black/85 active:scale-95 text-white rounded-full p-2 backdrop-blur-xs transition-all shadow-xs min-w-[36px] min-h-[36px] flex items-center justify-center"
                   title="Ampliar foto"
                 >
@@ -884,7 +899,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
             <div class="px-3 pt-3 sm:px-3.5 sm:pt-3.5 flex flex-col flex-1">
               <!-- Bloco de info: ocupa todo o espaço disponível -->
               <div class="flex-1">
-                <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate">${animal.nome || 'Sem nome'}</h4>
+                <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate">${tituloExibicao}</h4>
                 <p class="text-xs sm:text-sm text-gray-600 truncate mt-0.5 font-medium">${animal.fase_vida || ''} • ${animal.peso || 0}kg</p>
                 
                 <!-- min-h-[24px] garante espaço mesmo sem tags -->
@@ -976,7 +991,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                 <img 
                   src="${imgUrl}" 
                   class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-200" 
-                  alt="${animal.nome}"
+                  alt="${tituloExibicao}"
                   onclick="abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
                 >
               </div>
@@ -984,7 +999,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
               <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-center gap-1.5 mb-1">
                   ${badgeUrgencia}
-                  <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate">${animal.nome}</h4>
+                  <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate">${tituloExibicao}</h4>
                   <span class="text-xs sm:text-sm text-gray-600 font-medium whitespace-nowrap">• ${animal.fase_vida || ''} (${animal.peso || 0}kg)</span>
                 </div>
 
@@ -1167,9 +1182,18 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     if (!animal) return;
     animalParaCompartilhar = animal;
 
+    const especie = animal.especie?.toLowerCase() || '';
+    const sexo = animal.sexo?.toLowerCase() || '';
+    const isPlural = (sexo.includes('misto') || sexo.includes('ninhada')) || (especie.includes('múltiplos') || especie.includes('multiplos')) || (animal.quantidade > 1);
+
     const tituloEl = document.getElementById('modalCompartilharTitulo');
     if (tituloEl) {
-      tituloEl.textContent = `Compartilhar ${animal.nome || 'Animal'}`;
+      if (isPlural) {
+        const tipo = (especie.includes('gato') || especie.includes('felin')) ? 'Gatinhos' : ((especie.includes('cão') || especie.includes('cao') || especie.includes('cachorr')) ? 'Cãezinhos' : 'Filhotinhos');
+        tituloEl.textContent = `Compartilhar ${tipo}`;
+      } else {
+        tituloEl.textContent = `Compartilhar ${animal.nome || 'Animal'}`;
+      }
     }
 
     const modal = document.getElementById('modalCompartilhar');

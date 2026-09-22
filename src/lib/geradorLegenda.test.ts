@@ -109,5 +109,18 @@ describe('geradorLegenda - Geração de Textos', () => {
     expect(legenda).toContain('Esses anjinhos de quatro patas');
     expect(legenda).toContain('foram castrados e não merecem voltar para as ruas');
   });
+
+  it('não deve colocar nomes em ninhadas mesmo se preenchido, gerando cãezinhos para cães', () => {
+    const legenda = gerarLegendaAnimal({
+      nome: 'Ninhada do Posto',
+      especie: 'Cão',
+      sexo: 'Misto (Ninhada)',
+      situacao: 'Achado na Rua',
+      bairro: 'Centro'
+    });
+
+    expect(legenda).not.toContain('Ninhada do Posto');
+    expect(legenda).toContain('Esses cãezinhos lindos foram encontrados no bairro Centro');
+  });
 });
 
