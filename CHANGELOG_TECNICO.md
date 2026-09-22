@@ -17,36 +17,15 @@ Toda nova entrega de versão ou build de patch deve registrar:
 
 ---
 
-## [0.12.1] — 22/09/2026 (Patch de Usabilidade nos Cards)
-
-- **Tipo:** Patch (Bugfix de Usabilidade / Interação)
-- **Branch:** `dev`
-- **Arquivos Modificados:**
-  - `src/pages/index.astro`
-- **Problema / Causa Raiz:**
-  - O container do rodapé dos cards possuía `onclick="event.stopPropagation()"`. Isso interceptava qualquer clique na metade inferior do card antes de alcançar o listener `onclick="abrirFichaAnimal('${animal.id}')"` do card principal.
-  - Para visitantes sem login, o texto `📄 Ver ficha →` era um `<span>` sem listener próprio de clique, fazendo com que tocar em cima de "Ver ficha" literalmente não disparasse nenhuma ação.
-  - Na imagem do card, a tag `<img>` capturava o clique diretamente para abrir o modal de Zoom (`abrirModalZoom`), impedindo que o toque na foto abrisse a ficha detalhada.
-- **Solução Técnica Implementada:**
-  - Removido `onclick="event.stopPropagation()"` do container pai do rodapé dos cards, permitindo que cliques em áreas neutras propaguem naturalmente para a ficha.
-  - Substituído o `<span>` estático por `<button type="button" onclick="event.stopPropagation(); abrirFichaAnimal('${animal.id}')">` acessível, com altura mínima confortável (`min-h-[36px]`) e hover visível tanto em modo Admin quanto Visitante (e no Modo Lista).
-  - Tocar na foto do card agora dispara a abertura da ficha do animal; a ação de Zoom em tela cheia permanece no botão dedicado de lupa `[ 🔍 ]` no canto inferior da foto.
-- **Validação & Testes:**
-  - `vitest run`: 28 testes passando (100% de sucesso).
-  - `npm run build`: 0 erros, 0 avisos.
-  - Inspecionada a renderização do HTML localmente via dev server (`http://localhost:4321`).
-
----
-
 ## [0.12.0] — 22/09/2026 (Ficha Detalhada, Status com Desfazer & WhatsApp Contextual)
 
-- **Tipo:** Minor Release (Novas Funcionalidades e Melhorias)
+- **Tipo:** Minor Release (Novas Funcionalidades e Melhorias de Experiência)
 - **PR:** #132 (mergeado via squash) | **Issue Fechada:** #116
 - **Arquivos Modificados / Criados:**
   - `src/components/ModalFichaAnimal.astro` (novo componente de ficha modal completa)
   - `src/lib/whatsappContextual.ts` e `src/lib/whatsappContextual.test.ts` (geração de mensagens contextuais, suporte a ninhadas e Web Share API)
   - `src/components/Toast.astro` (suporte a botões de ação injetáveis com callbacks)
-  - `src/pages/index.astro` (menu de status rápido com botão "Desfazer", catálogo integrado mantendo adotados visíveis com badge `[✅ Adotado]` e filtro de coração)
+  - `src/pages/index.astro` (menu de status rápido com botão "Desfazer", catálogo integrado mantendo adotados visíveis, badges compactas em linha única, botão `Ficha →` em texto limpo e botão WhatsApp integrado)
   - `src/data/novidades.ts` e `RELEASE_NOTES.md` (atualização das notas centradas no usuário)
   - `package.json` (sincronização de versão para `0.12.0`)
 - **Principais Decisões Técnicas:**
@@ -54,8 +33,13 @@ Toda nova entrega de versão ou build de patch deve registrar:
   2. **Menu Rápido com Ação de Desfazer (Optimistic Undo):** Em vez de exibir popups de confirmação (`window.confirm`) a cada alteração de status de um animal (adotado, urgência, óbito), o status é alterado imediatamente e uma notificação de Toast fica disponível por 5 segundos com botão `[Desfazer]`, restaurando o estado anterior em caso de toque acidental no celular.
   3. **Catálogo Integrado de Adotados:** Animais adotados continuam visíveis na tela inicial identificados com o badge verde `[✅ Adotado]`, eliminando a percepção de que o animal "desapareceu do banco de dados", mantendo o filtro de coração para isolar os Finais Felizes.
   4. **WhatsApp Contextual para Ninhadas e Urgências:** Funções puras em `whatsappContextual.ts` com concordância gramatical dinâmica para filhotes individuais vs. ninhadas coletivas e mensagens adaptadas para resgates urgentes.
+  5. **Refinamento de Usabilidade Mobile e Cards:**
+     - Toque na foto do pet agora abre diretamente a Ficha Detalhada (a ampliação em tela cheia permanece na lupa `[ 🔍 ]`).
+     - Badges de urgência (`🔍 Desaparecido`, `🏠 Voltou p/ Tutor`) formatadas com `whitespace-nowrap inline-flex` para evitar quebras desengonçadas em 2 colunas no celular.
+     - Botão do rodapé simplificado como link de texto verde limpo `Ficha →`, sem container pesado.
+     - Botão do WhatsApp destacado em container verde esmeralda compacto (`34px × 34px`) com espaçamento perfeitamente simétrico de 12px (`p-3`) nas bordas inferior e laterais do card.
 - **Validação & Testes:**
   - 11 testes unitários em `whatsappContextual.test.ts`.
   - 11 testes unitários em `geradorLegenda.test.ts`.
   - 6 testes unitários em `filtrosData.test.ts`.
-  - `npm run build`: 0 erros.
+  - `npm run build`: 0 erros, 0 avisos, 7 páginas estáticas geradas com sucesso.

@@ -807,14 +807,14 @@ import { VERSAO_ATUAL } from '../data/novidades';
       let isResolvido = false;
 
       if (animal.situacao_urgencia === 'Machucado/Risco') {
-        badgeUrgencia = `<span class="inline-block bg-red-100 text-red-700 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-xs border border-red-200">🚨 Urgência Médica</span>`;
+        badgeUrgencia = `<span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-lg shadow-2xs border border-red-200 whitespace-nowrap">🚨 Urgência</span>`;
       } else if (animal.situacao_urgencia === 'Desaparecido' || animal.localizacao.includes('Desaparecido')) {
-        badgeUrgencia = `<span class="inline-block bg-yellow-100 text-yellow-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-xs border border-yellow-200">🔍 Desaparecido</span>`;
+        badgeUrgencia = `<span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-900 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-lg shadow-2xs border border-yellow-300/80 whitespace-nowrap">🔍 Desaparecido</span>`;
       } else if (animal.situacao_urgencia === 'Adotado') {
-        badgeUrgencia = `<span class="inline-block bg-green-100 text-green-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-xs border border-green-200">✅ Adotado</span>`;
+        badgeUrgencia = `<span class="inline-flex items-center gap-1 bg-green-100 text-green-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-lg shadow-2xs border border-green-200 whitespace-nowrap">✅ Adotado</span>`;
         isResolvido = true;
       } else if (animal.situacao_urgencia === 'Tutor Encontrado') {
-        badgeUrgencia = `<span class="inline-block bg-taka-green-100 text-taka-green-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-1 shadow-xs border border-taka-green-200">🏠 Voltou pro Tutor</span>`;
+        badgeUrgencia = `<span class="inline-flex items-center gap-1 bg-taka-green-100 text-taka-green-800 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-lg shadow-2xs border border-taka-green-200 whitespace-nowrap">🏠 Voltou p/ Tutor</span>`;
         isResolvido = true;
       }
 
@@ -866,8 +866,8 @@ import { VERSAO_ATUAL } from '../data/novidades';
                 title="Toque para ver a ficha completa de ${tituloExibicao}"
               >
               <!-- Topo da foto: Badges (esquerda) e Botão Compartilhar (direita) -->
-              <div class="absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-none">
-                <div class="pointer-events-auto">
+              <div class="absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-none gap-1.5">
+                <div class="pointer-events-auto min-w-0 max-w-[calc(100%-42px)]">
                   ${badgeUrgencia}
                 </div>
                 <button 
@@ -900,7 +900,7 @@ import { VERSAO_ATUAL } from '../data/novidades';
             </div>
 
             <!-- Área de conteúdo: flex-1 garante que todos cresçam igualmente -->
-            <div class="px-3 pt-3 sm:px-3.5 sm:pt-3.5 flex flex-col flex-1">
+            <div class="p-3 sm:p-3.5 flex flex-col flex-1">
               <!-- Bloco de info: ocupa todo o espaço disponível -->
               <div class="flex-1">
                 <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate">${tituloExibicao}</h4>
@@ -942,7 +942,7 @@ import { VERSAO_ATUAL } from '../data/novidades';
                       class="inline-flex items-center gap-1 text-[11px] font-bold text-taka-green-700 hover:text-taka-green-800 bg-taka-green-50/80 hover:bg-taka-green-100 border border-taka-green-200/80 px-2.5 py-1.5 rounded-xl transition-all active:scale-95 min-h-[36px]"
                       title="Abrir ficha detalhada de ${animal.nome}"
                     >
-                      <span>📄 Ficha →</span>
+                      <span>Ficha →</span>
                     </button>
                     <div class="flex items-center gap-1" onclick="event.stopPropagation()">
                       <button 
@@ -978,24 +978,25 @@ import { VERSAO_ATUAL } from '../data/novidades';
                     </div>
                   </div>
                 ` : `
-                  <!-- Visitante: 'Ver ficha' + botão WhatsApp direto -->
-                  <div class="flex items-center justify-between w-full">
+                  <!-- Visitante: 'Ficha ->' + botão WhatsApp direto -->
+                  <div class="flex items-center justify-between w-full gap-2">
                     <button 
                       type="button"
                       onclick="event.stopPropagation(); abrirFichaAnimal('${animal.id}')"
-                      class="inline-flex items-center gap-1.5 text-xs font-bold text-taka-green-700 hover:text-taka-green-800 bg-taka-green-50/80 hover:bg-taka-green-100 border border-taka-green-200/80 px-3 py-1.5 rounded-xl transition-all active:scale-95 min-h-[36px]"
+                      class="inline-flex items-center gap-1 text-xs font-bold text-taka-green-700 hover:text-taka-green-800 transition-colors py-1 hover:underline cursor-pointer"
                       title="Ver ficha completa de ${animal.nome}"
                     >
-                      <span>📄 Ver ficha →</span>
+                      <span>Ver ficha→</span>
                     </button>
                     <button 
                       type="button"
                       onclick="event.stopPropagation(); falarComTakanil('${animal.id}')" 
-                      class="p-1 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[36px] min-h-[36px]"
+                      class="w-[34px] h-[34px] bg-emerald-50 hover:bg-emerald-100 active:scale-95 border border-emerald-200/90 rounded-xl shadow-2xs flex items-center justify-center shrink-0 transition-all overflow-hidden"
                       title="Falar no WhatsApp oficial com a Takanil"
                       aria-label="Falar sobre ${animal.nome || 'Animal'} no WhatsApp da Takanil"
                     >
-                      <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-8 h-8 object-contain drop-shadow-xs" />
+                      <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-7 h-7 object-contain scale-[1.75]" />
+                    </button>
                   </div>
                 `}
               </div>
@@ -1072,10 +1073,10 @@ import { VERSAO_ATUAL } from '../data/novidades';
               <button 
                 type="button"
                 onclick="event.stopPropagation(); abrirFichaAnimal('${animal.id}')"
-                class="inline-flex items-center gap-1 text-xs font-bold text-taka-green-700 bg-taka-green-50 hover:bg-taka-green-100 border border-taka-green-200 px-3 py-1.5 rounded-xl transition-all active:scale-95 min-h-[36px]"
+                class="inline-flex items-center gap-1 text-xs font-bold text-taka-green-700 hover:text-taka-green-800 transition-colors py-1 hover:underline cursor-pointer"
                 title="Ver ficha completa de ${animal.nome}"
               >
-                <span>📄 Ver ficha →</span>
+                <span>Ficha →</span>
               </button>
             </div>
 
@@ -1131,11 +1132,11 @@ import { VERSAO_ATUAL } from '../data/novidades';
                 <button 
                   type="button"
                   onclick="event.stopPropagation(); falarComTakanil('${animal.id}')" 
-                  class="p-1 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[38px] min-h-[38px]"
+                  class="w-[34px] h-[34px] bg-emerald-50 hover:bg-emerald-100 active:scale-95 border border-emerald-200/90 rounded-xl shadow-2xs flex items-center justify-center shrink-0 transition-all overflow-hidden"
                   title="Falar no WhatsApp oficial com a Takanil"
                   aria-label="Falar sobre ${animal.nome || 'Animal'} no WhatsApp da Takanil"
                 >
-                  <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-9 h-9 object-contain drop-shadow-xs" />
+                  <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-7 h-7 object-contain scale-[1.75]" />
                 </button>
               `}
             </div>
