@@ -13,6 +13,7 @@ export interface DadosAnimalLegenda {
 }
 
 export interface ConcordanciaGramatical {
+  isPlural: boolean;
   artigoIndefinido: string; // 'um' | 'uma' | 'uns'
   artigoDefinido: string;   // 'o' | 'a' | 'os'
   pronomeReto: string;      // 'Ele' | 'Ela' | 'Eles'
@@ -27,21 +28,44 @@ export interface ConcordanciaGramatical {
   adotado: string;          // 'adotado' | 'adotada' | 'adotados'
   amado: string;            // 'amado' | 'amada' | 'amados'
   encontrado: string;       // 'encontrado' | 'encontrada' | 'encontrados'
+  verboSer: string;         // 'é' | 'são'
+  verboSerCapitalizado: string; // 'É' | 'São'
+  verboEstar: string;       // 'está' | 'estão'
+  verboEstava: string;      // 'estava' | 'estavam'
+  verboFoi: string;         // 'foi' | 'foram'
+  verboFui: string;         // 'Fui' | 'Fomos'
+  verboPassou: string;      // 'passou' | 'passaram'
+  verboMerece: string;      // 'merece' | 'merecem'
+  verboPrecisa: string;     // 'precisa' | 'precisam'
+  verboAndou: string;       // 'andou' | 'andaram'
+  verboTem: string;         // 'tem' | 'têm'
+  verboQuer: string;        // 'só quero' | 'só queremos'
+  tituloAnimal: string;     // 'ANIMAL' | 'ANIMAIS'
+  anjinho: string;          // 'Esse anjinho' | 'Essa anjinha' | 'Esses anjinhos'
+  termoAcolhimento: string; // 'precisa muito de acolhimento' | 'precisam muito de acolhimento'
+  termoCompanheiro: string; // 'o melhor companheiro da sua vida' | 'os melhores companheiros da sua vida'
+  termoMeTira: string;      // 'Me tira das ruas?' | 'Nos tira das ruas?'
+  termoQueroLar: string;    // 'Eu quero um lar e alguém para amar! ✨' | 'Nós queremos um lar e alguém para amar! ✨'
+  termoEnchelo: string;     // 'enchê-lo' | 'enchê-la' | 'enchê-los'
+  termoPraEle: string;      // 'pra ele' | 'pra ela' | 'pra eles'
+  termoSerFeliz: string;    // 'ser feliz' | 'ser felizes'
 }
 
 export function obterConcordancia(sexo?: string, especie?: string): ConcordanciaGramatical {
   const isGato = especie === 'Gato';
+  const isCao = especie === 'Cão' || especie === 'Cachorro';
   const isMisto = sexo === 'Misto (Ninhada)' || especie === 'Ambos/Múltiplos';
   const isFemea = sexo === 'Fêmea';
 
   if (isMisto) {
     return {
+      isPlural: true,
       artigoIndefinido: 'uns',
       artigoDefinido: 'os',
       pronomeReto: 'Eles',
       pronomeDemonstrativo: 'Esses',
-      substantivo: isGato ? 'gatinhos' : 'filhotinhos',
-      substantivoFormal: isGato ? 'gatos' : 'filhotes',
+      substantivo: isGato ? 'gatinhos' : (isCao ? 'cãezinhos' : 'filhotinhos'),
+      substantivoFormal: isGato ? 'gatos' : (isCao ? 'cães' : 'filhotes'),
       lindo: 'lindos',
       mansinho: 'mansinhos',
       castrado: 'castrados',
@@ -50,11 +74,33 @@ export function obterConcordancia(sexo?: string, especie?: string): Concordancia
       adotado: 'adotados',
       amado: 'amados',
       encontrado: 'encontrados',
+      verboSer: 'são',
+      verboSerCapitalizado: 'São',
+      verboEstar: 'estão',
+      verboEstava: 'estavam',
+      verboFoi: 'foram',
+      verboFui: 'Fomos',
+      verboPassou: 'passaram',
+      verboMerece: 'merecem',
+      verboPrecisa: 'precisam',
+      verboAndou: 'andaram',
+      verboTem: 'têm',
+      verboQuer: 'só queremos',
+      tituloAnimal: 'ANIMAIS',
+      anjinho: 'Esses anjinhos',
+      termoAcolhimento: 'precisam muito de acolhimento',
+      termoCompanheiro: 'os melhores companheiros da sua vida',
+      termoMeTira: 'Nos tira das ruas?',
+      termoQueroLar: 'Nós queremos um lar e alguém para amar! ✨',
+      termoEnchelo: 'enchê-los',
+      termoPraEle: 'pra eles',
+      termoSerFeliz: 'serem felizes',
     };
   }
 
   if (isFemea) {
     return {
+      isPlural: false,
       artigoIndefinido: 'uma',
       artigoDefinido: 'a',
       pronomeReto: 'Ela',
@@ -69,11 +115,33 @@ export function obterConcordancia(sexo?: string, especie?: string): Concordancia
       adotado: 'adotada',
       amado: 'amada',
       encontrado: 'encontrada',
+      verboSer: 'é',
+      verboSerCapitalizado: 'É',
+      verboEstar: 'está',
+      verboEstava: 'estava',
+      verboFoi: 'foi',
+      verboFui: 'Fui',
+      verboPassou: 'passou',
+      verboMerece: 'merece',
+      verboPrecisa: 'precisa',
+      verboAndou: 'andou',
+      verboTem: 'tem',
+      verboQuer: 'só quero',
+      tituloAnimal: 'ANIMAL',
+      anjinho: 'Essa anjinha',
+      termoAcolhimento: 'precisa muito de acolhimento',
+      termoCompanheiro: 'a melhor companheira da sua vida',
+      termoMeTira: 'Me tira das ruas?',
+      termoQueroLar: 'Eu quero um lar e alguém para amar! ✨',
+      termoEnchelo: 'enchê-la',
+      termoPraEle: 'pra ela',
+      termoSerFeliz: 'ser feliz',
     };
   }
 
   // Padrão Macho ou Não sei (masculino genérico em PT-BR)
   return {
+    isPlural: false,
     artigoIndefinido: 'um',
     artigoDefinido: 'o',
     pronomeReto: 'Ele',
@@ -88,6 +156,27 @@ export function obterConcordancia(sexo?: string, especie?: string): Concordancia
     adotado: 'adotado',
     amado: 'amado',
     encontrado: 'encontrado',
+    verboSer: 'é',
+    verboSerCapitalizado: 'É',
+    verboEstar: 'está',
+    verboEstava: 'estava',
+    verboFoi: 'foi',
+    verboFui: 'Fui',
+    verboPassou: 'passou',
+    verboMerece: 'merece',
+    verboPrecisa: 'precisa',
+    verboAndou: 'andou',
+    verboTem: 'tem',
+    verboQuer: 'só quero',
+    tituloAnimal: 'ANIMAL',
+    anjinho: 'Esse anjinho',
+    termoAcolhimento: 'precisa muito de acolhimento',
+    termoCompanheiro: 'o melhor companheiro da sua vida',
+    termoMeTira: 'Me tira das ruas?',
+    termoQueroLar: 'Eu quero um lar e alguém para amar! ✨',
+    termoEnchelo: 'enchê-lo',
+    termoPraEle: 'pra ele',
+    termoSerFeliz: 'ser feliz',
   };
 }
 
@@ -99,7 +188,8 @@ export function obterConcordancia(sexo?: string, especie?: string): Concordancia
 export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: number = 0): string {
   const g = obterConcordancia(dados.sexo, dados.especie);
 
-  const temNome = dados.nome && dados.nome.trim() !== '' && dados.nome.trim().toLowerCase() !== 'desconhecido';
+  // Ninhadas/múltiplos nunca usam nome individual, mesmo se preenchido
+  const temNome = !g.isPlural && dados.nome && dados.nome.trim() !== '' && dados.nome.trim().toLowerCase() !== 'desconhecido';
   const nomeOuRef = temNome ? dados.nome!.trim() : `${g.pronomeDemonstrativo} ${g.substantivo}`;
   const bairro = dados.bairro && dados.bairro.trim() !== '' ? dados.bairro.trim() : '';
   const fraseBairro = bairro ? `lá no bairro ${bairro}` : '';
@@ -109,23 +199,40 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
   const frasePorte = porte ? `porte ${porte}` : '';
   
   const temperamento = dados.temperamento && dados.temperamento !== 'Não informado' ? dados.temperamento.toLowerCase() : '';
-  const fraseTemperamento = temperamento ? `muito ${temperamento}` : g.mansinho;
+  let fraseTemperamento = '';
+  if (temperamento) {
+    if (g.isPlural) {
+      if (temperamento === 'mansinho') fraseTemperamento = 'muito mansinhos';
+      else if (temperamento === 'dócil' || temperamento === 'docil') fraseTemperamento = 'muito dóceis';
+      else if (temperamento === 'brincalhão' || temperamento === 'brincalhao') fraseTemperamento = 'muito brincalhões';
+      else if (temperamento === 'calmo') fraseTemperamento = 'muito calmos';
+      else if (temperamento === 'bravo') fraseTemperamento = 'bravinhos';
+      else if (temperamento === 'assustado') fraseTemperamento = 'assustadinhos';
+      else fraseTemperamento = `muito ${temperamento}`;
+    } else {
+      fraseTemperamento = `muito ${temperamento}`;
+    }
+  } else {
+    fraseTemperamento = g.mansinho;
+  }
 
-  const fraseCastrado = dados.castrado === 'Sim' ? `já está ${g.castrado}` : (dados.castrado === 'Não' ? `ainda não é ${g.castrado}` : '');
+  const fraseCastrado = dados.castrado === 'Sim' 
+    ? `já ${g.verboEstar} ${g.castrado}` 
+    : (dados.castrado === 'Não' ? `ainda não ${g.verboSer} ${g.castrado}` : '');
   
   let fraseVacinado = '';
   if (dados.vacinas && dados.vacinas.length > 0) {
-    fraseVacinado = `vacinado(a) com ${dados.vacinas.join(' e ')}`;
+    fraseVacinado = g.isPlural ? `vacinados com ${dados.vacinas.join(' e ')}` : `vacinado(a) com ${dados.vacinas.join(' e ')}`;
   } else if (dados.vacinado === 'Sim') {
-    fraseVacinado = 'já vacinado(a)';
+    fraseVacinado = g.isPlural ? 'já vacinados' : 'já vacinado(a)';
   }
 
   // Modelo específico se a situação for DESAPARECIDO
   if (dados.situacao === 'Desaparecido' || dados.situacao === 'Sumiu') {
     return [
-      `🚨 PROCURA-SE: ${nomeOuRef.toUpperCase()} ESTÁ ${g.desaparecido.toUpperCase()}!`,
+      `🚨 PROCURA-SE: ${nomeOuRef.toUpperCase()} ${g.verboEstar.toUpperCase()} ${g.desaparecido.toUpperCase()}!`,
       '',
-      `${temNome ? `${dados.nome!.trim()} é ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}` : `${g.pronomeDemonstrativo} ${g.substantivo} ${g.lindo}`} e está ${g.desaparecido}${fraseBairro ? ` ${fraseBairro}` : ''}. ${g.pronomeReto} é muito ${g.amado} e a família está desesperada por notícias.`,
+      `${temNome ? `${dados.nome!.trim()} ${g.verboSer} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}` : `${g.pronomeDemonstrativo} ${g.substantivo} ${g.lindo}`} e ${g.verboEstar} ${g.desaparecido}${fraseBairro ? ` ${fraseBairro}` : ''}. ${g.pronomeReto} ${g.verboSer} muito ${g.amado} e a família está desesperada por notícias.`,
       '',
       `🐾 Detalhes: ${[frasePorte, fraseTemperamento].filter(Boolean).join(', ')}.`,
       '',
@@ -137,10 +244,10 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
   // Modelo específico se a situação for ACHADO NA RUA
   if (dados.situacao === 'Achado na Rua') {
     return [
-      `🧭 ANIMAL ENCONTRADO NA RUA!`,
+      `🧭 ${g.tituloAnimal} ${g.encontrado.toUpperCase()} NA RUA!`,
       '',
-      `${g.pronomeDemonstrativo} ${g.substantivo} ${g.lindo} foi ${g.encontrado} ${fraseBairroResgate}.`,
-      `${g.pronomeReto} é ${fraseTemperamento}${frasePorte ? `, de ${frasePorte}` : ''}.`,
+      `${g.pronomeDemonstrativo} ${g.substantivo} ${g.lindo} ${g.verboFoi} ${g.encontrado} ${fraseBairroResgate}.`,
+      `${g.pronomeReto} ${g.verboSer} ${fraseTemperamento}${frasePorte ? `, de ${frasePorte}` : ''}.`,
       '',
       `Buscamos o tutor original ou um lar temporário/definitivo com urgência!`,
       `Por favor, compartilhem para encontrarmos a família ou um lar amoroso! 🐾❤️`
@@ -152,23 +259,29 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
     // Modelo 0: Apelo Emocional Direto ("Me tira das ruas?")
     () => {
       const caracteristicas = [frasePorte, fraseTemperamento, fraseCastrado, fraseVacinado].filter(Boolean).join(', ');
+      const refApresentacao = g.isPlural
+        ? `${nomeOuRef} ${g.lindo}`
+        : `${nomeOuRef} ${g.verboSer} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}`;
       return [
-        `"Me tira das ruas? Fui ${g.resgatado} e só quero uma chance de ser feliz..." 🐾`,
+        `"${g.termoMeTira} ${g.verboFui} ${g.resgatado} e ${g.verboQuer} uma chance de ${g.termoSerFeliz}..." 🐾`,
         '',
-        `${nomeOuRef} é ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}${bairro ? ` que estava ${fraseBairro}` : ''}.`,
-        caracteristicas ? `🐾 ${g.pronomeReto} é ${caracteristicas}.` : '',
+        `${refApresentacao}${bairro ? ` que ${g.verboEstava} ${fraseBairro}` : ''}.`,
+        caracteristicas ? `🐾 ${g.pronomeReto} ${g.verboSer} ${caracteristicas}.` : '',
         '',
-        `Um cantinho seguro e com carinho já muda tudo pra ${g.pronomeReto.toLowerCase()}! Você pode ser a virada nessa história?`,
+        `Um cantinho seguro e com carinho já muda tudo ${g.termoPraEle}! Você pode ser a virada nessa história?`,
         `Mesmo que não possa adotar, um compartilhamento seu pode chegar em quem pode! 🏠❤️`
       ].filter(l => l !== '').join('\n');
     },
 
     // Modelo 1: Pós-Clínica / Castração ("Não merece voltar pras ruas")
     () => {
+      const refApresentacao = g.isPlural
+        ? `${nomeOuRef} ${g.lindo}`
+        : `${nomeOuRef} ${g.verboSer} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}`;
       return [
-        `Esse anjinho de quatro patas passou por cuidados, foi ${g.castrado} e não merece voltar para as ruas! 🐾`,
+        `${g.anjinho} de quatro patas passou por cuidados, ${g.verboFoi} ${g.castrado} e não ${g.verboMerece} voltar para as ruas! 🐾`,
         '',
-        `${nomeOuRef} é ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}${bairro ? ` resgatado(a) ${fraseBairroResgate}` : ''}. ${g.pronomeReto} é ${fraseTemperamento}${frasePorte ? ` e de ${frasePorte}` : ''}.`,
+        `${refApresentacao}${bairro ? ` ${g.resgatado} ${fraseBairroResgate}` : ''}. ${g.pronomeReto} ${g.verboSer} ${fraseTemperamento}${frasePorte ? ` e de ${frasePorte}` : ''}.`,
         '',
         `Pedimos que ajudem compartilhando a foto na busca de um lar responsável e cheio de amor. Podemos transformar essa vida juntos!`,
         `Ajude compartilhando essa publicação! ✨🐶🐱`
@@ -178,11 +291,11 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
     // Modelo 2: Bairro / Comunidade ("Aparecendo lá no bairro...")
     () => {
       return [
-        `${g.pronomeDemonstrativo} ${g.substantivo} ${g.lindo} precisa urgente de um lar! 🐾`,
+        `${g.pronomeDemonstrativo} ${g.substantivo} ${g.lindo} ${g.verboPrecisa} urgente de um lar! 🐾`,
         '',
-        `${g.pronomeReto} andou aparecendo ${fraseBairro ? fraseBairro : 'na região'} precisando de amor e proteção. É ${fraseTemperamento}${frasePorte ? `, ${frasePorte}` : ''}${fraseCastrado ? ` e ${fraseCastrado}` : ''}.`,
+        `${g.pronomeReto} ${g.verboAndou} aparecendo ${fraseBairro ? fraseBairro : 'na região'} precisando de amor e proteção. ${g.verboSerCapitalizado} ${fraseTemperamento}${frasePorte ? `, ${frasePorte}` : ''}${fraseCastrado ? ` e ${fraseCastrado}` : ''}.`,
         '',
-        `Quem tiver espaço no coração e quiser dar uma vida digna a esse bichinho, entre em contato!`,
+        `Quem tiver espaço no coração e quiser dar uma vida digna a ${g.isPlural ? 'esses bichinhos' : 'esse bichinho'}, entre em contato!`,
         `Nos ajude compartilhando para que essa mensagem chegue à pessoa certa! 💖`
       ].filter(l => l !== '').join('\n');
     },
@@ -192,10 +305,10 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
       return [
         `🚨 URGÊNCIA: Um lar temporário ou definitivo com amor!`,
         '',
-        `${nomeOuRef} foi ${g.resgatado}${bairro ? ` ${fraseBairroResgate}` : ''} e precisa muito de acolhimento.`,
-        `É ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}, ${fraseTemperamento}${frasePorte ? ` e ${frasePorte}` : ''}.`,
+        `${nomeOuRef} ${g.verboFoi} ${g.resgatado}${bairro ? ` ${fraseBairroResgate}` : ''} e ${g.termoAcolhimento}.`,
+        `${g.verboSerCapitalizado} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}, ${fraseTemperamento}${frasePorte ? ` e ${frasePorte}` : ''}.`,
         '',
-        `Com amor e cuidado, ${g.pronomeReto.toLowerCase()} tem tudo para se tornar o melhor companheiro da sua vida!`,
+        `Com amor e cuidado, ${g.pronomeReto.toLowerCase()} ${g.verboTem} tudo para se tornar ${g.termoCompanheiro}!`,
         `Compartilhe para salvarmos mais essa vida! 🐾❤️`
       ].filter(l => l !== '').join('\n');
     },
@@ -203,12 +316,12 @@ export function gerarLegendaAnimal(dados: DadosAnimalLegenda, indiceModelo: numb
     // Modelo 4: Apelo Doce ("Eu quero um lar e alguém para amar")
     () => {
       return [
-        `"Eu quero um lar e alguém para amar! ✨"`,
+        `"${g.termoQueroLar}"`,
         '',
-        `Conheça ${nomeOuRef}! ${g.pronomeReto} é ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}, super ${fraseTemperamento}${frasePorte ? ` e ${frasePorte}` : ''}.`,
+        `Conheça ${nomeOuRef}! ${g.pronomeReto} ${g.verboSer} ${g.artigoIndefinido} ${g.substantivo} ${g.lindo}, super ${fraseTemperamento}${frasePorte ? ` e ${frasePorte}` : ''}.`,
         fraseCastrado ? `🐾 ${g.pronomeReto} ${fraseCastrado}.` : '',
         '',
-        `Você pode ser a família que vai enchê-lo(a) de carinho?`,
+        `Você pode ser a família que vai ${g.termoEnchelo} de carinho?`,
         `Adote ou compartilhe com seus amigos! 🏡🐾❤️`
       ].filter(l => l !== '').join('\n');
     }
