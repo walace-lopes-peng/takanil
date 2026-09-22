@@ -16,7 +16,8 @@ export interface AnimalWhatsAppInfo {
  */
 function formatarReferenciaAnimal(animal: AnimalWhatsAppInfo): string {
   const nomeTrim = animal.nome?.trim();
-  const temNome = nomeTrim && nomeTrim.toLowerCase() !== 'sem nome' && nomeTrim.toLowerCase() !== 'animal';
+  const nomesInvalidos = ['desconhecido', 'sem nome', 'animal', 'não identificado', 'nao identificado'];
+  const temNome = nomeTrim && !nomesInvalidos.includes(nomeTrim.toLowerCase());
   
   const especie = animal.especie?.toLowerCase() || '';
   const sexo = animal.sexo?.toLowerCase() || '';
@@ -33,15 +34,28 @@ function formatarReferenciaAnimal(animal: AnimalWhatsAppInfo): string {
     return `${artigo} *${nomeTrim}*`;
   }
 
-  const detalhes: string[] = [];
-  if (animal.localizacao) detalhes.push(`em ${animal.localizacao}`);
-  if (animal.fase_vida) detalhes.push(animal.fase_vida.toLowerCase());
-
-  if (detalhes.length > 0) {
-    return `${termoBase} (${detalhes.join(', ')})`;
+  // Opção 1: Natural e carinhosa (quando o nome for Desconhecido ou ausente)
+  let fase = animal.fase_vida?.trim().toLowerCase();
+  if (sexo === 'fêmea' || sexo === 'femea') {
+    if (fase === 'adulto') fase = 'adulta';
+    if (fase === 'idoso') fase = 'idosa';
   }
 
-  return termoBase;
+  let termoCompleto = fase ? `${termoBase} ${fase}` : termoBase;
+
+  if (animal.localizacao && animal.localizacao.trim() !== '') {
+    const loc = animal.localizacao.trim();
+    if (loc.toLowerCase() === 'na rua') {
+      const resgatado = (sexo === 'fêmea' || sexo === 'femea') ? 'resgatada na rua' : 'resgatado na rua';
+      return `${termoCompleto} ${resgatado}`;
+    }
+    if (loc.toLowerCase().startsWith('abrigo')) {
+      return `${termoCompleto} (no ${loc})`;
+    }
+    return `${termoCompleto} (em ${loc})`;
+  }
+
+  return termoCompleto;
 }
 
 /**
@@ -53,13 +67,13 @@ export function obterMensagemWhatsAppContextual(animal: AnimalWhatsAppInfo): str
   let textoBase = '';
 
   if (animal.situacao_urgencia === 'Machucado/Risco') {
-    textoBase = `Olá, equipe Takanil! Vi no app que ${ref} precisa de cuidados médicos e gostaria de ajudar com o tratamento.`;
+    textoBase = `Olá, Takanil! Vi no app que ${ref} precisa de cuidados médicos e gostaria de ajudar com o tratamento.`;
   } else if (animal.situacao_urgencia === 'Desaparecido' || (animal.localizacao && animal.localizacao.includes('Desaparecido'))) {
-    textoBase = `Olá, equipe Takanil! Vi o aviso no app sobre ${ref} que está desaparecido(a) e tenho informações.`;
+    textoBase = `Olá, Takanil! Vi o aviso no app sobre ${ref} que está desaparecido(a) e tenho informações.`;
   } else if (animal.situacao_urgencia === 'Achado na Rua') {
-    textoBase = `Olá, equipe Takanil! Vi a publicação no app sobre ${ref} resgatado(a) e gostaria de ajudar.`;
+    textoBase = `Olá, Takanil! Vi a publicação no app sobre ${ref} resgatado(a) e gostaria de ajudar.`;
   } else {
-    textoBase = `Olá, equipe Takanil! Vi ${ref} no app e gostaria de saber sobre a adoção.`;
+    textoBase = `Olá, Takanil! Vi ${ref} no app e gostaria de saber sobre a adoção.`;
   }
 
   const linhas: string[] = [textoBase];
