@@ -1,4 +1,5 @@
 export interface AnimalWhatsAppInfo {
+  id?: string;
   nome?: string | null;
   especie?: string | null;
   sexo?: string | null;
@@ -8,21 +9,44 @@ export interface AnimalWhatsAppInfo {
   status?: string | null;
   imagem_url?: string | null;
   instagram_url?: string | null;
+  bairro?: string | null;
 }
 
 /**
  * Retorna uma forma natural e carinhosa de se referir ao animal,
- * mesmo quando ele não possui nome cadastrado.
+ * mesmo quando ele não possui nome cadastrado ou é uma ninhada/múltiplos.
  */
-function formatarReferenciaAnimal(animal: AnimalWhatsAppInfo): string {
+export function formatarReferenciaAnimal(animal: AnimalWhatsAppInfo): string {
   const nomeTrim = animal.nome?.trim();
   const nomesInvalidos = ['desconhecido', 'sem nome', 'animal', 'não identificado', 'nao identificado'];
   const temNome = nomeTrim && !nomesInvalidos.includes(nomeTrim.toLowerCase());
   
   const especie = animal.especie?.toLowerCase() || '';
   const sexo = animal.sexo?.toLowerCase() || '';
-  let termoBase = 'esse animalzinho';
+  const isPlural = (sexo.includes('misto') || sexo.includes('ninhada')) || (especie.includes('múltiplos') || especie.includes('multiplos'));
 
+  if (isPlural) {
+    if (temNome) {
+      return `os *${nomeTrim}*`;
+    }
+    const termoBase = (especie.includes('gato') || especie.includes('felin')) ? 'esses gatinhos' : 'esses filhotinhos';
+    let fase = animal.fase_vida?.trim().toLowerCase();
+    let termoCompleto = fase === 'filhote' ? `${termoBase} filhotes` : termoBase;
+
+    if (animal.localizacao && animal.localizacao.trim() !== '') {
+      const loc = animal.localizacao.trim();
+      if (loc.toLowerCase() === 'na rua') {
+        return `${termoCompleto} resgatados na rua`;
+      }
+      if (loc.toLowerCase().startsWith('abrigo')) {
+        return `${termoCompleto} (no ${loc})`;
+      }
+      return `${termoCompleto} (em ${loc})`;
+    }
+    return termoCompleto;
+  }
+
+  let termoBase = 'esse animalzinho';
   if (especie.includes('cão') || especie.includes('cao') || especie.includes('cachorr')) {
     termoBase = (sexo === 'fêmea' || sexo === 'femea') ? 'essa cadelinha' : 'esse cachorrinho';
   } else if (especie.includes('gato') || especie.includes('felin')) {
@@ -59,27 +83,73 @@ function formatarReferenciaAnimal(animal: AnimalWhatsAppInfo): string {
 }
 
 /**
- * Gera mensagem humanizada, sem emojis (para não bugar no WhatsApp Web/app)
- * e com o link do Instagram se cadastrado.
+ * OPÇÃO 1 — Gera mensagem humanizada para contato DIRETO com a Takanil (wa.me)
+ * sem emojis pesados, com link do post no app e Instagram.
  */
-export function obterMensagemWhatsAppContextual(animal: AnimalWhatsAppInfo): string {
+export function obterMensagemWhatsAppContextual(animal: AnimalWhatsAppInfo, linkApp?: string): string {
   const ref = formatarReferenciaAnimal(animal);
+  const sexo = animal.sexo?.toLowerCase() || '';
+  const especie = animal.especie?.toLowerCase() || '';
+  const isPlural = (sexo.includes('misto') || sexo.includes('ninhada')) || (especie.includes('múltiplos') || especie.includes('multiplos'));
+
   let textoBase = '';
 
   if (animal.situacao_urgencia === 'Machucado/Risco') {
-    textoBase = `Olá, Takanil! Vi no app que ${ref} precisa de cuidados médicos e gostaria de ajudar com o tratamento.`;
+    textoBase = `Olá, Takanil! Vi no app que ${ref} ${isPlural ? 'precisam' : 'precisa'} de cuidados médicos e gostaria de ajudar com o tratamento.`;
   } else if (animal.situacao_urgencia === 'Desaparecido' || (animal.localizacao && animal.localizacao.includes('Desaparecido'))) {
-    textoBase = `Olá, Takanil! Vi o aviso no app sobre ${ref} que está desaparecido(a) e tenho informações.`;
+    textoBase = `Olá, Takanil! Vi o aviso no app sobre ${ref} que ${isPlural ? 'estão desaparecidos' : 'está desaparecido(a)'} e tenho informações.`;
   } else if (animal.situacao_urgencia === 'Achado na Rua') {
-    textoBase = `Olá, Takanil! Vi a publicação no app sobre ${ref} resgatado(a) e gostaria de ajudar.`;
+    textoBase = `Olá, Takanil! Vi a publicação no app sobre ${ref} ${isPlural ? 'resgatados' : 'resgatado(a)'} e gostaria de ajudar.`;
   } else {
     textoBase = `Olá, Takanil! Vi ${ref} no app e gostaria de saber sobre a adoção.`;
   }
 
   const linhas: string[] = [textoBase];
 
+  if (linkApp && linkApp.trim() !== '') {
+    linhas.push(`Ver no app: ${linkApp.trim()}`);
+  }
+
   if (animal.instagram_url && animal.instagram_url.trim() !== '') {
     linhas.push(`Post no Instagram: ${animal.instagram_url.trim()}`);
+  }
+
+  return linhas.join('\n\n');
+}
+
+/**
+ * OPÇÃO 2 — Gera mensagem humanizada pertinente à situação do animal
+ * para compartilhar com amigos, grupos, WhatsApp ou redes sociais.
+ */
+export function gerarMensagemCompartilhamentoPublico(animal: AnimalWhatsAppInfo, linkApp?: string): string {
+  const ref = formatarReferenciaAnimal(animal);
+  const sexo = animal.sexo?.toLowerCase() || '';
+  const especie = animal.especie?.toLowerCase() || '';
+  const isPlural = (sexo.includes('misto') || sexo.includes('ninhada')) || (especie.includes('múltiplos') || especie.includes('multiplos'));
+
+  let textoPrincipal = '';
+
+  if (animal.situacao_urgencia === 'Machucado/Risco') {
+    textoPrincipal = `🚨 AJUDA URGENTE: ${ref} ${isPlural ? 'precisam' : 'precisa'} de cuidados veterinários na ONG Takanil! Ajude compartilhando ou apadrinhando o tratamento. 🩺🐾`;
+  } else if (animal.situacao_urgencia === 'Desaparecido' || (animal.localizacao && animal.localizacao.includes('Desaparecido'))) {
+    textoPrincipal = `🚨 DESAPARECIDO: Nos ajude a encontrar ${ref}! Qualquer pista ou informação ajuda muito a família. 🔍🐾`;
+  } else if (animal.situacao_urgencia === 'Achado na Rua') {
+    const titulo = isPlural ? 'ANIMAIS ENCONTRADOS' : 'ANIMAL ENCONTRADO';
+    textoPrincipal = `🧭 ${titulo} NA RUA: ${ref} ${isPlural ? 'foram resgatados' : 'foi resgatado(a)'} e ${isPlural ? 'procuram' : 'procura'} uma família ou seus tutores! 🐾❤️`;
+  } else if (animal.status === 'Adotado') {
+    textoPrincipal = `🎉 FINAL FELIZ: ${ref} já tem um lar cheio de amor! Conheça outros animais que ainda esperam por adoção na ONG Takanil. 🏡❤️`;
+  } else {
+    textoPrincipal = `🏡 ADOTE: Olhem que amor ${ref} para adoção responsável na ONG Takanil! Vamos encontrar um lar com carinho? 🐾✨`;
+  }
+
+  const linhas: string[] = [textoPrincipal];
+
+  if (linkApp && linkApp.trim() !== '') {
+    linhas.push(`👉 Veja a foto e detalhes no app:\n${linkApp.trim()}`);
+  }
+
+  if (animal.instagram_url && animal.instagram_url.trim() !== '') {
+    linhas.push(`📸 Post no Instagram:\n${animal.instagram_url.trim()}`);
   }
 
   return linhas.join('\n\n');
@@ -102,51 +172,61 @@ export function obterLabelWhatsAppContextual(animal: AnimalWhatsAppInfo): { text
 }
 
 /**
- * Gera o link direto wa.me com a mensagem codificada em URL.
+ * Gera o link direto wa.me com a mensagem codificada em URL para a Takanil.
  */
-export function obterLinkWhatsAppContextual(animal: AnimalWhatsAppInfo, telefone: string = '5535998687395'): string {
-  const mensagem = obterMensagemWhatsAppContextual(animal);
+export function obterLinkWhatsAppContextual(animal: AnimalWhatsAppInfo, telefone: string = '5535998687395', linkApp?: string): string {
+  const mensagem = obterMensagemWhatsAppContextual(animal, linkApp);
   return `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
 }
 
 /**
- * Compartilha o animal no WhatsApp com a foto física anexada via Web Share API (celular),
- * ou faz fallback seguro para o link direto wa.me (desktop ou navegadores sem suporte a files).
+ * Abre diretamente a conversa com a Takanil no WhatsApp.
  */
-export async function compartilharWhatsAppComFoto(animal: AnimalWhatsAppInfo, telefone: string = '5535998687395'): Promise<void> {
-  const mensagem = obterMensagemWhatsAppContextual(animal);
-  const linkFallback = obterLinkWhatsAppContextual(animal, telefone);
+export function abrirWhatsAppDireto(animal: AnimalWhatsAppInfo, telefone: string = '5535998687395', linkApp?: string): void {
+  const link = obterLinkWhatsAppContextual(animal, telefone, linkApp);
+  if (typeof window !== 'undefined') {
+    window.open(link, '_blank', 'noopener,noreferrer');
+  }
+}
 
-  // Tenta compartilhar com a foto real caso o dispositivo e navegador suportem (ex: Android/iOS)
-  if (animal.imagem_url && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+/**
+ * Compartilha o animal usando Web Share API nativa (apenas texto + link, sem bug de legenda no WhatsApp),
+ * com fallback para cópia na área de transferência.
+ */
+export async function compartilharAnimalPublico(animal: AnimalWhatsAppInfo, linkApp?: string): Promise<'compartilhado' | 'copiado' | 'cancelado' | 'erro'> {
+  const mensagem = gerarMensagemCompartilhamentoPublico(animal, linkApp);
+  // Tenta compartilhamento nativo do navegador/celular
+  if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
     try {
-      const res = await fetch(animal.imagem_url);
-      if (res.ok) {
-        const blob = await res.blob();
-        const mimeType = blob.type || 'image/jpeg';
-        const extensao = mimeType.split('/')[1] || 'jpg';
-        const nomeLimpo = (animal.nome || 'animal').replace(/[^a-zA-Z0-9]/g, '_');
-        const arquivoFoto = new File([blob], `${nomeLimpo}.${extensao}`, { type: mimeType });
-
-        if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [arquivoFoto] })) {
-          await navigator.share({
-            files: [arquivoFoto],
-            title: `Takanil - ${animal.nome || 'Animal'}`,
-            text: mensagem,
-          });
-          return;
-        }
-      }
+      await navigator.share({
+        title: titulo,
+        text: mensagem,
+      });
+      return 'compartilhado';
     } catch (err: any) {
-      // Se o usuário apenas cancelou a tela de compartilhamento nativo do celular
-      if (err?.name === 'AbortError') return;
-      console.warn('Falha no Web Share com foto, usando fallback para link direto:', err);
+      if (err?.name === 'AbortError') return 'cancelado';
+      console.warn('Falha no navigator.share, acionando fallback de clipboard:', err);
     }
   }
 
-  // Fallback para Desktop ou navegadores que não suportam envio de arquivos
-  if (typeof window !== 'undefined') {
-    window.open(linkFallback, '_blank', 'noopener,noreferrer');
+  // Fallback: copia para a área de transferência
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(mensagem);
+      return 'copiado';
+    } catch (clipErr) {
+      console.warn('Falha ao copiar para clipboard:', clipErr);
+    }
   }
+
+  return 'erro';
 }
+
+/**
+ * Mantido para retrocompatibilidade
+ */
+export async function compartilharWhatsAppComFoto(animal: AnimalWhatsAppInfo, telefone: string = '5535998687395'): Promise<void> {
+  abrirWhatsAppDireto(animal, telefone);
+}
+
 

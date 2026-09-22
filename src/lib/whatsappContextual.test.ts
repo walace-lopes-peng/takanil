@@ -3,6 +3,7 @@ import {
   obterMensagemWhatsAppContextual, 
   obterLabelWhatsAppContextual, 
   obterLinkWhatsAppContextual,
+  gerarMensagemCompartilhamentoPublico,
   compartilharWhatsAppComFoto
 } from './whatsappContextual';
 
@@ -114,4 +115,44 @@ describe('whatsappContextual', () => {
     expect(urlAberta).toContain('https://wa.me/5535998687395?text=');
     expect(urlAberta).toContain(encodeURIComponent('Olá, Takanil! Vi o *Rex* no app e gostaria de saber sobre a adoção.'));
   });
+
+  it('deve gerar mensagem contextual e humanizada para compartilhamento público com link do app', () => {
+    const animal = {
+      id: 'abc-123',
+      nome: 'Pipoca',
+      especie: 'Cão',
+      sexo: 'Macho',
+      situacao_urgencia: 'Machucado/Risco',
+    };
+    const msg = gerarMensagemCompartilhamentoPublico(animal, 'https://hub-takanil.vercel.app/?animal=abc-123');
+
+    expect(msg).toContain('🚨 AJUDA URGENTE: o *Pipoca* precisa de cuidados veterinários na ONG Takanil!');
+    expect(msg).toContain('👉 Veja a foto e detalhes no app:\nhttps://hub-takanil.vercel.app/?animal=abc-123');
+  });
+
+  it('deve gerar mensagem pública de animal encontrado na rua no plural para ninhada', () => {
+    const ninhada = {
+      id: 'gatinhos-456',
+      especie: 'Gato',
+      sexo: 'Misto (Ninhada)',
+      situacao_urgencia: 'Achado na Rua',
+      localizacao: 'Na rua',
+    };
+    const msg = gerarMensagemCompartilhamentoPublico(ninhada, 'https://hub-takanil.vercel.app/?animal=gatinhos-456');
+
+    expect(msg).toContain('🧭 ANIMAIS ENCONTRADOS NA RUA: esses gatinhos resgatados na rua foram resgatados e procuram uma família ou seus tutores! 🐾❤️');
+    expect(msg).toContain('https://hub-takanil.vercel.app/?animal=gatinhos-456');
+  });
+
+  it('deve incluir link do app na mensagem direta da Takanil quando fornecido', () => {
+    const animal = {
+      nome: 'Rex',
+      especie: 'Cão',
+      sexo: 'Macho',
+      situacao_urgencia: 'Nenhuma',
+    };
+    const msg = obterMensagemWhatsAppContextual(animal, 'https://hub-takanil.vercel.app/?animal=123');
+    expect(msg).toContain('Ver no app: https://hub-takanil.vercel.app/?animal=123');
+  });
 });
+

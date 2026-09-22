@@ -83,4 +83,31 @@ describe('geradorLegenda - Geração de Textos', () => {
 
     expect(legenda).toContain('vacinado(a) com V10 e Antirrábica');
   });
+
+  it('deve gerar texto com concordância perfeita no plural para ninhada achada na rua (caso real)', () => {
+    const legenda = gerarLegendaAnimal({
+      especie: 'Gato',
+      sexo: 'Misto (Ninhada)',
+      situacao: 'Achado na Rua',
+      bairro: 'Tronqueiras',
+      porte: 'Médio',
+    });
+
+    expect(legenda).toContain('ANIMAIS ENCONTRADOS NA RUA');
+    expect(legenda).toContain('Esses gatinhos lindos foram encontrados no bairro Tronqueiras');
+    expect(legenda).toContain('Eles são mansinhos, de porte médio');
+  });
+
+  it('deve concordar corretamente no plural para modelos gerais', () => {
+    const legenda = gerarLegendaAnimal({
+      especie: 'Gato',
+      sexo: 'Misto (Ninhada)',
+      situacao: 'Nenhuma',
+      bairro: 'Centro'
+    }, 1);
+
+    expect(legenda).toContain('Esses anjinhos de quatro patas');
+    expect(legenda).toContain('foram castrados e não merecem voltar para as ruas');
+  });
 });
+
