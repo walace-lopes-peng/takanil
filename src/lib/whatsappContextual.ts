@@ -108,3 +108,45 @@ export function obterLinkWhatsAppContextual(animal: AnimalWhatsAppInfo, telefone
   const mensagem = obterMensagemWhatsAppContextual(animal);
   return `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
 }
+
+/**
+ * Compartilha o animal no WhatsApp com a foto física anexada via Web Share API (celular),
+ * ou faz fallback seguro para o link direto wa.me (desktop ou navegadores sem suporte a files).
+ */
+export async function compartilharWhatsAppComFoto(animal: AnimalWhatsAppInfo, telefone: string = '5535998687395'): Promise<void> {
+  const mensagem = obterMensagemWhatsAppContextual(animal);
+  const linkFallback = obterLinkWhatsAppContextual(animal, telefone);
+
+  // Tenta compartilhar com a foto real caso o dispositivo e navegador suportem (ex: Android/iOS)
+  if (animal.imagem_url && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    try {
+      const res = await fetch(animal.imagem_url);
+      if (res.ok) {
+        const blob = await res.blob();
+        const mimeType = blob.type || 'image/jpeg';
+        const extensao = mimeType.split('/')[1] || 'jpg';
+        const nomeLimpo = (animal.nome || 'animal').replace(/[^a-zA-Z0-9]/g, '_');
+        const arquivoFoto = new File([blob], `${nomeLimpo}.${extensao}`, { type: mimeType });
+
+        if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [arquivoFoto] })) {
+          await navigator.share({
+            files: [arquivoFoto],
+            title: `Takanil - ${animal.nome || 'Animal'}`,
+            text: mensagem,
+          });
+          return;
+        }
+      }
+    } catch (err: any) {
+      // Se o usuário apenas cancelou a tela de compartilhamento nativo do celular
+      if (err?.name === 'AbortError') return;
+      console.warn('Falha no Web Share com foto, usando fallback para link direto:', err);
+    }
+  }
+
+  // Fallback para Desktop ou navegadores que não suportam envio de arquivos
+  if (typeof window !== 'undefined') {
+    window.open(linkFallback, '_blank', 'noopener,noreferrer');
+  }
+}
+

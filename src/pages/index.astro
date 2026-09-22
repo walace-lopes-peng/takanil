@@ -344,7 +344,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
 
 <script>
   import { supabase, getUserRole } from '../lib/supabaseClient';
-  import { obterLinkWhatsAppContextual } from '../lib/whatsappContextual';
+  import { compartilharWhatsAppComFoto } from '../lib/whatsappContextual';
 
   const listaAnimais = document.getElementById('listaAnimais');
   const totalRacaoEl = document.getElementById('totalRacao');
@@ -775,7 +775,6 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
       const subtituloZoom = `${animal.especie || 'Animal'} • ${animal.sexo || ''} • ${animal.peso ? animal.peso + 'kg' : ''} • ${animal.localizacao || ''}`;
       const nomeSanitizado = (animal.nome || 'Animal').replace(/'/g, "\\'");
       const subtituloSanitizado = subtituloZoom.replace(/'/g, "\\'");
-      const linkWhatsApp = obterLinkWhatsAppContextual(animal);
 
 
       if (modoVisualizacao === 'grid') {
@@ -880,17 +879,15 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                 ` : `
                   <!-- Visitante: só o botão WhatsApp, sempre à direita -->
                   <div class="flex items-center justify-end w-full">
-                    <a 
-                      href="${linkWhatsApp}" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      onclick="event.stopPropagation()" 
+                    <button 
+                      type="button"
+                      onclick="event.stopPropagation(); compartilharWhatsApp('${animal.id}', this)" 
                       class="p-1 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[40px] min-h-[40px]"
-                      title="Falar no WhatsApp sobre ${animal.nome}"
-                      aria-label="Falar sobre ${animal.nome} no WhatsApp"
+                      title="Falar no WhatsApp sobre ${animal.nome || 'Animal'}"
+                      aria-label="Falar sobre ${animal.nome || 'Animal'} no WhatsApp"
                     >
                       <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-9 h-9 object-contain drop-shadow-xs" />
-                    </a>
+                    </button>
                   </div>
                 `}
               </div>
@@ -982,17 +979,15 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
                   </button>
                 </div>
               ` : `
-                <a 
-                  href="${linkWhatsApp}" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  onclick="event.stopPropagation()" 
+                <button 
+                  type="button"
+                  onclick="event.stopPropagation(); compartilharWhatsApp('${animal.id}', this)" 
                   class="p-1 hover:scale-110 active:scale-95 transition-transform flex items-center justify-center min-w-[38px] min-h-[38px]"
-                  title="Falar no WhatsApp oficial sobre ${animal.nome}"
-                  aria-label="Falar sobre ${animal.nome} no WhatsApp"
+                  title="Falar no WhatsApp oficial sobre ${animal.nome || 'Animal'}"
+                  aria-label="Falar sobre ${animal.nome || 'Animal'} no WhatsApp"
                 >
                   <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-9 h-9 object-contain drop-shadow-xs" />
-                </a>
+                </button>
               `}
             </div>
           </div>
@@ -1031,6 +1026,18 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     } catch (err) {
       console.error(err);
       (window as any).mostrarToast('Erro ao excluir o registro.', 'erro');
+    }
+  };
+
+  // Compartilhamento contextual via WhatsApp com anexo de foto nativo (Web Share API) no celular ou link no PC
+  (window as any).compartilharWhatsApp = async (id: string, btn?: HTMLElement) => {
+    const animal = animaisGlobais.find(a => a.id === id);
+    if (!animal) return;
+    if (btn) btn.classList.add('opacity-50', 'pointer-events-none');
+    try {
+      await compartilharWhatsAppComFoto(animal);
+    } finally {
+      if (btn) btn.classList.remove('opacity-50', 'pointer-events-none');
     }
   };
 

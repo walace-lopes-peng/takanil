@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { 
   obterMensagemWhatsAppContextual, 
   obterLabelWhatsAppContextual, 
-  obterLinkWhatsAppContextual 
+  obterLinkWhatsAppContextual,
+  compartilharWhatsAppComFoto
 } from './whatsappContextual';
 
 describe('whatsappContextual', () => {
@@ -94,5 +95,23 @@ describe('whatsappContextual', () => {
     const labelPadrao = obterLabelWhatsAppContextual({ situacao_urgencia: 'Nenhuma' });
     expect(labelPadrao.texto).toBe('Quero Adotar');
     expect(labelPadrao.icone).toBe('💬');
+  });
+
+  it('deve fazer fallback para window.open quando navigator.share não estiver disponível', async () => {
+    let urlAberta = '';
+    (globalThis as any).window = {
+      open: (url: string) => {
+        urlAberta = url;
+      }
+    };
+
+    await compartilharWhatsAppComFoto({
+      nome: 'Rex',
+      especie: 'Cão',
+      situacao_urgencia: 'Nenhuma',
+    });
+
+    expect(urlAberta).toContain('https://wa.me/5535998687395?text=');
+    expect(urlAberta).toContain(encodeURIComponent('Olá, Takanil! Vi o *Rex* no app e gostaria de saber sobre a adoção.'));
   });
 });
