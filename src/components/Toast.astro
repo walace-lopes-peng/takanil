@@ -59,14 +59,25 @@
       toastEl.setAttribute('role', tipo === 'erro' ? 'alert' : 'status');
       toastEl.className = 'pointer-events-auto flex items-center justify-between gap-3 px-4 py-3 rounded-2xl shadow-2xl border ' + c.bg + ' ' + c.border + ' ' + c.text + ' transform transition-all duration-300 translate-y-4 opacity-0';
 
+      // Montar HTML interno do toast
+      // Se opcoes.acao existe ({ texto: string, callback: Function }), renderiza um botão de ação
+      // entre a mensagem e o botão de fechar (ex: botão "Desfazer" para reverter uma ação)
+      var acaoHtml = '';
+      if (opcoes.acao && opcoes.acao.texto) {
+        acaoHtml = '<button type="button" data-toast-acao class="flex-shrink-0 text-sm font-bold underline underline-offset-2 px-2 py-1 rounded-lg hover:bg-white/20 active:bg-white/30 transition-colors min-h-[44px] whitespace-nowrap">' + opcoes.acao.texto + '</button>';
+      }
+
       toastEl.innerHTML = 
         '<div class="flex items-center gap-3 min-w-0">' +
           c.icone +
           '<span class="text-sm font-medium leading-snug break-words">' + mensagem + '</span>' +
         '</div>' +
-        '<button type="button" aria-label="Fechar notificação" class="flex-shrink-0 min-w-[44px] min-h-[44px] -mr-2 flex items-center justify-center rounded-xl hover:bg-black/10 active:bg-black/20 transition-colors">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/80 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>' +
-        '</button>';
+        '<div class="flex items-center gap-1 shrink-0">' +
+          acaoHtml +
+          '<button type="button" data-toast-fechar aria-label="Fechar notificação" class="flex-shrink-0 min-w-[44px] min-h-[44px] -mr-2 flex items-center justify-center rounded-xl hover:bg-black/10 active:bg-black/20 transition-colors">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/80 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>' +
+          '</button>' +
+        '</div>';
 
       container.appendChild(toastEl);
 
@@ -77,7 +88,7 @@
       });
 
       // Função de remoção suave
-      let timer = null;
+      var timer = null;
       function removerToast() {
         if (timer) clearTimeout(timer);
         toastEl.classList.remove('translate-y-0', 'opacity-100');
@@ -88,8 +99,19 @@
       }
 
       // Botão de fechar manual
-      const btnFechar = toastEl.querySelector('button');
+      var btnFechar = toastEl.querySelector('[data-toast-fechar]');
       if (btnFechar) btnFechar.addEventListener('click', removerToast);
+
+      // Botão de ação (ex: "Desfazer") — executa callback e remove o toast
+      if (opcoes.acao && opcoes.acao.callback) {
+        var btnAcao = toastEl.querySelector('[data-toast-acao]');
+        if (btnAcao) {
+          btnAcao.addEventListener('click', function() {
+            opcoes.acao.callback();
+            removerToast();
+          });
+        }
+      }
 
       // Auto-dismiss se duração > 0
       if (duracao > 0) {

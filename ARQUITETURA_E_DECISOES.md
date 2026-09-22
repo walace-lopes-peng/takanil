@@ -131,3 +131,21 @@ Cada nova decisão arquitetural ou técnica importante deve ser adicionada abaix
 * **Pré-requisitos de Estudo:**
   1. UX Writing e Redação Centrada no Usuário
   2. Gestão de Produto (Product Management) e Changelog Standards (Keep a Changelog)
+
+### 6. Governança de SemVer (Novidades vs Patches) e Rastreabilidade de Builds (Changelog de Engenharia)
+* **Data:** Setembro de 2026
+* **Contexto:** Em projetos ágeis, é tentador anunciar correções de bugs (*bugfixes*) ou pequenos ajustes de layout (*patches*) como "Novidades" nas notas de versão. Para o usuário final, isso causa frustração e desconfiança (pois o usuário abre o aplicativo esperando uma ferramenta nova e encontra o conserto de algo que não deveria ter quebrado). Ao mesmo tempo, quando o time de engenharia não documenta detalhadamente as causas raízes e os arquivos tocados em cada build de patch, perde-se a rastreabilidade histórica, tornando difícil identificar a origem de regressões no futuro.
+* **Decisão:**
+  1. **A Regra dos Três Baldes para o Usuário Final (`RELEASE_NOTES.md`):**
+     * **✨ Novas Funcionalidades:** Estritamente o que o usuário *não conseguia fazer antes* e agora consegue.
+     * **⚡ Melhorias e Refinamentos:** O que o usuário *já conseguia fazer*, mas que ficou mais ágil, intuitivo ou acessível.
+     * **🐛 Correções & Ajustes:** O que estava quebrado ou inconsistente e foi consertado. Patches de correção **nunca** entram como Novidades.
+  2. **Rastreabilidade Cirúrgica Interna (`CHANGELOG_TECNICO.md`):**
+     * Criação de um registro técnico dedicado na raiz do projeto onde cada build e patch é documentado com: versão SemVer, tipo de mudança, PR/Commit, arquivos modificados, Análise de Causa Raiz (RCA), solução técnica implementada e validação de testes executada.
+* **Por quê? (Justificativa Didática e Visão de Mercado):**
+  * *Padrão de Engenharia de Classe Mundial:* Organizações como Stripe, Google e GitHub dividem estritamente a comunicação de produto dos logs de engenharia. O usuário recebe clareza e valor imediato, enquanto a equipe técnica tem rastreabilidade completa para auditoria, rollback ágil e investigação de regressões via `git bisect`.
+* **Pré-requisitos de Estudo:**
+  1. Versionamento Semântico 2.0.0 (SemVer: `MAJOR.MINOR.PATCH`)
+  2. Root Cause Analysis (RCA - Análise de Causa Raiz de Software)
+  3. Git Bisect e Rastreabilidade de Regressões em Engenharia de Confiabilidade (SRE/DBRE)
+

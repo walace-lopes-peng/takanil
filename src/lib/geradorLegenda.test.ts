@@ -71,4 +71,56 @@ describe('geradorLegenda - Geração de Textos', () => {
       expect(legenda.length).toBeGreaterThan(30);
     }
   });
+
+  it('deve incluir vacinas aplicadas na legenda quando informadas', () => {
+    const legenda = gerarLegendaAnimal({
+      nome: 'Thor',
+      especie: 'Cão',
+      sexo: 'Macho',
+      vacinado: 'Sim',
+      vacinas: ['V10', 'Antirrábica']
+    }, 0);
+
+    expect(legenda).toContain('vacinado(a) com V10 e Antirrábica');
+  });
+
+  it('deve gerar texto com concordância perfeita no plural para ninhada achada na rua (caso real)', () => {
+    const legenda = gerarLegendaAnimal({
+      especie: 'Gato',
+      sexo: 'Misto (Ninhada)',
+      situacao: 'Achado na Rua',
+      bairro: 'Tronqueiras',
+      porte: 'Médio',
+    });
+
+    expect(legenda).toContain('ANIMAIS ENCONTRADOS NA RUA');
+    expect(legenda).toContain('Esses gatinhos lindos foram encontrados no bairro Tronqueiras');
+    expect(legenda).toContain('Eles são mansinhos, de porte médio');
+  });
+
+  it('deve concordar corretamente no plural para modelos gerais', () => {
+    const legenda = gerarLegendaAnimal({
+      especie: 'Gato',
+      sexo: 'Misto (Ninhada)',
+      situacao: 'Nenhuma',
+      bairro: 'Centro'
+    }, 1);
+
+    expect(legenda).toContain('Esses anjinhos de quatro patas');
+    expect(legenda).toContain('foram castrados e não merecem voltar para as ruas');
+  });
+
+  it('não deve colocar nomes em ninhadas mesmo se preenchido, gerando cãezinhos para cães', () => {
+    const legenda = gerarLegendaAnimal({
+      nome: 'Ninhada do Posto',
+      especie: 'Cão',
+      sexo: 'Misto (Ninhada)',
+      situacao: 'Achado na Rua',
+      bairro: 'Centro'
+    });
+
+    expect(legenda).not.toContain('Ninhada do Posto');
+    expect(legenda).toContain('Esses cãezinhos lindos foram encontrados no bairro Centro');
+  });
 });
+

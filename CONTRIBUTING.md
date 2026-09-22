@@ -70,6 +70,7 @@ no mesmo commit.
 - Título da PR segue o mesmo formato do commit (`feat: ...`, `fix: ...`)
 - Preencher o checklist do template antes de pedir revisão
 - Squash merge — o histórico da branch principal fica um commit por Parte
+- **Fechamento de Issues:** NUNCA fechar uma issue apenas por pushar uma branch. A issue só é encerrada após o PR correspondente ser efetivamente mergeado na branch de destino (`dev`). Ao mergear na `dev`, como o GitHub não fecha automaticamente por ser branch não-default, execute `gh issue close <numero>` logo após a confirmação do merge.
 
 ## Fluxo esperado para o agente de código
 
@@ -85,3 +86,4 @@ no mesmo commit.
 7. Abrir PR com `--base dev`, referenciando a issue, preenchendo o template
 8. Parar e aguardar revisão humana — não fazer merge sozinho, nem de
    `feat/*` para `dev`, nem de `dev` para `main`
+9. **Após a confirmação do merge do PR:** Executar `gh issue close <numero>` para fechar a issue associada. Nunca fechar a issue antes da aprovação e merge do PR.
