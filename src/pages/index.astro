@@ -857,14 +857,13 @@ import { VERSAO_ATUAL } from '../data/novidades';
             onclick="abrirFichaAnimal('${animal.id}')"
             title="Clique no card para abrir a ficha de ${tituloExibicao}"
           >
-            <!-- Foto Aspect Ratio 1:1 com Toque para Zoom -->
+            <!-- Foto Aspect Ratio 1:1 (Toque abre a ficha; lupa no canto amplia) -->
             <div class="relative aspect-square w-full bg-gray-100 overflow-hidden">
               <img 
                 src="${imgUrl}" 
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer" 
                 alt="${tituloExibicao}"
-                onclick="event.stopPropagation(); abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
-                title="Clique para ampliar a foto"
+                title="Toque para ver a ficha completa de ${tituloExibicao}"
               >
               <!-- Topo da foto: Badges (esquerda) e Botão Compartilhar (direita) -->
               <div class="absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-none">
@@ -887,7 +886,7 @@ import { VERSAO_ATUAL } from '../data/novidades';
               <!-- Base da foto: Botão de Lupa/Zoom no canto inferior direito -->
               <div class="absolute bottom-2 right-2 pointer-events-none">
                 <button 
-                  type="button"
+                  type="button" 
                   onclick="event.stopPropagation(); abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
                   aria-label="Ampliar foto de ${tituloExibicao}"
                   class="pointer-events-auto bg-black/60 hover:bg-black/85 active:scale-95 text-white rounded-full p-2 backdrop-blur-xs transition-all shadow-xs min-w-[36px] min-h-[36px] flex items-center justify-center"
@@ -933,14 +932,19 @@ import { VERSAO_ATUAL } from '../data/novidades';
               </div>
 
               <!-- Rodapé fixo: sempre a mesma altura em TODOS os cards -->
-              <div class="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between min-h-[44px]" onclick="event.stopPropagation()">
+              <div class="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between min-h-[44px]">
                 ${isAdminGlob ? `
                   <!-- Admin: [ficha] [menu status] [editar ficha] [excluir] -->
                   <div class="flex items-center justify-between w-full">
-                    <span class="text-[11px] font-bold text-taka-green-700 cursor-pointer hover:underline" onclick="event.stopPropagation(); abrirFichaAnimal('${animal.id}')">
-                      📄 Ficha →
-                    </span>
-                    <div class="flex items-center gap-1">
+                    <button 
+                      type="button"
+                      onclick="event.stopPropagation(); abrirFichaAnimal('${animal.id}')"
+                      class="inline-flex items-center gap-1 text-[11px] font-bold text-taka-green-700 hover:text-taka-green-800 bg-taka-green-50/80 hover:bg-taka-green-100 border border-taka-green-200/80 px-2.5 py-1.5 rounded-xl transition-all active:scale-95 min-h-[36px]"
+                      title="Abrir ficha detalhada de ${animal.nome}"
+                    >
+                      <span>📄 Ficha →</span>
+                    </button>
+                    <div class="flex items-center gap-1" onclick="event.stopPropagation()">
                       <button 
                         onclick="event.stopPropagation(); abrirDropdownStatus('${animal.id}', '${animal.situacao_urgencia}', '${animal.status || ''}', '${nomeSanitizado}', event)" 
                         aria-label="Menu de status de ${animal.nome}"
@@ -976,9 +980,14 @@ import { VERSAO_ATUAL } from '../data/novidades';
                 ` : `
                   <!-- Visitante: 'Ver ficha' + botão WhatsApp direto -->
                   <div class="flex items-center justify-between w-full">
-                    <span class="text-[11px] font-bold text-taka-green-700 flex items-center gap-1 group-hover:text-taka-green-800 transition-colors">
-                      📄 Ver ficha →
-                    </span>
+                    <button 
+                      type="button"
+                      onclick="event.stopPropagation(); abrirFichaAnimal('${animal.id}')"
+                      class="inline-flex items-center gap-1.5 text-xs font-bold text-taka-green-700 hover:text-taka-green-800 bg-taka-green-50/80 hover:bg-taka-green-100 border border-taka-green-200/80 px-3 py-1.5 rounded-xl transition-all active:scale-95 min-h-[36px]"
+                      title="Ver ficha completa de ${animal.nome}"
+                    >
+                      <span>📄 Ver ficha →</span>
+                    </button>
                     <button 
                       type="button"
                       onclick="event.stopPropagation(); falarComTakanil('${animal.id}')" 
@@ -987,7 +996,6 @@ import { VERSAO_ATUAL } from '../data/novidades';
                       aria-label="Falar sobre ${animal.nome || 'Animal'} no WhatsApp da Takanil"
                     >
                       <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-8 h-8 object-contain drop-shadow-xs" />
-                    </button>
                   </div>
                 `}
               </div>
@@ -1004,14 +1012,13 @@ import { VERSAO_ATUAL } from '../data/novidades';
             title="Clique para abrir a ficha de ${tituloExibicao}"
           >
             <div class="flex items-start sm:items-center gap-3 sm:gap-4 min-w-0 flex-1">
-              <!-- Miniatura com Toque para Zoom -->
+              <!-- Miniatura com Toque para Zoom (Lupa amplia, toque na foto abre ficha) -->
               <div class="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100 group">
                 <img 
                   src="${imgUrl}" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 cursor-pointer" 
                   alt="${tituloExibicao}"
-                  onclick="event.stopPropagation(); abrirModalZoom('${imgUrl}', '${nomeSanitizado}', '${subtituloSanitizado}')"
-                  title="Clique para ampliar a foto"
+                  title="Toque para ver a ficha completa de ${tituloExibicao}"
                 >
                 <button 
                   type="button"
@@ -1062,9 +1069,14 @@ import { VERSAO_ATUAL } from '../data/novidades';
 
             <!-- Indicador de Ficha no Modo Lista -->
             <div class="flex items-center gap-2 shrink-0 pt-2 sm:pt-0">
-              <span class="inline-flex items-center gap-1 text-xs font-bold text-taka-green-700 bg-taka-green-50 border border-taka-green-200 px-3 py-1.5 rounded-xl group-hover:bg-taka-green-100 transition-colors">
-                📄 Ver ficha →
-              </span>
+              <button 
+                type="button"
+                onclick="event.stopPropagation(); abrirFichaAnimal('${animal.id}')"
+                class="inline-flex items-center gap-1 text-xs font-bold text-taka-green-700 bg-taka-green-50 hover:bg-taka-green-100 border border-taka-green-200 px-3 py-1.5 rounded-xl transition-all active:scale-95 min-h-[36px]"
+                title="Ver ficha completa de ${animal.nome}"
+              >
+                <span>📄 Ver ficha →</span>
+              </button>
             </div>
 
             <!-- Ações Alinhadas à Direita -->

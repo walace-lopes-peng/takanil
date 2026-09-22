@@ -9,29 +9,36 @@ export interface ItemNovidade {
 export const VERSAO_ATUAL = packageJson.version;
 
 export const NOVIDADES_VERSAO: ItemNovidade[] = [
+  // --- Novas Funcionalidades ---
   {
-    icone: '📝',
-    titulo: '1. Gerador Automático de Legendas',
-    descricao: 'Cria textos prontos e personalizados para redes sociais (Instagram/WhatsApp) conforme você preenche o cadastro, com botão para sortear diferentes modelos de divulgação.'
+    icone: '📋',
+    titulo: '1. Ficha Detalhada do Pet com Toque no Card',
+    descricao: 'Toque em qualquer card da vitrine para abrir a ficha completa do animal, com foto em alta definição, características, histórico e cuidados clínicos.'
   },
   {
-    icone: '⚡',
-    titulo: '2. Cadastro Rápido com Sanfona de Detalhes',
-    descricao: 'O formulário inicial agora tem apenas os dados essenciais para preenchimento em segundos. Informações adicionais (porte, raça, idade e cuidados) ficam organizadas em uma sanfona expansível.'
+    icone: '✨',
+    titulo: '2. [Gestão] Menu Rápido de Status com Botão "Desfazer"',
+    descricao: 'Altere o status do animal direto pelo menu discreto dos cards. Uma notificação com o botão "Desfazer" fica ativa por 5 segundos para reverter toques acidentais.'
   },
   {
-    icone: '🎯',
-    titulo: '3. Nova Seleção de Situação do Animal',
-    descricao: 'Botões diretos para escolher entre Para Adoção, Sumiu (Desaparecido), Machucado ou Achado na Rua.'
+    icone: '💬',
+    titulo: '3. Conversa Contextual no WhatsApp',
+    descricao: 'Botão na ficha que abre o WhatsApp oficial da ONG com mensagem pronta para adoção (com o nome do animal), ajuda em tratamentos ou notícias de desaparecidos.'
   },
   {
-    icone: '📍',
-    titulo: '4. Bairro Automático para Resgates',
-    descricao: 'Ao marcar que o animal sumiu ou foi encontrado na rua, um campo de bairro surge automaticamente para facilitar a localização pelos tutores e voluntárias.'
+    icone: '✂️',
+    titulo: '4. Enquadramento Vertical de Fotos Padronizado',
+    descricao: 'Nova ferramenta de recorte que garante que as fotos dos animais fiquem perfeitamente centralizadas e nítidas nos cards da vitrine.'
   },
+  // --- Melhorias & Refinamentos ---
   {
     icone: '🐾',
-    titulo: '5. Suporte para Ninhadas e Múltiplos Animais',
-    descricao: 'Opção dedicada para registrar grupos de filhotes ou múltiplos animais de uma só vez, informando a quantidade exata.'
+    titulo: '5. Catálogo Integrado com Pets Adotados',
+    descricao: 'Animais que já ganharam um lar agora continuam visíveis na tela com o badge verde [✅ Adotado], além do filtro de coração para comemorar os Finais Felizes.'
+  },
+  {
+    icone: '💉',
+    titulo: '6. Registro Detalhado de Vacinas Aplicadas',
+    descricao: 'Acompanhe exatamente quais vacinas cada cão ou gato já tomou (V8/V10, Antirrábica, Giárdia, etc.), facilitando o controle veterinário.'
   },
 ];

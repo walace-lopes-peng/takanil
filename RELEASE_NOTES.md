@@ -4,17 +4,20 @@ Histórico de melhorias, novidades e correções entregues em cada versão do Hu
 
 ---
 
-## 🚀 Versão 0.12.0 — Gestão Ágil de Status, Catálogo Integrado & WhatsApp Contextual (Em Breve)
+## 🚀 Versão 0.12.0 — Ficha Detalhada, Gestão Ágil de Status & WhatsApp Contextual (22/09/2026)
 
-### ✨ Novidades da Versão
+### ✨ Novas Funcionalidades
 
+- **📋 Ficha Detalhada do Pet com Toque no Card:** Ao tocar em qualquer animal na vitrine, abre uma ficha completa com foto em destaque, história, características físicas e cuidados clínicos (castração e vacinas aplicadas).
 - **✨ `[Gestão]` Menu Rápido de Status com Botão "Desfazer":** Os botões antigos dos cards foram substituídos por um menu discreto `[ ⋮ ]`. Ao mudar o status do animal (Adotado, Voltou pro Tutor, Urgência Médica, etc.), uma notificação surge na tela com o botão **"Desfazer"** por 5 segundos para reverter qualquer toque acidental imediatamente sem confirmações burocráticas.
-- **🐾 Catálogo Integrado com Visualização de Todos os Status:** Todos os animais aprovados agora permanecem visíveis na tela inicial, incluindo os pets adotados identificados com o badge verde `[✅ Adotado]`. Assim, qualquer voluntária ou visitante consegue consultar a situação atual do pet com facilidade. O botão de coração no topo continua disponível como filtro exclusivo para comemorar os Finais Felizes.
-- **↗️ Menu de Compartilhamento Ágil:** Botão rápido `[ ↗ ]` no canto superior da foto que abre opções diretas para **WhatsApp** (com texto contextual e link), **Instagram** e **Copiar Tudo**, adaptando concordância gramatical para ninhadas/múltiplos pets e situações de urgência ou desaparecimento.
-- **🔗 Link Direto do Pet no App:** Compartilhar o pet gera um link direto que destaca o card do animal na tela inicial instantaneamente.
-- **💬 Contato Direto com a ONG no WhatsApp:** Botão no rodapé do card dedicado para interessados sem login conversarem diretamente com o WhatsApp oficial da ONG Takanil.
-- **✂️ Enquadramento Vertical de Fotos:** Nova ferramenta com corte na proporção vertical padronizada (500x680) para garantir que as fotos dos animais fiquem sempre bem centralizadas e sem distorções nos cards.
-- **💉 Registro Detalhado de Vacinas:** Seleção das vacinas específicas aplicadas (V8/V10, Antirrábica, etc.), facilitando o acompanhamento da saúde do pet.
+- **💬 Contato Contextual no WhatsApp com a ONG:** Dentro da ficha do pet, um botão inteligente monta automaticamente a mensagem personalizada para o WhatsApp oficial da Takanil (ex: *"Quero Adotar o Thor!"*, *"Quero Ajudar no Tratamento!"* ou *"Tenho Notícias!"* para animais desaparecidos), com suporte especial para ninhadas e múltiplos filhotes.
+- **✂️ Ferramenta de Enquadramento Vertical de Fotos:** Novo recurso com corte e zoom na proporção vertical padronizada (500x680) para garantir que as fotos dos animais fiquem sempre bem centralizadas e sem distorções nos cards.
+
+### ⚡ Melhorias e Refinamentos
+
+- **🐾 Catálogo Integrado com Visualização de Pets Adotados:** Todos os animais aprovados agora permanecem visíveis na tela inicial, incluindo os pets adotados identificados com o badge verde `[✅ Adotado]`. Assim, voluntárias e visitantes conseguem consultar a situação atual do pet com facilidade, sem achar que o animal sumiu do app. O botão de coração no topo continua disponível como filtro exclusivo para comemorar os Finais Felizes.
+- **↗️ Compartilhamento Ágil e Link Direto:** Botão rápido `[ ↗ ]` no canto da foto que aciona o compartilhamento nativo do celular (Web Share API) ou copia o link direto, gerando uma mensagem amigável com link que destaca o animal na vitrine instantaneamente.
+- **💉 Registro Detalhado de Vacinas Aplicadas:** Seleção das vacinas específicas já tomadas pelo animal (V8/V10, Antirrábica, etc.), facilitando o acompanhamento clínico veterinário.
 
 ---
 
