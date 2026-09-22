@@ -125,7 +125,7 @@
         rel="noopener noreferrer" 
         class="flex-[2] py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm active:scale-98 transition-all min-h-[48px]"
       >
-        <span class="text-lg">💚</span>
+        <span id="iconeBtnAdotar" class="text-lg">💚</span>
         <span id="txtBtnAdotar">Quero Adotar!</span>
       </a>
       <button 
@@ -152,6 +152,20 @@
 
 <script>
   import { gerarLegendaAnimal } from '../lib/geradorLegenda';
+  import { 
+    obterLinkWhatsAppContextual, 
+    obterLabelWhatsAppContextual, 
+    TAKANIL_WHATSAPP_NUMERO, 
+    compartilharAnimalPublico 
+  } from '../lib/whatsappContextual';
+
+  function obterUrlBaseApp(): string {
+    if (typeof window === 'undefined') return 'https://hub-takanil.vercel.app';
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'https://hub-takanil.vercel.app';
+    }
+    return window.location.origin;
+  }
 
   (window as any).abrirFichaAnimal = (id: string) => {
     const animaisGlobais = (window as any).animaisGlobais || [];
@@ -178,17 +192,33 @@
     const tempoSistemaEl = document.getElementById('fichaTempoSistema');
     const dataCadastroEl = document.getElementById('fichaDataCadastro');
     const btnAdotar = document.getElementById('btnAdotarWhatsApp') as HTMLAnchorElement;
+    const iconeBtnAdotar = document.getElementById('iconeBtnAdotar');
     const txtBtnAdotar = document.getElementById('txtBtnAdotar');
     const btnCompartilhar = document.getElementById('btnCompartilharFicha');
     const btnInstagram = document.getElementById('btnFichaInstagram') as HTMLAnchorElement;
 
-    const nomeSanitizado = animal.nome && animal.nome.trim() !== '' ? animal.nome : 'Sem Nome';
+    // Detecção e formatação para ninhadas e múltiplos animais
+    const especie = animal.especie?.toLowerCase() || '';
+    const sexo = animal.sexo?.toLowerCase() || '';
+    const isPlural = (sexo.includes('misto') || sexo.includes('ninhada')) || (especie.includes('múltiplos') || especie.includes('multiplos')) || (animal.quantidade > 1);
+
+    let tituloExibicao = animal.nome && animal.nome.trim() !== '' ? animal.nome.trim() : 'Sem Nome';
+    if (isPlural) {
+      if (especie.includes('gato') || especie.includes('felin')) {
+        tituloExibicao = 'Gatinhos';
+      } else if (especie.includes('cão') || especie.includes('cao') || especie.includes('cachorr')) {
+        tituloExibicao = 'Cãezinhos';
+      } else {
+        tituloExibicao = 'Filhotinhos';
+      }
+    }
+
     const fotoUrl = animal.imagem_url || '/assets/takanil-icon-png.png';
     const subtituloZoom = `${animal.especie || 'Animal'} • ${animal.sexo || ''} • ${animal.peso ? animal.peso + 'kg' : ''} • ${animal.localizacao || ''}`;
 
     // Foto e Cabeçalho
     if (img) img.src = fotoUrl;
-    if (nomeEl) nomeEl.textContent = nomeSanitizado;
+    if (nomeEl) nomeEl.textContent = tituloExibicao;
     if (locEl) {
       const bairroStr = animal.bairro ? ` (${animal.bairro})` : '';
       locEl.textContent = `📍 ${animal.localizacao || 'Passa Quatro/MG'}${bairroStr}`;
@@ -212,7 +242,7 @@
     // Botão Ampliar Foto
     if (btnAmpliar) {
       btnAmpliar.onclick = () => {
-        (window as any).abrirModalZoom(fotoUrl, nomeSanitizado, subtituloZoom);
+        (window as any).abrirModalZoom(fotoUrl, tituloExibicao, subtituloZoom);
       };
     }
 
@@ -350,36 +380,28 @@
       dataCadastroEl.textContent = `Cadastrado em ${dataFormatada}`;
     }
 
-    // Botão de Adoção via WhatsApp
+    // Botão de Adoção via WhatsApp Contextual
+    const urlApp = `${obterUrlBaseApp()}/?animal=${animal.id}`;
+    const linkWhats = obterLinkWhatsAppContextual(animal, TAKANIL_WHATSAPP_NUMERO, urlApp);
+    const labelContextual = obterLabelWhatsAppContextual(animal, 'completo');
+
     if (btnAdotar) {
-      const mensagemWhats = `Olá! Vi o cadastro de *${nomeSanitizado}* no Hub Takanil e gostaria de mais informações para adoção/apadrinhamento!`;
-      btnAdotar.href = `https://wa.me/553598687395?text=${encodeURIComponent(mensagemWhats)}`;
+      btnAdotar.href = linkWhats;
+    }
+    if (iconeBtnAdotar) {
+      iconeBtnAdotar.textContent = labelContextual.icone;
     }
     if (txtBtnAdotar) {
-      txtBtnAdotar.textContent = `Quero Adotar o(a) ${nomeSanitizado}!`;
+      txtBtnAdotar.textContent = labelContextual.texto;
     }
 
-    // Botão Compartilhar Ficha (Web Share API)
+    // Botão Compartilhar Ficha (menu integrado de opções ou fallback nativo)
     if (btnCompartilhar) {
-      btnCompartilhar.onclick = async () => {
-        const shareData = {
-          title: `Conheça ${nomeSanitizado} - ONG Takanil`,
-          text: `Olha que amor! Conheça ${nomeSanitizado}, disponível para adoção responsável na ONG Takanil em Passa Quatro/MG:\n\n${legendaFinal.slice(0, 200)}...`,
-          url: window.location.href
-        };
-        if (navigator.share) {
-          try {
-            await navigator.share(shareData);
-          } catch (err) {
-            // Compartilhamento cancelado pelo usuário
-          }
+      btnCompartilhar.onclick = () => {
+        if (typeof (window as any).compartilharAnimal === 'function') {
+          (window as any).compartilharAnimal(animal.id);
         } else {
-          try {
-            await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
-            (window as any).mostrarToast?.('Link e resumo do animal copiados!', 'sucesso');
-          } catch (e) {
-            (window as any).mostrarToast?.('Não foi possível compartilhar.', 'erro');
-          }
+          compartilharAnimalPublico(animal, urlApp);
         }
       };
     }

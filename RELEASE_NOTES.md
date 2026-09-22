@@ -4,6 +4,20 @@ Histórico de melhorias, novidades e correções entregues em cada versão do Hu
 
 ---
 
+## 🚀 Versão 0.12.0 — Gestão Ágil de Status, Catálogo Integrado & WhatsApp Contextual (Em Breve)
+
+### ✨ Novidades da Versão
+
+- **✨ `[Gestão]` Menu Rápido de Status com Botão "Desfazer":** Os botões antigos dos cards foram substituídos por um menu discreto `[ ⋮ ]`. Ao mudar o status do animal (Adotado, Voltou pro Tutor, Urgência Médica, etc.), uma notificação surge na tela com o botão **"Desfazer"** por 5 segundos para reverter qualquer toque acidental imediatamente sem confirmações burocráticas.
+- **🐾 Catálogo Integrado com Visualização de Todos os Status:** Todos os animais aprovados agora permanecem visíveis na tela inicial, incluindo os pets adotados identificados com o badge verde `[✅ Adotado]`. Assim, qualquer voluntária ou visitante consegue consultar a situação atual do pet com facilidade. O botão de coração no topo continua disponível como filtro exclusivo para comemorar os Finais Felizes.
+- **↗️ Menu de Compartilhamento Ágil:** Botão rápido `[ ↗ ]` no canto superior da foto que abre opções diretas para **WhatsApp** (com texto contextual e link), **Instagram** e **Copiar Tudo**, adaptando concordância gramatical para ninhadas/múltiplos pets e situações de urgência ou desaparecimento.
+- **🔗 Link Direto do Pet no App:** Compartilhar o pet gera um link direto que destaca o card do animal na tela inicial instantaneamente.
+- **💬 Contato Direto com a ONG no WhatsApp:** Botão no rodapé do card dedicado para interessados sem login conversarem diretamente com o WhatsApp oficial da ONG Takanil.
+- **✂️ Enquadramento Vertical de Fotos:** Nova ferramenta com corte na proporção vertical padronizada (500x680) para garantir que as fotos dos animais fiquem sempre bem centralizadas e sem distorções nos cards.
+- **💉 Registro Detalhado de Vacinas:** Seleção das vacinas específicas aplicadas (V8/V10, Antirrábica, etc.), facilitando o acompanhamento da saúde do pet.
+
+---
+
 ## 🚀 Versão 0.11.0 — Formulário Inteligente & Legendas da Rita (19/09/2026)
 
 ### ✨ Novidades da Versão
