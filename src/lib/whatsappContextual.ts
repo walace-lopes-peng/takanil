@@ -195,6 +195,7 @@ export function abrirWhatsAppDireto(animal: AnimalWhatsAppInfo, telefone: string
  */
 export async function compartilharAnimalPublico(animal: AnimalWhatsAppInfo, linkApp?: string): Promise<'compartilhado' | 'copiado' | 'cancelado' | 'erro'> {
   const mensagem = gerarMensagemCompartilhamentoPublico(animal, linkApp);
+  const titulo = `Takanil - ${animal.nome || 'Animal'}`;
   // Tenta compartilhamento nativo do navegador/celular
   if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
     try {

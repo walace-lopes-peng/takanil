@@ -316,6 +316,60 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
     </div>
   </div>
 
+  <!-- Modal / Bottom Sheet de Opções de Compartilhamento -->
+  <div id="modalCompartilharBackdrop" class="fixed inset-0 z-50 bg-black/60 hidden transition-opacity duration-200 opacity-0" onclick="fecharModalCompartilhar()"></div>
+  <div id="modalCompartilhar" class="fixed inset-x-0 bottom-0 sm:bottom-auto sm:inset-0 sm:flex sm:items-center sm:justify-center z-50 hidden transition-all duration-200 translate-y-full sm:translate-y-0 sm:opacity-0 p-0 sm:p-4 pointer-events-none" role="dialog" aria-modal="true" aria-labelledby="modalCompartilharTitulo">
+    <div class="pointer-events-auto bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border border-gray-200 w-full sm:max-w-md overflow-hidden p-5 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div>
+          <h3 class="text-base font-bold text-gray-900" id="modalCompartilharTitulo">Compartilhar Animal</h3>
+          <p class="text-xs text-gray-500">Escolha onde deseja compartilhar</p>
+        </div>
+        <button type="button" onclick="fecharModalCompartilhar()" aria-label="Fechar opções de compartilhamento" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 min-w-[44px] min-h-[44px] flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="space-y-2.5">
+        <!-- Opção WhatsApp -->
+        <button type="button" onclick="executarCompartilhamento('whatsapp')" class="w-full flex items-center gap-3.5 p-3.5 rounded-2xl border border-green-200 bg-green-50/70 hover:bg-green-100 text-green-900 transition-all active:scale-[0.98] min-h-[48px] text-left">
+          <img src="/assets/whatspp-icon-png.png" alt="WhatsApp" class="w-8 h-8 object-contain shrink-0" />
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-sm">WhatsApp</div>
+            <div class="text-xs text-green-700">Enviar para amigos, grupos ou Status</div>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+
+        <!-- Opção Instagram -->
+        <button type="button" onclick="executarCompartilhamento('instagram')" class="w-full flex items-center gap-3.5 p-3.5 rounded-2xl border border-pink-200 bg-pink-50/70 hover:bg-pink-100 text-pink-900 transition-all active:scale-[0.98] min-h-[48px] text-left">
+          <img src="/assets/insta-logo.png" alt="Instagram" class="w-8 h-8 object-contain shrink-0" />
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-sm">Instagram</div>
+            <div class="text-xs text-pink-700">Copia texto/link e abre o Instagram</div>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+
+        <!-- Opção Copiar Texto e Link -->
+        <button type="button" onclick="executarCompartilhamento('copiar')" class="w-full flex items-center gap-3.5 p-3.5 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-800 transition-all active:scale-[0.98] min-h-[48px] text-left">
+          <span class="text-2xl w-8 text-center shrink-0">📋</span>
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-sm">Copiar Mensagem e Link</div>
+            <div class="text-xs text-gray-500">Copia tudo para colar onde quiser</div>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
+
+      <div class="pt-1">
+        <button type="button" onclick="fecharModalCompartilhar()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 active:scale-98 text-gray-700 font-semibold rounded-xl text-sm transition-all min-h-[44px]">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal de Novidades da Versão -->
   <ModalNovidades />
 
@@ -344,7 +398,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
 
 <script>
   import { supabase, getUserRole } from '../lib/supabaseClient';
-  import { abrirWhatsAppDireto, compartilharAnimalPublico } from '../lib/whatsappContextual';
+  import { abrirWhatsAppDireto, gerarMensagemCompartilhamentoPublico } from '../lib/whatsappContextual';
 
   const listaAnimais = document.getElementById('listaAnimais');
   const totalRacaoEl = document.getElementById('totalRacao');
@@ -358,6 +412,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
   let isAdminGlob = false;
   let modoVisualizacao: 'grid' | 'list' = (localStorage.getItem('takanil_view_mode') as any) || 'grid';
   let paramAnimalProcessado = false;
+  let animalParaCompartilhar: any = null;
 
   // Variáveis de Filtro do Modal e Busca
   let termoBusca = '';
@@ -470,6 +525,7 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       (window as any).fecharModalZoom();
+      (window as any).fecharModalCompartilhar?.();
       (window as any).fecharModalFiltros();
       (window as any).fecharDropdownStatus();
       (window as any).fecharModalNovidades?.();
@@ -1105,21 +1161,70 @@ import { VERSAO_ATUAL } from "../data/novidades.ts";
   // Mantido para retrocompatibilidade
   (window as any).compartilharWhatsApp = (window as any).falarComTakanil;
 
-  // 2. Compartilhamento público do animal (redes sociais / amigos / grupos)
-  (window as any).compartilharAnimal = async (id: string, btn?: HTMLElement) => {
+  // 2. Abre o menu de opções para a pessoa escolher onde compartilhar
+  (window as any).compartilharAnimal = (id: string) => {
     const animal = animaisGlobais.find(a => a.id === id);
     if (!animal) return;
-    if (btn) btn.classList.add('opacity-50', 'pointer-events-none');
-    try {
-      const urlApp = `${obterUrlBaseApp()}/?animal=${animal.id}`;
-      const resultado = await compartilharAnimalPublico(animal, urlApp);
-      if (resultado === 'copiado') {
-        (window as any).mostrarToast?.('Mensagem e link copiados! Cole onde quiser 📋✨', 'sucesso');
-      } else if (resultado === 'compartilhado') {
-        (window as any).mostrarToast?.('Prontinho para compartilhar! 🐾✨', 'sucesso');
+    animalParaCompartilhar = animal;
+
+    const tituloEl = document.getElementById('modalCompartilharTitulo');
+    if (tituloEl) {
+      tituloEl.textContent = `Compartilhar ${animal.nome || 'Animal'}`;
+    }
+
+    const modal = document.getElementById('modalCompartilhar');
+    const backdrop = document.getElementById('modalCompartilharBackdrop');
+    if (!modal || !backdrop) return;
+
+    backdrop.classList.remove('hidden');
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      backdrop.classList.remove('opacity-0');
+      backdrop.classList.add('opacity-100');
+      modal.classList.remove('translate-y-full', 'sm:opacity-0');
+      modal.classList.add('translate-y-0', 'sm:opacity-100');
+    });
+  };
+
+  (window as any).fecharModalCompartilhar = () => {
+    const modal = document.getElementById('modalCompartilhar');
+    const backdrop = document.getElementById('modalCompartilharBackdrop');
+    if (!modal || !backdrop) return;
+
+    backdrop.classList.remove('opacity-100');
+    backdrop.classList.add('opacity-0');
+    modal.classList.remove('translate-y-0', 'sm:opacity-100');
+    modal.classList.add('translate-y-full', 'sm:opacity-0');
+
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      backdrop.classList.add('hidden');
+    }, 200);
+  };
+
+  (window as any).executarCompartilhamento = async (destino: 'whatsapp' | 'instagram' | 'copiar') => {
+    if (!animalParaCompartilhar) return;
+    const urlApp = `${obterUrlBaseApp()}/?animal=${animalParaCompartilhar.id}`;
+    const mensagem = gerarMensagemCompartilhamentoPublico(animalParaCompartilhar, urlApp);
+
+    (window as any).fecharModalCompartilhar();
+
+    if (destino === 'whatsapp') {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`, '_blank');
+      (window as any).mostrarToast?.('Abrindo WhatsApp para escolher conversa... 💬', 'sucesso');
+    } else if (destino === 'instagram') {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(mensagem);
       }
-    } finally {
-      if (btn) btn.classList.remove('opacity-50', 'pointer-events-none');
+      (window as any).mostrarToast?.('Mensagem copiada! Abrindo o Instagram... 📸', 'sucesso');
+      setTimeout(() => {
+        window.open('https://www.instagram.com', '_blank');
+      }, 500);
+    } else if (destino === 'copiar') {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(mensagem);
+      }
+      (window as any).mostrarToast?.('Mensagem e link copiados com sucesso! 📋✨', 'sucesso');
     }
   };
 
