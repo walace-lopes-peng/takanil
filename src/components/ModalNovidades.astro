@@ -73,7 +73,7 @@ import { VERSAO_ATUAL, NOVIDADES_VERSAO } from '../data/novidades';
 </div>
 
 <script>
-  import { VERSAO_ATUAL } from '../data/novidades';
+  import { VERSAO_NOVIDADES } from '../data/novidades';
 
   const STORAGE_KEY = 'takanil_versao_vista';
   const modal = document.getElementById('modalNovidades');
@@ -90,7 +90,7 @@ import { VERSAO_ATUAL, NOVIDADES_VERSAO } from '../data/novidades';
     });
 
     // Marca como vista e remove pontinho de novidade
-    localStorage.setItem(STORAGE_KEY, VERSAO_ATUAL);
+    localStorage.setItem(STORAGE_KEY, VERSAO_NOVIDADES);
     atualizarBadgeNovidades();
   };
 
@@ -105,7 +105,7 @@ import { VERSAO_ATUAL, NOVIDADES_VERSAO } from '../data/novidades';
       modal.classList.add('hidden');
     }, 250);
 
-    localStorage.setItem(STORAGE_KEY, VERSAO_ATUAL);
+    localStorage.setItem(STORAGE_KEY, VERSAO_NOVIDADES);
     atualizarBadgeNovidades();
   };
 
@@ -113,7 +113,7 @@ import { VERSAO_ATUAL, NOVIDADES_VERSAO } from '../data/novidades';
     const badge = document.getElementById('badgeNovidadesFooter');
     const versaoVista = localStorage.getItem(STORAGE_KEY);
     if (badge) {
-      if (versaoVista !== VERSAO_ATUAL) {
+      if (versaoVista !== VERSAO_NOVIDADES) {
         badge.classList.remove('hidden');
       } else {
         badge.classList.add('hidden');
@@ -139,7 +139,7 @@ import { VERSAO_ATUAL, NOVIDADES_VERSAO } from '../data/novidades';
   document.addEventListener('DOMContentLoaded', () => {
     atualizarBadgeNovidades();
     const versaoVista = localStorage.getItem(STORAGE_KEY);
-    if (versaoVista !== VERSAO_ATUAL) {
+    if (versaoVista !== VERSAO_NOVIDADES) {
       // Abre automaticamente após 600ms para uma transição suave de tela
       setTimeout(() => {
         (window as any).abrirModalNovidades();

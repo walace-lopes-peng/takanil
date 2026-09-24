@@ -8,6 +8,11 @@ export interface ItemNovidade {
 
 export const VERSAO_ATUAL = packageJson.version;
 
+// Chave usada pelo localStorage para controlar se o modal já foi visto.
+// Usa apenas MAJOR.MINOR — patches (ex: 0.12.1) não reexibem o modal.
+// Só atualize este valor quando houver novidades reais para as voluntárias.
+export const VERSAO_NOVIDADES = packageJson.version.split('.').slice(0, 2).join('.');
+
 export const NOVIDADES_VERSAO: ItemNovidade[] = [
   // --- Novas Funcionalidades ---
   {
