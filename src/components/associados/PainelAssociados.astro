@@ -2,6 +2,7 @@
 import ModalAssociado from './ModalAssociado.astro';
 import ModalLembreteAssociado from './ModalLembreteAssociado.astro';
 import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
+import ModalImportarLote from './ModalImportarLote.astro';
 ---
 
 <div class="space-y-6">
@@ -62,46 +63,82 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
         />
       </div>
 
-      <!-- Botão Novo Associado -->
-      <button
-        type="button"
-        id="btnAbrirNovoAssociado"
-        class="shrink-0 px-5 py-3 bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 min-h-[44px]"
-      >
-        <span>➕</span> Novo Associado
-      </button>
+      <!-- Botões de Ação: Novo e Importar -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button
+          type="button"
+          id="btnAbrirImportarLote"
+          class="px-3.5 sm:px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 active:scale-95 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5 min-h-[44px]"
+          title="Importar vários associados de uma planilha"
+        >
+          <span>📥</span> <span>Importar em Lote</span>
+        </button>
+
+        <button
+          type="button"
+          id="btnAbrirNovoAssociado"
+          class="px-4 sm:px-5 py-3 bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 min-h-[44px]"
+        >
+          <span>➕</span> <span>Novo Associado</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Toggles Rápidos de Filtro por Status -->
-    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none" id="filtrosStatusAssociados">
-      <button
-        type="button"
-        data-filtro="todos"
-        class="filtro-associado-btn px-3.5 py-2 rounded-xl border transition-all bg-taka-green-700 text-white border-taka-green-700 shadow-2xs whitespace-nowrap min-h-[40px]"
-      >
-        Todos (<span id="contFiltroTodos">0</span>)
-      </button>
-      <button
-        type="button"
-        data-filtro="atrasados"
-        class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
-      >
-        ⚠️ Atrasados (<span id="contFiltroAtrasados">0</span>)
-      </button>
-      <button
-        type="button"
-        data-filtro="vencendo"
-        class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
-      >
-        ⏳ Vencendo (<span id="contFiltroVencendo">0</span>)
-      </button>
-      <button
-        type="button"
-        data-filtro="em_dia"
-        class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
-      >
-        ✅ Em dia (<span id="contFiltroEmDia">0</span>)
-      </button>
+    <!-- Barra de Filtros e Alternador de Modo de Visualização -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+      <!-- Toggles Rápidos de Filtro por Status -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none" id="filtrosStatusAssociados">
+        <button
+          type="button"
+          data-filtro="todos"
+          class="filtro-associado-btn px-3.5 py-2 rounded-xl border transition-all bg-taka-green-700 text-white border-taka-green-700 shadow-2xs whitespace-nowrap min-h-[40px]"
+        >
+          Todos (<span id="contFiltroTodos">0</span>)
+        </button>
+        <button
+          type="button"
+          data-filtro="atrasados"
+          class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
+        >
+          ⚠️ Atrasados (<span id="contFiltroAtrasados">0</span>)
+        </button>
+        <button
+          type="button"
+          data-filtro="vencendo"
+          class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
+        >
+          ⏳ Vencendo (<span id="contFiltroVencendo">0</span>)
+        </button>
+        <button
+          type="button"
+          data-filtro="em_dia"
+          class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
+        >
+          ✅ Em dia (<span id="contFiltroEmDia">0</span>)
+        </button>
+      </div>
+
+      <!-- Alternador de Visualização (Cards vs Linhas) -->
+      <div class="flex items-center p-1 bg-gray-100 rounded-xl border border-gray-200 shrink-0 self-end sm:self-auto" role="group" aria-label="Modo de visualização dos associados">
+        <button
+          type="button"
+          id="btnModoCardsAssoc"
+          aria-label="Visualizar em cartões"
+          title="Visualização em Cartões"
+          class="h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs"
+        >
+          <span>🗂️</span> <span>Cards</span>
+        </button>
+        <button
+          type="button"
+          id="btnModoLinhasAssoc"
+          aria-label="Visualizar em linhas compactas"
+          title="Visualização em Linhas Compactas"
+          class="h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900"
+        >
+          <span>📋</span> <span>Linhas</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -135,6 +172,7 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
 <ModalAssociado />
 <ModalLembreteAssociado />
 <ModalConfirmarPagamento />
+<ModalImportarLote />
 
 <script>
   import { supabase } from '../../lib/supabaseClient';
@@ -180,6 +218,36 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
   const formAssociado = document.getElementById('formAssociado') as HTMLFormElement | null;
   const modalLembrete = document.getElementById('modalLembrete');
   const modalPagamento = document.getElementById('modalConfirmarPagamento');
+
+  // Alternador de Visualização (Cards vs Linhas)
+  let modoVisualizacaoAssoc: 'cards' | 'linhas' = (localStorage.getItem('takanil_assoc_view') as any) || 'cards';
+  const btnModoCards = document.getElementById('btnModoCardsAssoc');
+  const btnModoLinhas = document.getElementById('btnModoLinhasAssoc');
+
+  function atualizarModoVisualizacao(modo: 'cards' | 'linhas') {
+    modoVisualizacaoAssoc = modo;
+    localStorage.setItem('takanil_assoc_view', modo);
+    if (btnModoCards && btnModoLinhas) {
+      if (modo === 'cards') {
+        btnModoCards.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer';
+        btnModoLinhas.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer';
+      } else {
+        btnModoCards.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer';
+        btnModoLinhas.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer';
+      }
+    }
+    if (container) {
+      if (modo === 'cards') {
+        container.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+      } else {
+        container.className = 'flex flex-col gap-2.5';
+      }
+    }
+    renderizarCards();
+  }
+
+  btnModoCards?.addEventListener('click', () => atualizarModoVisualizacao('cards'));
+  btnModoLinhas?.addEventListener('click', () => atualizarModoVisualizacao('linhas'));
 
   // Inicialização
   async function carregarAssociados() {
@@ -303,6 +371,67 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
           if (partes.length === 3) {
             ultimoPagoTexto = `${partes[2]}/${partes[1]}/${partes[0]}`;
           }
+        }
+
+        // Renderização em Modo Linhas Compactas
+        if (modoVisualizacaoAssoc === 'linhas') {
+          return `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-white rounded-2xl border border-gray-100 shadow-2xs hover:border-gray-200 gap-3">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="text-sm font-bold text-gray-900 truncate">${a.nome}</h4>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${st.classeBadge}">
+                    ${st.rotulo}
+                  </span>
+                </div>
+                <div class="text-xs text-gray-500 flex items-center gap-2 mt-1 flex-wrap font-medium">
+                  <span>Vence dia <strong>${a.dia_vencimento}</strong></span>
+                  <span>•</span>
+                  <span class="font-extrabold text-gray-900">${valorFormatado}</span>
+                  ${telLimpo ? `<span>•</span><span class="text-gray-700">📱 ${telFormatado}</span>` : ''}
+                  ${instaFormatado ? `<span>•</span><a href="${gerarLinkInstagram(a.instagram)}" target="_blank" rel="noopener noreferrer" class="text-pink-600 font-bold hover:underline">📸 ${instaFormatado}</a>` : ''}
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-50 w-full sm:w-auto justify-end">
+                ${st.status === 'em_dia' ? `
+                  <button
+                    type="button"
+                    data-acao-lembrete="${a.id}"
+                    data-tipo-sugerido="agradecimento"
+                    class="py-2 px-3 bg-white hover:bg-emerald-50 active:scale-95 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-300 transition-all flex items-center gap-1 min-h-[38px]"
+                  >
+                    <span>❤️</span> Agradecer
+                  </button>
+                ` : `
+                  <button
+                    type="button"
+                    data-acao-lembrete="${a.id}"
+                    data-tipo-sugerido="${st.tipoMensagemSugerida}"
+                    class="py-2 px-3 bg-white hover:bg-amber-50 active:scale-95 text-amber-900 font-bold text-xs rounded-xl border border-amber-300 transition-all flex items-center gap-1 min-h-[38px]"
+                  >
+                    <span>💬</span> Lembrar
+                  </button>
+                  <button
+                    type="button"
+                    data-acao-pagamento="${a.id}"
+                    class="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center gap-1 min-h-[38px]"
+                  >
+                    <span>💵</span> Baixa
+                  </button>
+                `}
+                <button
+                  type="button"
+                  data-acao-editar="${a.id}"
+                  class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center"
+                  title="Editar ${a.nome}"
+                  aria-label="Editar ${a.nome}"
+                >
+                  ✏️
+                </button>
+              </div>
+            </div>
+          `;
         }
 
         const btnAcaoPrincipal = st.status === 'em_dia'
@@ -494,6 +623,7 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
     const card = document.getElementById('modalAssociadoCard');
     const titulo = document.getElementById('modalAssociadoTitulo');
     const btnExcluir = document.getElementById('btnExcluirAssociado');
+    const btnSalvarENovo = document.getElementById('btnSalvarENovoAssociado');
     const btnSalvarTexto = document.getElementById('btnSalvarAssociadoTexto');
 
     const inputId = document.getElementById('associadoId') as HTMLInputElement;
@@ -509,7 +639,14 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
     if (associado) {
       if (titulo) titulo.textContent = 'Editar Associado';
       if (btnSalvarTexto) btnSalvarTexto.textContent = 'Salvar Alterações';
-      if (btnExcluir) btnExcluir.classList.remove('hidden');
+      if (btnExcluir) {
+        btnExcluir.classList.remove('hidden');
+        btnExcluir.classList.add('inline-flex');
+      }
+      if (btnSalvarENovo) {
+        btnSalvarENovo.classList.add('hidden');
+        btnSalvarENovo.classList.remove('inline-flex');
+      }
 
       if (inputId) inputId.value = associado.id;
       if (inputNome) inputNome.value = associado.nome;
@@ -523,7 +660,14 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
     } else {
       if (titulo) titulo.textContent = 'Novo Associado';
       if (btnSalvarTexto) btnSalvarTexto.textContent = 'Salvar Associado';
-      if (btnExcluir) btnExcluir.classList.add('hidden');
+      if (btnExcluir) {
+        btnExcluir.classList.add('hidden');
+        btnExcluir.classList.remove('inline-flex');
+      }
+      if (btnSalvarENovo) {
+        btnSalvarENovo.classList.remove('hidden');
+        btnSalvarENovo.classList.add('inline-flex');
+      }
       formAssociado?.reset();
       if (inputId) inputId.value = '';
       if (inputDia) inputDia.value = '10';
@@ -548,10 +692,17 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
     modalAssociado.classList.add('opacity-0');
     card?.classList.remove('scale-100');
     card?.classList.add('scale-95');
+    salvarENovo = false;
     setTimeout(() => {
       modalAssociado.classList.add('hidden');
     }, 250);
   }
+
+  let salvarENovo = false;
+  document.getElementById('btnSalvarENovoAssociado')?.addEventListener('click', () => {
+    salvarENovo = true;
+    formAssociado?.requestSubmit();
+  });
 
   document.getElementById('btnAbrirNovoAssociado')?.addEventListener('click', () => abrirModalAssociado());
   document.getElementById('btnFecharModalAssociado')?.addEventListener('click', fecharModalAssociado);
@@ -675,8 +826,27 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
         (window as any).mostrarToast?.('Associado cadastrado com sucesso!', 'sucesso');
       }
 
-      fecharModalAssociado();
-      await carregarAssociados();
+      if (salvarENovo) {
+        salvarENovo = false;
+        // Limpar dados para o próximo cadastro contínuo
+        const inputId = document.getElementById('associadoId') as HTMLInputElement | null;
+        const inputNome = document.getElementById('associadoNome') as HTMLInputElement | null;
+        const inputZap = document.getElementById('associadoWhatsapp') as HTMLInputElement | null;
+        const inputInsta = document.getElementById('associadoInstagram') as HTMLInputElement | null;
+        const inputObs = document.getElementById('associadoObservacoes') as HTMLTextAreaElement | null;
+        if (inputId) inputId.value = '';
+        if (inputNome) inputNome.value = '';
+        if (inputZap) inputZap.value = '';
+        if (inputInsta) inputInsta.value = '';
+        if (inputObs) inputObs.value = '';
+        sanitizarInstaAoColar();
+        inputNome?.focus();
+        (window as any).mostrarToast?.('Associado salvo! Pode preencher o próximo.', 'sucesso');
+        await carregarAssociados();
+      } else {
+        fecharModalAssociado();
+        await carregarAssociados();
+      }
     } catch (err: any) {
       console.error('Erro ao salvar associado:', err);
       (window as any).mostrarToast?.(`Erro ao salvar: ${err.message || err}`, 'erro');
@@ -965,10 +1135,17 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
     }, 200);
   });
 
-  // Inicializar dados ao carregar a página
-  document.addEventListener('DOMContentLoaded', () => {
+  // Inicializar dados e modo de exibição ao carregar a página
+  function inicializarPainelAssociados() {
+    atualizarModoVisualizacao(modoVisualizacaoAssoc);
     carregarAssociados();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarPainelAssociados);
+  } else {
+    inicializarPainelAssociados();
+  }
 
   // Exportar função para recarregar se necessário externamente
   (window as any).recarregarAssociados = carregarAssociados;

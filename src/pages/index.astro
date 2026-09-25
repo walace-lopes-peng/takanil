@@ -9,14 +9,132 @@ import { VERSAO_ATUAL } from '../data/novidades';
   
   <div class="space-y-6 pb-20">
     
-    <!-- Header / Ração -->
-    <div class="bg-gradient-to-br from-taka-green-500 to-taka-green-700 text-white rounded-2xl p-6 shadow-md border border-taka-green-400/50">
-      <h2 class="text-sm font-medium text-taka-green-100 mb-1">Previsão de Ração (Mensal)</h2>
-      <div class="flex items-baseline space-x-2">
-        <span class="text-4xl font-bold" id="totalRacao">--</span>
-        <span class="text-taka-green-200">kg/mês</span>
+    <!-- Placar de Impacto da ONG (Visível para o público / visitantes deslogados) -->
+    <div id="placarImpactoPublico" class="bg-gradient-to-r from-emerald-600 via-taka-green-600 to-teal-700 text-white rounded-2xl p-4 sm:p-5 shadow-sm border border-emerald-400/30">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <span class="text-[11px] uppercase tracking-wider font-extrabold text-emerald-200 block mb-0.5">Placar de Impacto</span>
+          <h2 class="text-base sm:text-lg font-extrabold text-white leading-tight">ONG Takanil em Ação</h2>
+          <p class="text-xs text-emerald-100/90 mt-0.5">Protegendo e transformando vidas em Passa Quatro/MG</p>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <div class="bg-white/15 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-white/20 text-center min-w-[76px]">
+            <span class="block text-lg font-black text-white leading-none" id="publicoDisponiveis">--</span>
+            <span class="text-[10px] uppercase font-bold text-emerald-100 tracking-wider">Adoção</span>
+          </div>
+          <div class="bg-white/15 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-white/20 text-center min-w-[76px]">
+            <span class="block text-lg font-black text-white leading-none" id="publicoAdotados">--</span>
+            <span class="text-[10px] uppercase font-bold text-emerald-100 tracking-wider">Adotados</span>
+          </div>
+          <div class="bg-white/15 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-white/20 text-center min-w-[76px]">
+            <span class="block text-lg font-black text-white leading-none" id="publicoDesaparecidos">--</span>
+            <span class="text-[10px] uppercase font-bold text-emerald-100 tracking-wider">Desaparecidos</span>
+          </div>
+        </div>
       </div>
-      <p class="text-xs text-taka-green-200 mt-2">*Apenas para animais no Abrigo Takanil (aprox. 1.5% peso/dia)</p>
+    </div>
+
+    <!-- Painel Executivo da Gestão (Visível apenas para Administradores / Gestão) -->
+    <div id="painelExecutivoGestao" class="hidden bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-gray-200/80 space-y-4">
+      <!-- Top Bar da Gestão -->
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">👋</span>
+          <div>
+            <h2 class="text-base font-extrabold text-gray-900 leading-tight">Painel da Gestão</h2>
+            <p class="text-xs text-gray-500 font-medium">Indicadores e resumo executivo da ONG</p>
+          </div>
+        </div>
+        <a
+          href="/financas"
+          class="px-3.5 py-2 bg-taka-green-50 hover:bg-taka-green-100 text-taka-green-700 font-bold text-xs rounded-xl border border-taka-green-200 transition-all flex items-center gap-1.5 min-h-[40px] shadow-2xs active:scale-95 shrink-0"
+          title="Acessar Gestão Completa de Associados e Caixa"
+        >
+          <span>📊 Gestão</span>
+          <span>→</span>
+        </a>
+      </div>
+
+      <!-- Grade de 3 Cards Executivos -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- Card 1: Animais & Abrigo -->
+        <div class="p-3.5 bg-gradient-to-br from-emerald-50/70 via-white to-emerald-50/30 rounded-xl border border-emerald-100/90 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1">
+              <span>🐾</span> Animais
+            </span>
+            <span id="badgeRacaoAbrigo" class="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md truncate">
+              -- kg ração
+            </span>
+          </div>
+          <div class="space-y-0.5 my-1">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-black text-gray-900" id="cardQtdAnimais">--</span>
+              <span class="text-xs text-gray-500 font-semibold">no abrigo</span>
+            </div>
+            <p class="text-xs text-gray-500 font-medium truncate" id="cardAnimaisDetalhe">
+              Carregando animais...
+            </p>
+          </div>
+          <a
+            href="#listaAnimais"
+            class="mt-2 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline flex items-center gap-1 min-h-[28px]"
+          >
+            <span>Ver lista de pets</span> <span>↓</span>
+          </a>
+        </div>
+
+        <!-- Card 2: Associados & Apoios -->
+        <div class="p-3.5 bg-gradient-to-br from-teal-50/70 via-white to-teal-50/30 rounded-xl border border-teal-100/90 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-teal-800 flex items-center gap-1">
+              <span>🤝</span> Associados
+            </span>
+            <span id="badgeStatusAssociados" class="text-[10px] font-bold text-teal-700 bg-teal-100/80 px-2 py-0.5 rounded-md truncate">
+              --
+            </span>
+          </div>
+          <div class="space-y-0.5 my-1">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-2xl font-black text-gray-900" id="cardQtdAssociados">--</span>
+              <span class="text-xs text-gray-500 font-semibold">apoiadores</span>
+            </div>
+            <p class="text-xs text-gray-500 font-medium truncate" id="cardAssociadosDetalhe">
+              Carregando associados...
+            </p>
+          </div>
+          <a
+            href="/financas"
+            class="mt-2 text-[11px] font-bold text-teal-700 hover:text-teal-900 hover:underline flex items-center gap-1 min-h-[28px]"
+          >
+            <span>Gerenciar associados</span> <span>→</span>
+          </a>
+        </div>
+
+        <!-- Card 3: Caixa da ONG -->
+        <div class="p-3.5 bg-gradient-to-br from-amber-50/60 via-white to-amber-50/30 rounded-xl border border-amber-100/90 flex flex-col justify-between">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
+              <span>💰</span> Caixa ONG
+            </span>
+            <span class="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md">
+              Saldo Geral
+            </span>
+          </div>
+          <div class="space-y-0.5 my-1">
+            <span class="text-2xl font-black text-gray-900 block truncate" id="cardSaldoCaixa">--</span>
+            <p class="text-xs text-gray-500 font-medium truncate" id="cardCaixaDetalhe">
+              Carregando caixa...
+            </p>
+          </div>
+          <a
+            href="/financas?aba=caixa"
+            class="mt-2 text-[11px] font-bold text-amber-800 hover:text-amber-950 hover:underline flex items-center gap-1 min-h-[28px]"
+          >
+            <span>Ver fluxo de caixa</span> <span>→</span>
+          </a>
+        </div>
+      </div>
     </div>
 
     <!-- Painel de Pendências da Gestão (Visível apenas para Administradores) -->
@@ -429,10 +547,9 @@ import { VERSAO_ATUAL } from '../data/novidades';
 <script>
   import { supabase, getUserRole } from '../lib/supabaseClient';
   import { abrirWhatsAppDireto, gerarMensagemCompartilhamentoPublico } from '../lib/whatsappContextual';
-  import { calcularStatusAssociado } from '../lib/associados';
+  import { calcularStatusAssociado, formatarMoeda } from '../lib/associados';
 
   const listaAnimais = document.getElementById('listaAnimais');
-  const totalRacaoEl = document.getElementById('totalRacao');
   const totalAnimaisEl = document.getElementById('totalAnimais');
   const loadingState = document.getElementById('loadingState');
 
@@ -1675,15 +1792,49 @@ import { VERSAO_ATUAL } from '../data/novidades';
 
     if (loadingState) loadingState.style.display = 'none';
 
-    // Gestão de Pendências da Home (Animais + Associados)
-    const painelPendencias = document.getElementById('painelPendenciasGestao');
-    const bannerAnimais = document.getElementById('bannerPendentesAnimais');
-    const bannerAssoc = document.getElementById('bannerPendentesAssociados');
-    const qtdAnimaisEl = document.getElementById('qtdPendentesAnimais');
-    const qtdAssocEl = document.getElementById('qtdPendentesAssociados');
+    const placarPublico = document.getElementById('placarImpactoPublico');
+    const painelExecutivo = document.getElementById('painelExecutivoGestao');
 
-    let associadosPendentes = 0;
+    // 1. Placar Público de Impacto (visível por padrão ou para visitantes deslogados)
+    const disponiveis = animaisOriginais?.filter(a => a.status === 'Disponível' && a.status_moderacao === 'aprovado').length || 0;
+    const adotados = animaisOriginais?.filter(a => a.status === 'Adotado' || a.situacao_urgencia === 'Adotado' || a.situacao_urgencia === 'Tutor Encontrado').length || 0;
+    const desaparecidos = animaisOriginais?.filter(a => a.situacao_urgencia === 'Desaparecido' && a.status_moderacao === 'aprovado').length || 0;
+
+    const publicoDisponiveisEl = document.getElementById('publicoDisponiveis');
+    const publicoAdotadosEl = document.getElementById('publicoAdotados');
+    const publicoDesaparecidosEl = document.getElementById('publicoDesaparecidos');
+    if (publicoDisponiveisEl) publicoDisponiveisEl.textContent = String(disponiveis);
+    if (publicoAdotadosEl) publicoAdotadosEl.textContent = String(adotados);
+    if (publicoDesaparecidosEl) publicoDesaparecidosEl.textContent = String(desaparecidos);
+
+    // 2. Previsão de Ração do Abrigo
+    let totalRacao = 0;
+    const statusFinais = ['Adotado', 'Tutor Encontrado'];
+    animais.forEach((animal) => {
+      const isResolvido = animal.status === 'Adotado' || statusFinais.includes(animal.situacao_urgencia);
+      if (!isResolvido && animal.localizacao === 'Abrigo Takanil' && animal.peso) {
+        totalRacao += (animal.peso * 0.015) * 30;
+      }
+    });
+
+    // 3. Gestão e Painel Executivo (somente para Administradores)
     if (isAdmin) {
+      placarPublico?.classList.add('hidden');
+      painelExecutivo?.classList.remove('hidden');
+
+      // Card 1: Animais & Abrigo
+      const noAbrigo = animais.filter(a => a.localizacao === 'Abrigo Takanil' && a.status !== 'Adotado').length;
+      const urgencias = animais.filter(a => a.situacao_urgencia && a.situacao_urgencia !== 'Nenhuma' && a.status !== 'Adotado').length;
+      const cardQtdAnimais = document.getElementById('cardQtdAnimais');
+      const cardAnimaisDetalhe = document.getElementById('cardAnimaisDetalhe');
+      const badgeRacaoAbrigo = document.getElementById('badgeRacaoAbrigo');
+      if (cardQtdAnimais) cardQtdAnimais.textContent = String(noAbrigo);
+      if (cardAnimaisDetalhe) cardAnimaisDetalhe.textContent = urgencias > 0 ? `${urgencias} com urgência cadastrada` : 'Nenhuma urgência ativa';
+      if (badgeRacaoAbrigo) badgeRacaoAbrigo.textContent = `~${Math.round(totalRacao)} kg ração/mês`;
+
+      // Card 2: Associados & Apoios
+      let totalAssociadosAtivos = 0;
+      let associadosPendentes = 0;
       try {
         const { data: assocData } = await supabase
           .from('associados')
@@ -1691,6 +1842,7 @@ import { VERSAO_ATUAL } from '../data/novidades';
           .eq('ativo', true);
 
         if (assocData) {
+          totalAssociadosAtivos = assocData.length;
           const hoje = new Date();
           assocData.forEach((assoc) => {
             const st = calcularStatusAssociado(assoc, hoje);
@@ -1700,47 +1852,94 @@ import { VERSAO_ATUAL } from '../data/novidades';
           });
         }
       } catch (errAssoc) {
-        console.warn('Erro ao verificar associados pendentes:', errAssoc);
+        console.warn('Erro ao verificar associados:', errAssoc);
       }
-    }
 
-    let temPendencia = false;
-    if (pendentes.length > 0) {
-      temPendencia = true;
-      bannerAnimais?.classList.remove('hidden');
-      if (qtdAnimaisEl) qtdAnimaisEl.textContent = String(pendentes.length);
-    } else {
-      bannerAnimais?.classList.add('hidden');
-    }
+      const cardQtdAssociados = document.getElementById('cardQtdAssociados');
+      const cardAssociadosDetalhe = document.getElementById('cardAssociadosDetalhe');
+      const badgeStatusAssociados = document.getElementById('badgeStatusAssociados');
+      if (cardQtdAssociados) cardQtdAssociados.textContent = String(totalAssociadosAtivos);
+      if (cardAssociadosDetalhe) {
+        cardAssociadosDetalhe.textContent = associadosPendentes > 0 ? `${associadosPendentes} cobrança(s) pendente(s)` : 'Todas mensalidades em dia';
+      }
+      if (badgeStatusAssociados) {
+        badgeStatusAssociados.textContent = associadosPendentes > 0 ? `${associadosPendentes} pendentes` : '100% em dia';
+      }
 
-    if (associadosPendentes > 0) {
-      temPendencia = true;
-      bannerAssoc?.classList.remove('hidden');
-      if (qtdAssocEl) qtdAssocEl.textContent = String(associadosPendentes);
-    } else {
-      bannerAssoc?.classList.add('hidden');
-    }
+      // Card 3: Caixa da ONG
+      try {
+        const { data: financasData } = await supabase
+          .from('financas')
+          .select('tipo, valor, data');
 
-    if (temPendencia) {
-      painelPendencias?.classList.remove('hidden');
+        let saldo = 0;
+        let entradasMes = 0;
+        const agora = new Date();
+        const anoAtual = agora.getFullYear();
+        const mesAtual = String(agora.getMonth() + 1).padStart(2, '0');
+        const prefixoMesAtual = `${anoAtual}-${mesAtual}`;
+
+        if (financasData) {
+          financasData.forEach((f) => {
+            const val = Number(f.valor) || 0;
+            const tipoNorm = (f.tipo || '').toLowerCase();
+            if (tipoNorm === 'entrada') {
+              saldo += val;
+              if (f.data && f.data.startsWith(prefixoMesAtual)) {
+                entradasMes += val;
+              }
+            } else if (tipoNorm === 'saida' || tipoNorm === 'saída') {
+              saldo -= val;
+            }
+          });
+        }
+
+        const cardSaldoCaixa = document.getElementById('cardSaldoCaixa');
+        const cardCaixaDetalhe = document.getElementById('cardCaixaDetalhe');
+        if (cardSaldoCaixa) cardSaldoCaixa.textContent = formatarMoeda(saldo);
+        if (cardCaixaDetalhe) cardCaixaDetalhe.textContent = `+${formatarMoeda(entradasMes)} este mês`;
+      } catch (errFin) {
+        console.warn('Erro ao verificar caixa:', errFin);
+      }
+
+      // Pendências da Gestão
+      const painelPendencias = document.getElementById('painelPendenciasGestao');
+      const bannerAnimais = document.getElementById('bannerPendentesAnimais');
+      const bannerAssoc = document.getElementById('bannerPendentesAssociados');
+      const qtdAnimaisEl = document.getElementById('qtdPendentesAnimais');
+      const qtdAssocEl = document.getElementById('qtdPendentesAssociados');
+
+      let temPendencia = false;
+      if (pendentes.length > 0) {
+        temPendencia = true;
+        bannerAnimais?.classList.remove('hidden');
+        if (qtdAnimaisEl) qtdAnimaisEl.textContent = String(pendentes.length);
+      } else {
+        bannerAnimais?.classList.add('hidden');
+      }
+
+      if (associadosPendentes > 0) {
+        temPendencia = true;
+        bannerAssoc?.classList.remove('hidden');
+        if (qtdAssocEl) qtdAssocEl.textContent = String(associadosPendentes);
+      } else {
+        bannerAssoc?.classList.add('hidden');
+      }
+
+      if (temPendencia) {
+        painelPendencias?.classList.remove('hidden');
+      } else {
+        painelPendencias?.classList.add('hidden');
+      }
     } else {
+      placarPublico?.classList.remove('hidden');
+      painelExecutivo?.classList.add('hidden');
+      const painelPendencias = document.getElementById('painelPendenciasGestao');
       painelPendencias?.classList.add('hidden');
     }
 
     animaisGlobais = animais;
     (window as any).animaisGlobais = animais;
-    
-    let totalRacao = 0;
-    const statusFinais = ['Adotado', 'Tutor Encontrado'];
-
-    animais.forEach((animal) => {
-      const isResolvido = animal.status === 'Adotado' || statusFinais.includes(animal.situacao_urgencia);
-      if (!isResolvido && animal.localizacao === 'Abrigo Takanil' && animal.peso) {
-        totalRacao += (animal.peso * 0.015) * 30;
-      }
-    });
-
-    if (totalRacaoEl) totalRacaoEl.textContent = totalRacao.toFixed(1);
 
     // Primeira renderização da vitrine normal
     renderLista(animaisGlobais);

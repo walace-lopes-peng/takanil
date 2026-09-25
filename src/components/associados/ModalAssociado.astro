@@ -181,29 +181,38 @@
     </form>
 
     <!-- Rodapé de Ações -->
-    <div class="p-4 sm:p-5 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between gap-3">
+    <div class="p-3.5 sm:p-5 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between gap-2">
       <button
         type="button"
         id="btnExcluirAssociado"
-        class="hidden px-4 py-3 text-rose-600 hover:bg-rose-50 active:scale-95 font-bold text-sm rounded-xl transition-all min-h-[44px]"
+        class="hidden px-3.5 py-2.5 sm:px-4 sm:py-3 text-rose-600 hover:bg-rose-50 active:scale-95 font-bold text-xs sm:text-sm rounded-xl border border-rose-200 transition-all min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap"
       >
-        🗑️ Excluir
+        <span>🗑️</span> <span>Excluir</span>
       </button>
 
-      <div class="flex items-center gap-2.5 ml-auto">
+      <div class="flex items-center gap-2 sm:gap-2.5 ml-auto">
         <button
           type="button"
           id="btnCancelarModalAssociado"
-          class="px-5 py-3 text-gray-600 hover:bg-gray-100 active:scale-95 font-semibold text-sm rounded-xl transition-all min-h-[44px]"
+          class="px-3.5 py-2.5 sm:px-5 sm:py-3 text-gray-600 hover:bg-gray-100 active:scale-95 font-semibold text-xs sm:text-sm rounded-xl transition-all min-h-[44px] shrink-0 whitespace-nowrap"
         >
           Cancelar
+        </button>
+
+        <button
+          type="button"
+          id="btnSalvarENovoAssociado"
+          class="hidden px-3 py-2.5 sm:px-4 sm:py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 active:scale-95 font-bold text-xs sm:text-sm rounded-xl transition-all min-h-[44px] items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
+          title="Salvar e continuar cadastrando o próximo associado"
+        >
+          <span>➕</span> <span>Salvar e Novo</span>
         </button>
 
         <button
           type="submit"
           form="formAssociado"
           id="btnSalvarAssociado"
-          class="px-6 py-3 bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-sm transition-all min-h-[44px] flex items-center justify-center gap-2"
+          class="px-4 py-2.5 sm:px-6 sm:py-3 bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all min-h-[44px] flex items-center justify-center gap-2 shrink-0 whitespace-nowrap"
         >
           <span id="btnSalvarAssociadoTexto">Salvar Associado</span>
         </button>
