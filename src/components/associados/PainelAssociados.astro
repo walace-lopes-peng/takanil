@@ -1,0 +1,921 @@
+---
+import ModalAssociado from './ModalAssociado.astro';
+import ModalLembreteAssociado from './ModalLembreteAssociado.astro';
+import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
+---
+
+<div class="space-y-6">
+  <!-- Resumo Geral em Cards de Estatísticas -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <!-- Card 1: Total de Associados -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-2xs">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+        <span>🤝</span>
+        <span>Apoiadores Ativos</span>
+      </div>
+      <div class="text-2xl sm:text-3xl font-black text-gray-900" id="kpiTotalAssociados">--</div>
+      <div class="text-[11px] text-gray-400 mt-0.5">Mensalistas cadastrados</div>
+    </div>
+
+    <!-- Card 2: Previsão Mensal -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-2xs">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600 mb-1">
+        <span>📈</span>
+        <span>Previsão / Mês</span>
+      </div>
+      <div class="text-2xl sm:text-3xl font-black text-emerald-800" id="kpiPrevisaoMensal">R$ 0,00</div>
+      <div class="text-[11px] text-emerald-700/80 mt-0.5">Se todos contribuírem</div>
+    </div>
+
+    <!-- Card 3: Arrecadado Neste Mês -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-2xs">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-taka-green-700 mb-1">
+        <span>✅</span>
+        <span>Recebido no Mês</span>
+      </div>
+      <div class="text-2xl sm:text-3xl font-black text-taka-green-800" id="kpiRecebidoMes">R$ 0,00</div>
+      <div class="text-[11px] text-taka-green-700/80 mt-0.5" id="kpiPercentualMeta">0% da previsão</div>
+    </div>
+
+    <!-- Card 4: Atrasados -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-2xs">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-500 mb-1">
+        <span>⚠️</span>
+        <span>Atrasados</span>
+      </div>
+      <div class="text-2xl sm:text-3xl font-black text-rose-600" id="kpiAtrasados">0</div>
+      <div class="text-[11px] text-rose-500/80 mt-0.5">Precisam de lembrete</div>
+    </div>
+  </div>
+
+  <!-- Barra de Ferramentas: Busca + Filtros + Botão Novo -->
+  <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-2xs space-y-3.5">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <!-- Campo de Busca -->
+      <div class="relative flex-1">
+        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        <input
+          type="search"
+          id="buscaAssociados"
+          placeholder="Buscar por nome, WhatsApp ou @Instagram..."
+          class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all"
+        />
+      </div>
+
+      <!-- Botão Novo Associado -->
+      <button
+        type="button"
+        id="btnAbrirNovoAssociado"
+        class="shrink-0 px-5 py-3 bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 min-h-[44px]"
+      >
+        <span>➕</span> Novo Associado
+      </button>
+    </div>
+
+    <!-- Toggles Rápidos de Filtro por Status -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none" id="filtrosStatusAssociados">
+      <button
+        type="button"
+        data-filtro="todos"
+        class="filtro-associado-btn px-3.5 py-2 rounded-xl border transition-all bg-taka-green-700 text-white border-taka-green-700 shadow-2xs whitespace-nowrap min-h-[40px]"
+      >
+        Todos (<span id="contFiltroTodos">0</span>)
+      </button>
+      <button
+        type="button"
+        data-filtro="atrasados"
+        class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
+      >
+        ⚠️ Atrasados (<span id="contFiltroAtrasados">0</span>)
+      </button>
+      <button
+        type="button"
+        data-filtro="vencendo"
+        class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
+      >
+        ⏳ Vencendo (<span id="contFiltroVencendo">0</span>)
+      </button>
+      <button
+        type="button"
+        data-filtro="em_dia"
+        class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
+      >
+        ✅ Em dia (<span id="contFiltroEmDia">0</span>)
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Associados (Grade de Cartões) -->
+  <div id="containerCardsAssociados" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Esqueleto / Loading Inicial -->
+    <div class="col-span-full py-12 text-center text-gray-400 font-medium">
+      <div class="inline-block animate-spin text-2xl mb-2">⏳</div>
+      <p class="text-sm">Carregando associados...</p>
+    </div>
+  </div>
+
+  <!-- Estado Vazio -->
+  <div id="emptyStateAssociados" class="hidden bg-white rounded-2xl border border-dashed border-gray-200 p-8 sm:p-12 text-center">
+    <div class="w-16 h-16 mx-auto mb-3 bg-emerald-50 rounded-full flex items-center justify-center text-3xl">🤝</div>
+    <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1" id="emptyStateTitulo">Nenhum associado encontrado</h3>
+    <p class="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto mb-5" id="emptyStateDescricao">
+      Cadastre os padrinhos e mensalistas que contribuem regularmente com a Takanil.
+    </p>
+    <button
+      type="button"
+      onclick="document.getElementById('btnAbrirNovoAssociado')?.click()"
+      class="px-5 py-3 bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-xs transition-all inline-flex items-center gap-2 min-h-[44px]"
+    >
+      <span>➕</span> Cadastrar Primeiro Associado
+    </button>
+  </div>
+</div>
+
+<!-- Inclusão dos Modais -->
+<ModalAssociado />
+<ModalLembreteAssociado />
+<ModalConfirmarPagamento />
+
+<script>
+  import { supabase } from '../../lib/supabaseClient';
+  import {
+    type Associado,
+    calcularStatusAssociado,
+    formatarMoeda,
+    formatarTelefone,
+    limparTelefone,
+    formatarInstagram,
+    gerarMensagemAssociado,
+    gerarLinkWhatsApp,
+    CHAVE_PIX_OFICIAL,
+  } from '../../lib/associados';
+
+  let listaAssociados: Associado[] = [];
+  let filtroStatusAtivo = 'todos';
+  let termoBusca = '';
+  let associadoSelecionado: Associado | null = null;
+
+  // Elementos do DOM
+  const container = document.getElementById('containerCardsAssociados');
+  const emptyState = document.getElementById('emptyStateAssociados');
+  const inputBusca = document.getElementById('buscaAssociados') as HTMLInputElement | null;
+  const botoesFiltro = document.querySelectorAll('.filtro-associado-btn');
+
+  // KPIs
+  const kpiTotal = document.getElementById('kpiTotalAssociados');
+  const kpiPrevisao = document.getElementById('kpiPrevisaoMensal');
+  const kpiRecebido = document.getElementById('kpiRecebidoMes');
+  const kpiMeta = document.getElementById('kpiPercentualMeta');
+  const kpiAtrasados = document.getElementById('kpiAtrasados');
+
+  // Contadores
+  const contTodos = document.getElementById('contFiltroTodos');
+  const contAtrasados = document.getElementById('contFiltroAtrasados');
+  const contVencendo = document.getElementById('contFiltroVencendo');
+  const contEmDia = document.getElementById('contFiltroEmDia');
+
+  // Modais
+  const modalAssociado = document.getElementById('modalAssociado');
+  const formAssociado = document.getElementById('formAssociado') as HTMLFormElement | null;
+  const modalLembrete = document.getElementById('modalLembrete');
+  const modalPagamento = document.getElementById('modalConfirmarPagamento');
+
+  // Inicialização
+  async function carregarAssociados() {
+    try {
+      const { data, error } = await supabase
+        .from('associados')
+        .select('*')
+        .order('nome', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao buscar associados:', error);
+        if (container) {
+          container.innerHTML = `
+            <div class="col-span-full py-8 text-center text-rose-500">
+              <p class="font-bold">Não foi possível carregar a lista de associados.</p>
+              <p class="text-xs text-gray-500 mt-1">${error.message}</p>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      listaAssociados = (data as Associado[]) || [];
+      atualizarInterface();
+    } catch (err) {
+      console.error('Falha geral ao carregar associados:', err);
+    }
+  }
+
+  function atualizarInterface() {
+    atualizarKPIs();
+    renderizarCards();
+  }
+
+  function atualizarKPIs() {
+    const dataHoje = new Date();
+    const ativos = listaAssociados.filter((a) => a.ativo !== false);
+
+    let somaPrevisao = 0;
+    let somaRecebido = 0;
+    let totalAtrasados = 0;
+    let totalVencendo = 0;
+    let totalEmDia = 0;
+
+    ativos.forEach((a) => {
+      const valor = Number(a.valor_mensalidade) || 0;
+      somaPrevisao += valor;
+
+      const st = calcularStatusAssociado(a, dataHoje);
+      if (st.status === 'em_dia') {
+        somaRecebido += valor;
+        totalEmDia++;
+      } else if (st.status === 'atrasado') {
+        totalAtrasados++;
+      } else if (st.status === 'vence_hoje' || st.status === 'a_vencer') {
+        totalVencendo++;
+      }
+    });
+
+    if (kpiTotal) kpiTotal.textContent = String(ativos.length);
+    if (kpiPrevisao) kpiPrevisao.textContent = formatarMoeda(somaPrevisao);
+    if (kpiRecebido) kpiRecebido.textContent = formatarMoeda(somaRecebido);
+    if (kpiAtrasados) kpiAtrasados.textContent = String(totalAtrasados);
+
+    if (kpiMeta) {
+      const pct = somaPrevisao > 0 ? Math.round((somaRecebido / somaPrevisao) * 100) : 0;
+      kpiMeta.textContent = `${pct}% da previsão`;
+    }
+
+    if (contTodos) contTodos.textContent = String(listaAssociados.length);
+    if (contAtrasados) contAtrasados.textContent = String(totalAtrasados);
+    if (contVencendo) contVencendo.textContent = String(totalVencendo);
+    if (contEmDia) contEmDia.textContent = String(totalEmDia);
+  }
+
+  function renderizarCards() {
+    if (!container) return;
+
+    const dataHoje = new Date();
+    const termo = termoBusca.toLowerCase().trim();
+
+    const filtrados = listaAssociados.filter((a) => {
+      // Filtro de busca
+      if (termo) {
+        const nomeMatch = a.nome.toLowerCase().includes(termo);
+        const zapMatch = a.whatsapp ? limparTelefone(a.whatsapp).includes(limparTelefone(termo)) : false;
+        const instaMatch = a.instagram ? a.instagram.toLowerCase().includes(termo) : false;
+        if (!nomeMatch && !zapMatch && !instaMatch) return false;
+      }
+
+      // Filtro de status
+      if (filtroStatusAtivo === 'todos') return true;
+      const st = calcularStatusAssociado(a, dataHoje);
+
+      if (filtroStatusAtivo === 'atrasados') return st.status === 'atrasado';
+      if (filtroStatusAtivo === 'vencendo') return st.status === 'vence_hoje' || st.status === 'a_vencer';
+      if (filtroStatusAtivo === 'em_dia') return st.status === 'em_dia';
+
+      return true;
+    });
+
+    if (filtrados.length === 0) {
+      container.innerHTML = '';
+      if (emptyState) emptyState.classList.remove('hidden');
+      return;
+    }
+
+    if (emptyState) emptyState.classList.add('hidden');
+
+    container.innerHTML = filtrados
+      .map((a) => {
+        const st = calcularStatusAssociado(a, dataHoje);
+        const valorFormatado = formatarMoeda(Number(a.valor_mensalidade));
+        const telFormatado = formatarTelefone(a.whatsapp);
+        const telLimpo = limparTelefone(a.whatsapp);
+        const instaFormatado = formatarInstagram(a.instagram);
+        const instaPuro = instaFormatado.replace(/^@/, '');
+
+        let ultimoPagoTexto = 'Nenhum registro';
+        if (a.ultimo_pagamento) {
+          const partes = a.ultimo_pagamento.split('-');
+          if (partes.length === 3) {
+            ultimoPagoTexto = `${partes[2]}/${partes[1]}/${partes[0]}`;
+          }
+        }
+
+        const btnAcaoPrincipal = st.status === 'em_dia'
+          ? `
+            <button
+              type="button"
+              data-acao-lembrete="${a.id}"
+              data-tipo-sugerido="agradecimento"
+              class="flex-1 py-2.5 px-3 bg-white hover:bg-emerald-50 active:scale-95 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-300 shadow-2xs transition-all flex items-center justify-center gap-1.5 min-h-[44px]"
+            >
+              <span>❤️</span> Agradecer
+            </button>
+          `
+          : `
+            <button
+              type="button"
+              data-acao-lembrete="${a.id}"
+              data-tipo-sugerido="${st.tipoMensagemSugerida}"
+              class="flex-1 py-2.5 px-3 bg-white hover:bg-amber-50 active:scale-95 text-amber-900 font-bold text-xs rounded-xl border border-amber-300 shadow-2xs transition-all flex items-center justify-center gap-1.5 min-h-[44px]"
+            >
+              <span>💬</span> Lembrar
+            </button>
+            <button
+              type="button"
+              data-acao-pagamento="${a.id}"
+              class="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-2xs transition-all flex items-center justify-center gap-1.5 min-h-[44px]"
+            >
+              <span>💵</span> Registrar Pagto
+            </button>
+          `;
+
+        return `
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-2xs p-4 sm:p-5 flex flex-col justify-between transition-all hover:border-gray-200 hover:shadow-xs">
+            <!-- Cabeçalho do Card: Nome + Badge de Status -->
+            <div>
+              <div class="flex items-start justify-between gap-2.5 mb-2">
+                <div class="min-w-0">
+                  <h4 class="text-base sm:text-lg font-bold text-gray-900 truncate leading-snug">
+                    ${a.nome}
+                  </h4>
+                  <div class="text-xs text-gray-500 font-medium">
+                    Vencimento dia <strong>${a.dia_vencimento}</strong> de cada mês
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${st.classeBadge}">
+                    ${st.rotulo}
+                  </span>
+                  <button
+                    type="button"
+                    data-acao-editar="${a.id}"
+                    class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+                    title="Editar dados"
+                    aria-label="Editar ${a.nome}"
+                  >
+                    ✏️
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dados Financeiros -->
+              <div class="flex items-baseline justify-between py-2 border-y border-gray-50 my-2 text-xs">
+                <div>
+                  <span class="text-gray-400 block text-[11px] font-semibold uppercase">Mensalidade</span>
+                  <span class="text-sm font-extrabold text-gray-900">${valorFormatado}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-gray-400 block text-[11px] font-semibold uppercase">Último Pago</span>
+                  <span class="text-xs font-bold ${st.status === 'em_dia' ? 'text-emerald-700' : 'text-gray-700'}">
+                    ${ultimoPagoTexto}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Contatos com Cópia Direta -->
+              <div class="space-y-1.5 pt-1 text-xs">
+                ${telLimpo ? `
+                  <div class="flex items-center justify-between gap-2 bg-gray-50 px-2.5 py-1.5 rounded-xl border border-gray-100">
+                    <span class="text-gray-700 font-medium truncate flex items-center gap-1.5">
+                      <span>📱</span> ${telFormatado}
+                    </span>
+                    <button
+                      type="button"
+                      data-copiar-zap="${telLimpo}"
+                      class="text-[11px] font-bold text-taka-green-700 hover:text-taka-green-900 hover:underline px-2 py-1 min-h-[36px] flex items-center gap-1"
+                      title="Copiar número puro"
+                    >
+                      <span>📋</span> Copiar nº
+                    </button>
+                  </div>
+                ` : ''}
+
+                ${instaPuro ? `
+                  <div class="flex items-center justify-between gap-2 bg-gray-50 px-2.5 py-1.5 rounded-xl border border-gray-100">
+                    <a
+                      href="https://instagram.com/${instaPuro}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-pink-600 hover:text-pink-800 hover:underline font-bold truncate flex items-center gap-1.5 min-h-[36px]"
+                    >
+                      <span>📸</span> ${instaFormatado}
+                    </a>
+                    <button
+                      type="button"
+                      data-copiar-insta="${instaFormatado}"
+                      class="text-[11px] font-bold text-gray-500 hover:text-gray-800 hover:underline px-2 py-1 min-h-[36px] flex items-center gap-1"
+                      title="Copiar @ do Instagram"
+                    >
+                      <span>📋</span> Copiar @
+                    </button>
+                  </div>
+                ` : ''}
+
+                ${a.observacoes ? `
+                  <p class="text-[11px] text-gray-500 italic pt-1 truncate">
+                    📝 ${a.observacoes}
+                  </p>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="flex items-center gap-2 pt-4 mt-3 border-t border-gray-100">
+              ${btnAcaoPrincipal}
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    anexarEventosCards();
+  }
+
+  function anexarEventosCards() {
+    // Copiar número puro de WhatsApp
+    document.querySelectorAll('[data-copiar-zap]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const num = (btn as HTMLElement).dataset.copiarZap || '';
+        navigator.clipboard.writeText(num);
+        (window as any).mostrarToast?.(`Número ${num} copiado!`, 'sucesso');
+      });
+    });
+
+    // Copiar Instagram @
+    document.querySelectorAll('[data-copiar-insta]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const handle = (btn as HTMLElement).dataset.copiarInsta || '';
+        navigator.clipboard.writeText(handle);
+        (window as any).mostrarToast?.(`Instagram ${handle} copiado!`, 'sucesso');
+      });
+    });
+
+    // Botão Editar
+    document.querySelectorAll('[data-acao-editar]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.acaoEditar;
+        const assoc = listaAssociados.find((a) => a.id === id);
+        if (assoc) abrirModalAssociado(assoc);
+      });
+    });
+
+    // Botão Lembrar / Agradecer
+    document.querySelectorAll('[data-acao-lembrete]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.acaoLembrete;
+        const tipo = ((btn as HTMLElement).dataset.tipoSugerido as any) || 'lembrete';
+        const assoc = listaAssociados.find((a) => a.id === id);
+        if (assoc) abrirModalLembrete(assoc, tipo);
+      });
+    });
+
+    // Botão Registrar Pagamento
+    document.querySelectorAll('[data-acao-pagamento]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.acaoPagamento;
+        const assoc = listaAssociados.find((a) => a.id === id);
+        if (assoc) abrirModalPagamento(assoc);
+      });
+    });
+  }
+
+  // --- Lógica Modal Associado (Cadastro/Edição) ---
+  function abrirModalAssociado(associado?: Associado) {
+    if (!modalAssociado) return;
+    const card = document.getElementById('modalAssociadoCard');
+    const titulo = document.getElementById('modalAssociadoTitulo');
+    const btnExcluir = document.getElementById('btnExcluirAssociado');
+    const btnSalvarTexto = document.getElementById('btnSalvarAssociadoTexto');
+
+    const inputId = document.getElementById('associadoId') as HTMLInputElement;
+    const inputNome = document.getElementById('associadoNome') as HTMLInputElement;
+    const inputValor = document.getElementById('associadoValor') as HTMLInputElement;
+    const inputDia = document.getElementById('associadoDiaVencimento') as HTMLInputElement;
+    const inputZap = document.getElementById('associadoWhatsapp') as HTMLInputElement;
+    const inputInsta = document.getElementById('associadoInstagram') as HTMLInputElement;
+    const inputUltimoPago = document.getElementById('associadoUltimoPagamento') as HTMLInputElement;
+    const inputObs = document.getElementById('associadoObservacoes') as HTMLTextAreaElement;
+    const inputAtivo = document.getElementById('associadoAtivo') as HTMLInputElement;
+
+    if (associado) {
+      if (titulo) titulo.textContent = 'Editar Associado';
+      if (btnSalvarTexto) btnSalvarTexto.textContent = 'Salvar Alterações';
+      if (btnExcluir) btnExcluir.classList.remove('hidden');
+
+      if (inputId) inputId.value = associado.id;
+      if (inputNome) inputNome.value = associado.nome;
+      if (inputValor) inputValor.value = String(associado.valor_mensalidade);
+      if (inputDia) inputDia.value = String(associado.dia_vencimento);
+      if (inputZap) inputZap.value = formatarTelefone(associado.whatsapp);
+      if (inputInsta) inputInsta.value = associado.instagram || '';
+      if (inputUltimoPago) inputUltimoPago.value = associado.ultimo_pagamento || '';
+      if (inputObs) inputObs.value = associado.observacoes || '';
+      if (inputAtivo) inputAtivo.checked = associado.ativo !== false;
+    } else {
+      if (titulo) titulo.textContent = 'Novo Associado';
+      if (btnSalvarTexto) btnSalvarTexto.textContent = 'Salvar Associado';
+      if (btnExcluir) btnExcluir.classList.add('hidden');
+      formAssociado?.reset();
+      if (inputId) inputId.value = '';
+      if (inputDia) inputDia.value = '10';
+      if (inputAtivo) inputAtivo.checked = true;
+    }
+
+    modalAssociado.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modalAssociado.classList.remove('opacity-0');
+      modalAssociado.classList.add('opacity-100');
+      card?.classList.remove('scale-95');
+      card?.classList.add('scale-100');
+    });
+  }
+
+  function fecharModalAssociado() {
+    if (!modalAssociado) return;
+    const card = document.getElementById('modalAssociadoCard');
+    modalAssociado.classList.remove('opacity-100');
+    modalAssociado.classList.add('opacity-0');
+    card?.classList.remove('scale-100');
+    card?.classList.add('scale-95');
+    setTimeout(() => {
+      modalAssociado.classList.add('hidden');
+    }, 250);
+  }
+
+  document.getElementById('btnAbrirNovoAssociado')?.addEventListener('click', () => abrirModalAssociado());
+  document.getElementById('btnFecharModalAssociado')?.addEventListener('click', fecharModalAssociado);
+  document.getElementById('btnCancelarModalAssociado')?.addEventListener('click', fecharModalAssociado);
+
+  // Máscara e formatação em tempo real dos campos de contato
+  const inputZapForm = document.getElementById('associadoWhatsapp') as HTMLInputElement | null;
+  inputZapForm?.addEventListener('input', () => {
+    const limpo = limparTelefone(inputZapForm.value);
+    if (limpo) {
+      inputZapForm.value = formatarTelefone(limpo);
+    }
+  });
+
+  const inputInstaForm = document.getElementById('associadoInstagram') as HTMLInputElement | null;
+  inputInstaForm?.addEventListener('input', () => {
+    if (inputInstaForm.value.includes('instagram.com')) {
+      inputInstaForm.value = formatarInstagram(inputInstaForm.value);
+    }
+  });
+  inputInstaForm?.addEventListener('blur', () => {
+    if (inputInstaForm.value) {
+      inputInstaForm.value = formatarInstagram(inputInstaForm.value);
+    }
+  });
+
+  formAssociado?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btnSalvar = document.getElementById('btnSalvarAssociado') as HTMLButtonElement | null;
+    const btnTexto = document.getElementById('btnSalvarAssociadoTexto');
+
+    const id = (document.getElementById('associadoId') as HTMLInputElement)?.value;
+    const nome = (document.getElementById('associadoNome') as HTMLInputElement)?.value.trim();
+    const valor = parseFloat((document.getElementById('associadoValor') as HTMLInputElement)?.value);
+    const dia = parseInt((document.getElementById('associadoDiaVencimento') as HTMLInputElement)?.value, 10);
+    const zap = (document.getElementById('associadoWhatsapp') as HTMLInputElement)?.value.trim();
+    const insta = (document.getElementById('associadoInstagram') as HTMLInputElement)?.value.trim();
+    const ultimoPago = (document.getElementById('associadoUltimoPagamento') as HTMLInputElement)?.value || null;
+    const obs = (document.getElementById('associadoObservacoes') as HTMLTextAreaElement)?.value.trim() || null;
+    const ativo = (document.getElementById('associadoAtivo') as HTMLInputElement)?.checked ?? true;
+
+    if (!nome || isNaN(valor) || isNaN(dia)) {
+      (window as any).mostrarToast?.('Preencha os campos obrigatórios.', 'erro');
+      return;
+    }
+
+    if (btnSalvar) btnSalvar.disabled = true;
+    if (btnTexto) btnTexto.textContent = 'Salvando...';
+
+    const payload = {
+      nome,
+      valor_mensalidade: valor,
+      dia_vencimento: dia,
+      whatsapp: limparTelefone(zap) || null,
+      instagram: formatarInstagram(insta) || null,
+      ultimo_pagamento: ultimoPago,
+      observacoes: obs,
+      ativo,
+      atualizado_em: new Date().toISOString(),
+    };
+
+    try {
+      if (id) {
+        // Update
+        const { error } = await supabase.from('associados').update(payload).eq('id', id);
+        if (error) throw error;
+        (window as any).mostrarToast?.('Associado atualizado com sucesso!', 'sucesso');
+      } else {
+        // Insert
+        const { error } = await supabase.from('associados').insert([payload]);
+        if (error) throw error;
+        (window as any).mostrarToast?.('Associado cadastrado com sucesso!', 'sucesso');
+      }
+
+      fecharModalAssociado();
+      await carregarAssociados();
+    } catch (err: any) {
+      console.error('Erro ao salvar associado:', err);
+      (window as any).mostrarToast?.(`Erro ao salvar: ${err.message || err}`, 'erro');
+    } finally {
+      if (btnSalvar) btnSalvar.disabled = false;
+      if (btnTexto) btnTexto.textContent = id ? 'Salvar Alterações' : 'Salvar Associado';
+    }
+  });
+
+  // Excluir Associado
+  document.getElementById('btnExcluirAssociado')?.addEventListener('click', async () => {
+    const id = (document.getElementById('associadoId') as HTMLInputElement)?.value;
+    if (!id) return;
+
+    if (!confirm('Deseja realmente excluir este associado? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('associados').delete().eq('id', id);
+      if (error) throw error;
+      (window as any).mostrarToast?.('Associado excluído com sucesso.', 'sucesso');
+      fecharModalAssociado();
+      await carregarAssociados();
+    } catch (err: any) {
+      console.error('Erro ao excluir associado:', err);
+      (window as any).mostrarToast?.(`Erro ao excluir: ${err.message || err}`, 'erro');
+    }
+  });
+
+  // --- Lógica Modal Lembrete ---
+  let tipoModeloAtual: 'lembrete' | 'hoje' | 'atraso' | 'agradecimento' = 'lembrete';
+
+  function abrirModalLembrete(associado: Associado, tipoSugerido: 'lembrete' | 'hoje' | 'atraso' | 'agradecimento') {
+    if (!modalLembrete) return;
+    associadoSelecionado = associado;
+    tipoModeloAtual = tipoSugerido;
+
+    const card = document.getElementById('modalLembreteCard');
+    const nomeEl = document.getElementById('lembreteNomeAssociado');
+    const contatosBadges = document.getElementById('lembreteContatosBadges');
+    const textarea = document.getElementById('textoMensagemLembrete') as HTMLTextAreaElement | null;
+    const btnZap = document.getElementById('btnAbrirWhatsAppLembrete') as HTMLButtonElement | null;
+
+    if (nomeEl) nomeEl.textContent = associado.nome;
+
+    if (contatosBadges) {
+      const badges: string[] = [];
+      if (associado.whatsapp) {
+        badges.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100/90 text-emerald-900 rounded-lg text-xs font-semibold whitespace-nowrap shadow-2xs">📱 ${formatarTelefone(associado.whatsapp)}</span>`);
+      }
+      if (associado.instagram) {
+        badges.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-pink-100/90 text-pink-900 rounded-lg text-xs font-semibold whitespace-nowrap shadow-2xs">📸 ${formatarInstagram(associado.instagram)}</span>`);
+      }
+      contatosBadges.innerHTML = badges.join('');
+    }
+
+    // Configurar botões de modelo
+    document.querySelectorAll('.btn-modelo-lembrete').forEach((b) => {
+      const t = (b as HTMLElement).dataset.tipoModelo;
+      if (t === tipoModeloAtual) {
+        b.className = 'btn-modelo-lembrete py-2.5 px-2 rounded-lg text-center transition-all bg-white text-taka-green-800 shadow-2xs font-bold';
+      } else {
+        b.className = 'btn-modelo-lembrete py-2.5 px-2 rounded-lg text-center transition-all text-gray-600 hover:text-gray-900';
+      }
+    });
+
+    // Gerar mensagem inicial
+    if (textarea) {
+      textarea.value = gerarMensagemAssociado(associado, tipoModeloAtual);
+    }
+
+    // Se não tiver WhatsApp, desativa o botão de WhatsApp mas mantém copiar
+    if (btnZap) {
+      const temZap = Boolean(limparTelefone(associado.whatsapp));
+      btnZap.disabled = !temZap;
+      btnZap.title = temZap ? 'Abrir conversa no WhatsApp' : 'Associado sem WhatsApp cadastrado';
+      btnZap.className = temZap
+        ? 'w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-md transition-all min-h-[44px] flex items-center justify-center gap-2 cursor-pointer'
+        : 'w-full sm:w-auto px-6 py-3 bg-gray-300 text-gray-500 font-bold text-sm rounded-xl transition-all min-h-[44px] flex items-center justify-center gap-2 cursor-not-allowed opacity-60';
+    }
+
+    modalLembrete.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modalLembrete.classList.remove('opacity-0');
+      modalLembrete.classList.add('opacity-100');
+      card?.classList.remove('scale-95');
+      card?.classList.add('scale-100');
+    });
+  }
+
+  function fecharModalLembrete() {
+    if (!modalLembrete) return;
+    const card = document.getElementById('modalLembreteCard');
+    modalLembrete.classList.remove('opacity-100');
+    modalLembrete.classList.add('opacity-0');
+    card?.classList.remove('scale-100');
+    card?.classList.add('scale-95');
+    setTimeout(() => {
+      modalLembrete.classList.add('hidden');
+      associadoSelecionado = null;
+    }, 250);
+  }
+
+  document.getElementById('btnFecharModalLembrete')?.addEventListener('click', fecharModalLembrete);
+
+  // Trocar modelo de mensagem
+  document.querySelectorAll('.btn-modelo-lembrete').forEach((b) => {
+    b.addEventListener('click', () => {
+      if (!associadoSelecionado) return;
+      const t = (b as HTMLElement).dataset.tipoModelo as any;
+      tipoModeloAtual = t;
+
+      document.querySelectorAll('.btn-modelo-lembrete').forEach((other) => {
+        if (other === b) {
+          other.className = 'btn-modelo-lembrete py-2.5 px-2 rounded-lg text-center transition-all bg-white text-taka-green-800 shadow-2xs font-bold';
+        } else {
+          other.className = 'btn-modelo-lembrete py-2.5 px-2 rounded-lg text-center transition-all text-gray-600 hover:text-gray-900';
+        }
+      });
+
+      const textarea = document.getElementById('textoMensagemLembrete') as HTMLTextAreaElement | null;
+      if (textarea) {
+        textarea.value = gerarMensagemAssociado(associadoSelecionado, tipoModeloAtual);
+      }
+    });
+  });
+
+  // Copiar PIX dentro do modal
+  document.getElementById('btnCopiarPixLembrete')?.addEventListener('click', () => {
+    navigator.clipboard.writeText(CHAVE_PIX_OFICIAL);
+    (window as any).mostrarToast?.('Chave PIX copiada!', 'sucesso');
+  });
+
+  // Copiar Mensagem Completa
+  document.getElementById('btnCopiarMensagemCompleta')?.addEventListener('click', () => {
+    const textarea = document.getElementById('textoMensagemLembrete') as HTMLTextAreaElement | null;
+    if (textarea) {
+      navigator.clipboard.writeText(textarea.value);
+      (window as any).mostrarToast?.('Mensagem copiada para a área de transferência!', 'sucesso');
+    }
+  });
+
+  // Abrir no WhatsApp
+  document.getElementById('btnAbrirWhatsAppLembrete')?.addEventListener('click', () => {
+    if (!associadoSelecionado || !associadoSelecionado.whatsapp) return;
+    const textarea = document.getElementById('textoMensagemLembrete') as HTMLTextAreaElement | null;
+    const texto = textarea ? textarea.value : '';
+    const link = gerarLinkWhatsApp(associadoSelecionado.whatsapp, texto);
+    window.open(link, '_blank', 'noopener,noreferrer');
+  });
+
+  // --- Lógica Modal Confirmar Pagamento ---
+  function abrirModalPagamento(associado: Associado) {
+    if (!modalPagamento) return;
+    associadoSelecionado = associado;
+
+    const card = document.getElementById('modalConfirmarPagamentoCard');
+    const inputId = document.getElementById('pagamentoAssociadoId') as HTMLInputElement | null;
+    const nomeEl = document.getElementById('pagamentoNomeAssociado');
+    const valorEl = document.getElementById('pagamentoValorAssociado');
+    const inputData = document.getElementById('pagamentoData') as HTMLInputElement | null;
+
+    if (inputId) inputId.value = associado.id;
+    if (nomeEl) nomeEl.textContent = associado.nome;
+    if (valorEl) valorEl.textContent = formatarMoeda(Number(associado.valor_mensalidade));
+
+    // Data de hoje como padrão YYYY-MM-DD
+    const hojeStr = new Date().toISOString().split('T')[0];
+    if (inputData) inputData.value = hojeStr;
+
+    modalPagamento.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modalPagamento.classList.remove('opacity-0');
+      modalPagamento.classList.add('opacity-100');
+      card?.classList.remove('scale-95');
+      card?.classList.add('scale-100');
+    });
+  }
+
+  function fecharModalPagamento() {
+    if (!modalPagamento) return;
+    const card = document.getElementById('modalConfirmarPagamentoCard');
+    modalPagamento.classList.remove('opacity-100');
+    modalPagamento.classList.add('opacity-0');
+    card?.classList.remove('scale-100');
+    card?.classList.add('scale-95');
+    setTimeout(() => {
+      modalPagamento.classList.add('hidden');
+      associadoSelecionado = null;
+    }, 250);
+  }
+
+  document.getElementById('btnFecharModalConfirmarPagamento')?.addEventListener('click', fecharModalPagamento);
+  document.getElementById('btnCancelarConfirmarPagamento')?.addEventListener('click', fecharModalPagamento);
+
+  document.getElementById('btnEfetivarPagamento')?.addEventListener('click', async () => {
+    if (!associadoSelecionado) return;
+    const inputData = document.getElementById('pagamentoData') as HTMLInputElement | null;
+    const btnEfetivar = document.getElementById('btnEfetivarPagamento') as HTMLButtonElement | null;
+    const btnTexto = document.getElementById('btnEfetivarPagamentoTexto');
+
+    const dataPagamento = inputData?.value || new Date().toISOString().split('T')[0];
+    const valor = Number(associadoSelecionado.valor_mensalidade);
+
+    if (btnEfetivar) btnEfetivar.disabled = true;
+    if (btnTexto) btnTexto.textContent = 'Gravando...';
+
+    try {
+      // 1. Atualizar o associado com a nova data de último pagamento
+      const { error: errAssoc } = await supabase
+        .from('associados')
+        .update({
+          ultimo_pagamento: dataPagamento,
+          atualizado_em: new Date().toISOString(),
+        })
+        .eq('id', associadoSelecionado.id);
+
+      if (errAssoc) throw errAssoc;
+
+      // 2. Criar o lançamento no módulo de Finanças (Caixa da ONG)
+      const partesData = dataPagamento.split('-');
+      const mesAno = partesData.length >= 2 ? `${partesData[1]}/${partesData[0]}` : '';
+
+      const { error: errFinancas } = await supabase
+        .from('financas')
+        .insert([
+          {
+            tipo: 'Entrada',
+            valor,
+            descricao: `Mensalidade Associado: ${associadoSelecionado.nome} (${mesAno})`,
+            categoria: 'Doação / Associado',
+            data: dataPagamento,
+          },
+        ]);
+
+      if (errFinancas) throw errFinancas;
+
+      (window as any).mostrarToast?.(
+        `Pagamento de ${associadoSelecionado.nome} registrado e lançado no Caixa!`,
+        'sucesso'
+      );
+
+      fecharModalPagamento();
+      await carregarAssociados();
+
+      // Se existir a função de recarregar finanças na página, executa para atualizar o saldo
+      if (typeof (window as any).carregarTransacoes === 'function') {
+        (window as any).carregarTransacoes();
+      }
+    } catch (err: any) {
+      console.error('Erro ao efetivar pagamento:', err);
+      (window as any).mostrarToast?.(`Erro ao registrar: ${err.message || err}`, 'erro');
+    } finally {
+      if (btnEfetivar) btnEfetivar.disabled = false;
+      if (btnTexto) btnTexto.textContent = '✅ Confirmar e Lançar';
+    }
+  });
+
+  // Filtros rápidos por status
+  botoesFiltro.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filtroStatusAtivo = (btn as HTMLElement).dataset.filtro || 'todos';
+
+      botoesFiltro.forEach((other) => {
+        if (other === btn) {
+          other.className = 'filtro-associado-btn px-3.5 py-2 rounded-xl border transition-all bg-taka-green-700 text-white border-taka-green-700 shadow-2xs whitespace-nowrap min-h-[40px]';
+        } else {
+          other.className = 'filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]';
+        }
+      });
+
+      renderizarCards();
+    });
+  });
+
+  // Campo de busca com debounce
+  let timerBusca: any;
+  inputBusca?.addEventListener('input', () => {
+    clearTimeout(timerBusca);
+    timerBusca = setTimeout(() => {
+      termoBusca = inputBusca.value;
+      renderizarCards();
+    }, 200);
+  });
+
+  // Inicializar dados ao carregar a página
+  document.addEventListener('DOMContentLoaded', () => {
+    carregarAssociados();
+  });
+
+  // Exportar função para recarregar se necessário externamente
+  (window as any).recarregarAssociados = carregarAssociados;
+</script>

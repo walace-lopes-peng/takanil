@@ -1,9 +1,37 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PainelAssociados from '../../components/associados/PainelAssociados.astro';
 ---
 
-<Layout title="Finanças - Hub Takanil">
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<Layout title="Gestão - Hub Takanil">
+  <!-- Alternador de Sub-abas da Gestão: Associados primeiro, depois Caixa -->
+  <div class="mb-6 flex justify-center">
+    <div class="inline-flex p-1.5 bg-gray-100 rounded-2xl border border-gray-200/80 w-full max-w-md shadow-2xs">
+      <button
+        id="subtabAssociados"
+        type="button"
+        class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all bg-white text-taka-green-800 shadow-2xs min-h-[44px]"
+      >
+        <span>🤝</span> Associados
+      </button>
+      <button
+        id="subtabCaixa"
+        type="button"
+        class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-gray-900 min-h-[44px]"
+      >
+        <span>💰</span> Caixa & Despesas
+      </button>
+    </div>
+  </div>
+
+  <!-- Seção 1: Associados (Padrinhos e Mensalistas - Padrão) -->
+  <div id="secaoAssociados" class="transition-opacity duration-200">
+    <PainelAssociados />
+  </div>
+
+  <!-- Seção 2: Caixa & Despesas -->
+  <div id="secaoCaixa" class="hidden transition-opacity duration-200">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
     
     <!-- Coluna Esquerda: Saldo Total + Formulário de Transação (lg:col-span-5 xl:col-span-4) -->
     <div class="lg:col-span-5 xl:col-span-4 space-y-6">
@@ -309,6 +337,12 @@ import Layout from '../../layouts/Layout.astro';
         <span>Saída</span>
       </button>
     </div>
+  </div>
+  </div>
+
+  <!-- Seção 2: Associados (Padrinhos e Mensalistas) -->
+  <div id="secaoAssociados" class="hidden transition-opacity duration-200">
+    <PainelAssociados />
   </div>
 </Layout>
 
@@ -1030,6 +1064,54 @@ import Layout from '../../layouts/Layout.astro';
     XLSX.utils.book_append_sheet(wb, ws, 'Financeiro');
     XLSX.writeFile(wb, 'Takanil-Financeiro.xlsx');
   });
+
+  // Alternador de Sub-abas: Caixa vs Associados
+  const subtabCaixa = document.getElementById('subtabCaixa');
+  const subtabAssociados = document.getElementById('subtabAssociados');
+  const secaoCaixa = document.getElementById('secaoCaixa');
+  const secaoAssociados = document.getElementById('secaoAssociados');
+
+  function ativarSubAba(aba: 'caixa' | 'associados') {
+    if (aba === 'caixa') {
+      subtabCaixa?.classList.add('bg-white', 'text-taka-green-800', 'shadow-2xs');
+      subtabCaixa?.classList.remove('text-gray-500');
+      subtabAssociados?.classList.remove('bg-white', 'text-taka-green-800', 'shadow-2xs');
+      subtabAssociados?.classList.add('text-gray-500');
+
+      secaoCaixa?.classList.remove('hidden');
+      secaoAssociados?.classList.add('hidden');
+      if (barraLancamentoRapido) barraLancamentoRapido.style.display = 'flex';
+      window.history.replaceState(null, '', '/financas?aba=caixa');
+    } else {
+      subtabAssociados?.classList.add('bg-white', 'text-taka-green-800', 'shadow-2xs');
+      subtabAssociados?.classList.remove('text-gray-500');
+      subtabCaixa?.classList.remove('bg-white', 'text-taka-green-800', 'shadow-2xs');
+      subtabCaixa?.classList.add('text-gray-500');
+
+      secaoAssociados?.classList.remove('hidden');
+      secaoCaixa?.classList.add('hidden');
+      if (barraLancamentoRapido) barraLancamentoRapido.style.display = 'none';
+      window.history.replaceState(null, '', '/financas');
+
+      if (typeof (window as any).recarregarAssociados === 'function') {
+        (window as any).recarregarAssociados();
+      }
+    }
+  }
+
+  subtabCaixa?.addEventListener('click', () => ativarSubAba('caixa'));
+  subtabAssociados?.addEventListener('click', () => ativarSubAba('associados'));
+
+  // Verificar query param ou hash (Padrão: associados)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('aba') === 'caixa' || window.location.hash === '#caixa') {
+    ativarSubAba('caixa');
+  } else {
+    ativarSubAba('associados');
+  }
+
+  // Expor recarga de transações para o modal de pagamento de associados
+  (window as any).carregarTransacoes = carregarDados;
 
   // Inicialização
   atualizarBotoesAtalho();

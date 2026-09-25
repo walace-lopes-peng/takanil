@@ -50,11 +50,11 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
   <body class="bg-taka-green-50 text-gray-900 font-sans min-h-screen antialiased flex flex-col overflow-x-hidden">
     <!-- Navbar responsiva adaptativa -->
     <header class="bg-taka-green-600 text-white shadow-sm sticky top-0 z-50 w-full">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-4 sm:gap-6 min-w-0">
-          <a href="/" class="font-bold text-lg hover:text-taka-green-100 transition-colors flex items-center gap-2.5 shrink-0">
-            <img src="/assets/takanil-icon-png.png" alt="Logo Takanil" class="w-10 h-10 rounded-full object-cover border-2 border-white/20 bg-white" />
-            <span class="tracking-tight text-base sm:text-lg">Hub Takanil</span>
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-1.5 sm:gap-2">
+        <div class="flex items-center gap-2 sm:gap-6 min-w-0">
+          <a href="/" class="font-bold text-lg hover:text-taka-green-100 transition-colors flex items-center gap-2 shrink-0">
+            <img src="/assets/takanil-icon-png.png" alt="Logo Takanil" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white/20 bg-white shrink-0" />
+            <span class="tracking-tight text-sm sm:text-lg font-bold">Hub Takanil</span>
           </a>
 
           <!-- Links de Navegação para Tablet / Desktop (>= md) -->
@@ -63,7 +63,7 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
               🐾 Animais
             </a>
             <a href="/financas" id="desktopFinancasTab" class={`hidden px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${currentPath.startsWith('/financas') ? 'bg-white/20 text-white shadow-inner' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-              💰 Finanças
+              📊 Gestão
             </a>
             <a href="/aprovacoes" id="desktopAprovacoesTab" class={`hidden px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${currentPath.startsWith('/aprovacoes') ? 'bg-white/20 text-white shadow-inner' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
               📋 Aprovações
@@ -71,16 +71,22 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
           </nav>
         </div>
 
-        <div class="flex items-center gap-3">
-          <!-- Botão Cãotribuição -->
-          <button id="btnOpenPixDrawer" aria-label="Abrir painel de doação Cãotribuição via Pix" class="rounded-full border border-taka-green-300 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center bg-white text-taka-orange-500 shadow-sm px-3.5 py-2 gap-1.5 min-h-[44px]" title="Fazer uma doação">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+        <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <!-- Botão Cãotribuição Responsivo -->
+          <button
+            id="btnOpenPixDrawer"
+            aria-label="Abrir painel de doação Cãotribuição via Pix"
+            class="rounded-full border border-taka-green-300 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center bg-white text-taka-orange-500 shadow-sm px-2.5 sm:px-3.5 py-1.5 sm:py-2 gap-1 sm:gap-1.5 min-h-[38px] sm:min-h-[44px] shrink-0"
+            title="Fazer uma doação"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 text-taka-orange-500" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
             </svg>
-            <span class="text-xs font-bold uppercase tracking-wider">Cãotribuição</span>
+            <span class="text-xs font-bold uppercase tracking-wider hidden sm:inline">Cãotribuição</span>
+            <span class="text-xs font-bold uppercase tracking-wider sm:hidden">Cãotribuição</span>
           </button>
           
-          <div id="authContainer" class="text-sm font-medium flex items-center min-h-[44px]">
+          <div id="authContainer" class="text-sm font-medium flex items-center min-h-[38px] sm:min-h-[44px] shrink-0">
             <!-- Inserido via JS -->
           </div>
         </div>
@@ -151,12 +157,12 @@ const currentPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
           <span class="text-xs">Animais</span>
         </a>
 
-        <!-- Tab: Finanças (Adm/Dev) -->
-        <a href="/financas" id="financasTab" aria-label="Ir para a página de Finanças" class={`hidden flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors min-h-[48px] ${currentPath.startsWith('/financas') ? 'text-taka-green-700 font-bold' : 'text-gray-500 hover:text-gray-800'}`}>
+        <!-- Tab: Gestão (Adm/Dev) -->
+        <a href="/financas" id="financasTab" aria-label="Ir para a página de Gestão (Caixa e Associados)" class={`hidden flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors min-h-[48px] ${currentPath.startsWith('/financas') ? 'text-taka-green-700 font-bold' : 'text-gray-500 hover:text-gray-800'}`}>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width={currentPath.startsWith('/financas') ? "2.5" : "2"}>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          <span class="text-xs">Finanças</span>
+          <span class="text-xs">Gestão</span>
         </a>
 
         <!-- Tab: Aprovações (Adm/Dev) -->

@@ -1,0 +1,100 @@
+---
+// Modal para Confirmar Recebimento de Mensalidade e Integração Financeira
+---
+
+<div
+  id="modalConfirmarPagamento"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden opacity-0 transition-opacity duration-300"
+  role="dialog"
+  aria-labelledby="modalConfirmarPagamentoTitulo"
+  aria-modal="true"
+>
+  <div
+    id="modalConfirmarPagamentoCard"
+    class="bg-white rounded-3xl max-w-md w-full flex flex-col shadow-2xl border border-gray-100 overflow-hidden transform scale-95 transition-transform duration-300"
+  >
+    <!-- Cabeçalho -->
+    <div class="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-emerald-50 via-white to-taka-green-50">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">💵</span>
+        <div>
+          <h3 id="modalConfirmarPagamentoTitulo" class="text-lg font-bold text-gray-900 leading-tight">
+            Registrar Pagamento
+          </h3>
+          <p class="text-xs text-gray-500 font-medium">
+            Atualiza status e lança no Caixa da ONG
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="btnFecharModalConfirmarPagamento"
+        class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+        aria-label="Fechar"
+      >
+        <span class="text-xl leading-none">✕</span>
+      </button>
+    </div>
+
+    <!-- Corpo -->
+    <div class="p-6 space-y-4">
+      <input type="hidden" id="pagamentoAssociadoId" value="" />
+
+      <!-- Cartão de Resumo -->
+      <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200/80">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Associado(a)</span>
+          <span id="pagamentoNomeAssociado" class="text-sm font-bold text-emerald-950">--</span>
+        </div>
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Valor Acordado</span>
+          <span id="pagamentoValorAssociado" class="text-2xl font-black text-emerald-900">R$ 0,00</span>
+        </div>
+      </div>
+
+      <!-- Data do Pagamento -->
+      <div>
+        <label for="pagamentoData" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+          🗓️ Data do Pagamento
+        </label>
+        <input
+          type="date"
+          id="pagamentoData"
+          required
+          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all"
+        />
+      </div>
+
+      <!-- Caixa explicativa da integração -->
+      <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200/70 text-xs text-gray-600 leading-relaxed space-y-1.5">
+        <div class="font-bold text-gray-800 flex items-center gap-1.5">
+          <span>⚡</span> O que acontece ao confirmar:
+        </div>
+        <ul class="list-disc list-inside space-y-1 pl-1 text-[11.5px]">
+          <li>Atualiza o último pagamento para a data informada.</li>
+          <li>Muda o status do apoiador para <strong>[✅ Em dia]</strong>.</li>
+          <li>Gera automaticamente uma <strong>Entrada</strong> no Caixa em <em>Finanças</em> (categoria <em>"Doação / Associado"</em>).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="p-4 sm:p-5 bg-gray-50/80 border-t border-gray-100 flex items-center justify-end gap-2.5">
+      <button
+        type="button"
+        id="btnCancelarConfirmarPagamento"
+        class="px-5 py-3 text-gray-600 hover:bg-gray-100 active:scale-95 font-semibold text-sm rounded-xl transition-all min-h-[44px]"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        id="btnEfetivarPagamento"
+        class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-md transition-all min-h-[44px] flex items-center justify-center gap-2"
+      >
+        <span id="btnEfetivarPagamentoTexto">✅ Confirmar e Lançar</span>
+      </button>
+    </div>
+  </div>
+</div>
