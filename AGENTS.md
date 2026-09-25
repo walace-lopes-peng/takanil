@@ -103,6 +103,32 @@ PWA para a ONG Takanil (proteção animal, Passa Quatro/MG) cadastrar animais e
 controlar finanças. Usuárias finais são voluntárias sem experiência técnica.
 Prioridade absoluta: **simplicidade e telas com poucos toques**, não recursos.
 
+## 📱 Mobile-First — Diretriz Obrigatória
+
+O app Takanil é usado **exclusivamente em celular**. Todo componente, banner,
+card, modal ou layout deve ser desenvolvido e validado primeiro em **375px de
+largura** (iPhone SE / Android pequeno). Breakpoints `sm:` e maiores são
+*melhorias opcionais*, nunca a referência principal.
+
+**Regras práticas que o agente deve seguir sem exceção:**
+
+- **Nunca use `hidden` em mobile** para esconder informação essencial.
+  Se a informação é importante no desktop, ela é importante no mobile também.
+- **Evite `flex` com muitos filhos em linha** em viewports estreitos.
+  Prefira `grid grid-cols-N` (colunas iguais, sem overflow) ou `flex-col`.
+- **Textos não podem sobrepor** outros elementos. Se um layout começa a
+  empilhar ou cortar texto no mobile, refaça — não use `truncate` como
+  solução padrão para conteúdo crítico.
+- **Altura mínima de toque: 44px** em todos os elementos interativos
+  (botões, links, cards clicáveis). Usar `min-h-[44px]` ou `py-3`.
+- **Validação obrigatória**: antes de declarar qualquer UI como pronta,
+  inspecionar mentalmente (ou via browser) em 375px. Se não couber ou
+  estiver ilegível, o trabalho não está concluído.
+- **Crescer na vertical é aceitável** — aumentar a altura de um banner
+  ou card para acomodar o conteúdo com espaço é correto. Espremer conteúdo
+  em uma linha estreita para "economizar espaço" é errado.
+
+
 ## Stack (fixa — não trocar nem sugerir alternativa sem perguntar)
 
 - Astro (não usar React/Vue/Svelte para novos componentes)

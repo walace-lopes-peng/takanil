@@ -20,7 +20,7 @@ import { VERSAO_ATUAL } from '../data/novidades';
         <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
           <div class="bg-white/15 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-white/20 text-center min-w-[76px]">
             <span class="block text-lg font-black text-white leading-none" id="publicoDisponiveis">--</span>
-            <span class="text-[10px] uppercase font-bold text-emerald-100 tracking-wider">Adoção</span>
+            <span class="text-[10px] uppercase font-bold text-emerald-100 tracking-wider">Para Adoção</span>
           </div>
           <div class="bg-white/15 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-white/20 text-center min-w-[76px]">
             <span class="block text-lg font-black text-white leading-none" id="publicoAdotados">--</span>
@@ -35,104 +35,153 @@ import { VERSAO_ATUAL } from '../data/novidades';
     </div>
 
     <!-- Painel Executivo da Gestão (Visível apenas para Administradores / Gestão) -->
-    <div id="painelExecutivoGestao" class="hidden bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-gray-200/80 space-y-4">
-      <!-- Top Bar da Gestão -->
-      <div class="flex items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5">
-          <span class="text-2xl">👋</span>
-          <div>
-            <h2 class="text-base font-extrabold text-gray-900 leading-tight">Painel da Gestão</h2>
-            <p class="text-xs text-gray-500 font-medium">Indicadores e resumo executivo da ONG</p>
-          </div>
+    <div id="painelExecutivoGestao" class="hidden bg-white rounded-2xl shadow-xs border border-gray-200/80 overflow-hidden mb-4">
+
+      <!-- === BARRA SEMPRE VISÍVEL (header + grid de métricas) === -->
+
+      <!-- Linha 1: título e botão toggle -->
+      <div
+        id="painelGestaoHeader"
+        class="flex items-center justify-between px-4 pt-3.5 pb-0 sm:px-5 cursor-pointer select-none"
+        role="button"
+        aria-expanded="false"
+        aria-controls="painelCardsExpandido"
+        tabindex="0"
+      >
+        <div class="flex items-center gap-2">
+          <span class="text-lg">👋</span>
+          <h2 class="text-sm font-extrabold text-gray-800 leading-tight">Painel da Gestão</h2>
         </div>
-        <a
-          href="/financas"
-          class="px-3.5 py-2 bg-taka-green-50 hover:bg-taka-green-100 text-taka-green-700 font-bold text-xs rounded-xl border border-taka-green-200 transition-all flex items-center gap-1.5 min-h-[40px] shadow-2xs active:scale-95 shrink-0"
-          title="Acessar Gestão Completa de Associados e Caixa"
+        <button
+          id="btnTogglePainelGestao"
+          type="button"
+          class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-bold transition-all"
+          aria-label="Expandir ou recolher painel de gestão"
+          title="Expandir / Recolher"
         >
-          <span>📊 Gestão</span>
-          <span>→</span>
-        </a>
+          <span id="togglePainelIcone">▼</span>
+        </button>
       </div>
 
-      <!-- Grade de 3 Cards Executivos -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <!-- Card 1: Animais & Abrigo -->
-        <div class="p-3.5 bg-gradient-to-br from-emerald-50/70 via-white to-emerald-50/30 rounded-xl border border-emerald-100/90 flex flex-col justify-between">
-          <div class="flex items-center justify-between gap-2 mb-1.5">
-            <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1">
-              <span>🐾</span> Animais
-            </span>
-            <span id="badgeRacaoAbrigo" class="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md truncate">
-              -- kg ração
-            </span>
-          </div>
-          <div class="space-y-0.5 my-1">
-            <div class="flex items-baseline gap-1.5">
-              <span class="text-2xl font-black text-gray-900" id="cardQtdAnimais">--</span>
-              <span class="text-xs text-gray-500 font-semibold">no abrigo</span>
-            </div>
-            <p class="text-xs text-gray-500 font-medium truncate" id="cardAnimaisDetalhe">
-              Carregando animais...
-            </p>
-          </div>
-          <a
-            href="#listaAnimais"
-            class="mt-2 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline flex items-center gap-1 min-h-[28px]"
-          >
-            <span>Ver lista de pets</span> <span>↓</span>
-          </a>
+      <!-- Linha 2: 3 colunas de métricas com grid -->
+      <div class="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-100 mt-3 cursor-pointer" id="painelGestaoGrid">
+
+        <!-- Bloco 🐾 Animais -->
+        <div class="flex flex-col items-center py-3 px-2">
+          <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-700 whitespace-nowrap flex items-center gap-0.5 mb-1">
+            <span>🐾</span><span> Animais</span>
+          </span>
+          <span class="text-xl font-black text-gray-900 leading-none" id="resumoAnimaisCad">--</span>
+          <span class="text-[10px] text-gray-400 font-medium mt-0.5">cadastrados</span>
+          <span id="resumoAnimaisUrg" class="text-[10px] font-bold text-rose-600 mt-0.5 text-center hidden"></span>
         </div>
 
-        <!-- Card 2: Associados & Apoios -->
-        <div class="p-3.5 bg-gradient-to-br from-teal-50/70 via-white to-teal-50/30 rounded-xl border border-teal-100/90 flex flex-col justify-between">
-          <div class="flex items-center justify-between gap-2 mb-1.5">
-            <span class="text-xs font-bold uppercase tracking-wider text-teal-800 flex items-center gap-1">
-              <span>🤝</span> Associados
-            </span>
-            <span id="badgeStatusAssociados" class="text-[10px] font-bold text-teal-700 bg-teal-100/80 px-2 py-0.5 rounded-md truncate">
-              --
-            </span>
-          </div>
-          <div class="space-y-0.5 my-1">
-            <div class="flex items-baseline gap-1.5">
-              <span class="text-2xl font-black text-gray-900" id="cardQtdAssociados">--</span>
-              <span class="text-xs text-gray-500 font-semibold">apoiadores</span>
-            </div>
-            <p class="text-xs text-gray-500 font-medium truncate" id="cardAssociadosDetalhe">
-              Carregando associados...
-            </p>
-          </div>
+        <!-- Bloco 🤝 Associados -->
+        <div class="flex flex-col items-center py-3 px-2">
+          <span class="text-[10px] font-bold uppercase tracking-wide text-teal-700 whitespace-nowrap flex items-center gap-0.5 mb-1">
+            <span>🤝</span><span> Assoc.</span>
+          </span>
+          <span class="text-xl font-black text-gray-900 leading-none" id="resumoAssocTotal">--</span>
+          <span class="text-[10px] text-gray-400 font-medium mt-0.5">apoiadores</span>
+          <span id="resumoAssocPend" class="text-[10px] font-bold text-rose-600 mt-0.5 text-center hidden"></span>
+        </div>
+
+        <!-- Bloco 💰 Caixa -->
+        <div class="flex flex-col items-center py-3 px-2">
+          <span class="text-[10px] font-bold uppercase tracking-wide text-amber-700 whitespace-nowrap flex items-center gap-0.5 mb-1">
+            <span>💰</span><span> Caixa</span>
+          </span>
+          <span class="text-base sm:text-xl font-black text-gray-900 leading-none truncate max-w-[88px]" id="resumoCaixaSaldo">--</span>
+          <span id="resumoCaixaMes" class="text-[10px] text-gray-400 font-medium mt-0.5 text-center truncate max-w-[88px]">-- este mês</span>
+        </div>
+      </div>
+
+      <!-- Linha 3: Strip de dias de pendência (só aparece se houver atrasados há 10+ dias) -->
+      <div id="resumoAssocDias" class="hidden items-center justify-center gap-3 px-4 py-2 bg-rose-50/60 border-t border-rose-100 flex-wrap cursor-pointer">
+        <!-- preenchido via JS -->
+      </div>
+
+
+      <!-- === CARDS EXPANDIDOS (recolhidos por padrão) === -->
+      <div id="painelCardsExpandido" class="hidden border-t border-gray-100 px-4 sm:px-5 pb-4 sm:pb-5 pt-3 space-y-3">
+        <!-- Botão Gestão (dentro do expandido) -->
+        <div class="flex items-center justify-between mb-1">
+          <p class="text-xs text-gray-500 font-medium">Indicadores e resumo executivo da ONG</p>
           <a
             href="/financas"
-            class="mt-2 text-[11px] font-bold text-teal-700 hover:text-teal-900 hover:underline flex items-center gap-1 min-h-[28px]"
+            class="px-3 py-1.5 bg-taka-green-50 hover:bg-taka-green-100 text-taka-green-700 font-bold text-xs rounded-xl border border-taka-green-200 transition-all flex items-center gap-1.5 min-h-[36px] shadow-2xs active:scale-95 shrink-0"
+            title="Acessar Gestão Completa"
           >
-            <span>Gerenciar associados</span> <span>→</span>
+            <span>📊</span> <span>Gestão Completa</span> <span>→</span>
           </a>
         </div>
 
-        <!-- Card 3: Caixa da ONG -->
-        <div class="p-3.5 bg-gradient-to-br from-amber-50/60 via-white to-amber-50/30 rounded-xl border border-amber-100/90 flex flex-col justify-between">
-          <div class="flex items-center justify-between gap-2 mb-1.5">
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
-              <span>💰</span> Caixa ONG
-            </span>
-            <span class="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md">
-              Saldo Geral
-            </span>
+        <!-- Grade de 3 Cards Detalhados -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- Card 1: Animais -->
+          <div class="p-3.5 bg-gradient-to-br from-emerald-50/70 via-white to-emerald-50/30 rounded-xl border border-emerald-100/90 flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1">
+                <span>🐾</span> Animais Cadastrados
+              </span>
+            </div>
+            <div class="space-y-1 my-1">
+              <div class="flex items-baseline gap-1.5">
+                <span class="text-2xl font-black text-gray-900" id="cardQtdAnimais">--</span>
+                <span class="text-xs text-gray-500 font-semibold">cadastrados</span>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap text-xs font-medium">
+                <span id="cardAnimaisDisponiveis" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">-- para adoção</span>
+                <span id="cardAnimaisUrgencia" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold text-[11px] hidden">-- c/ urgência</span>
+              </div>
+              <p class="text-[11px] text-gray-400 font-medium" id="cardAnimaisDetalhe">Carregando...</p>
+            </div>
+            <a href="#listaAnimais" class="mt-2 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline flex items-center gap-1 min-h-[28px]">
+              <span>Ver lista de pets</span> <span>↓</span>
+            </a>
           </div>
-          <div class="space-y-0.5 my-1">
-            <span class="text-2xl font-black text-gray-900 block truncate" id="cardSaldoCaixa">--</span>
-            <p class="text-xs text-gray-500 font-medium truncate" id="cardCaixaDetalhe">
-              Carregando caixa...
-            </p>
+
+          <!-- Card 2: Associados -->
+          <div class="p-3.5 bg-gradient-to-br from-teal-50/70 via-white to-teal-50/30 rounded-xl border border-teal-100/90 flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-teal-800 flex items-center gap-1">
+                <span>🤝</span> Associados
+              </span>
+              <span id="badgeStatusAssociados" class="text-[10px] font-bold text-teal-700 bg-teal-100/80 px-2 py-0.5 rounded-md truncate">--</span>
+            </div>
+            <div class="space-y-1 my-1">
+              <div class="flex items-baseline gap-1.5">
+                <span class="text-2xl font-black text-gray-900" id="cardQtdAssociados">--</span>
+                <span class="text-xs text-gray-500 font-semibold">apoiadores</span>
+              </div>
+              <p class="text-xs text-gray-500 font-medium" id="cardAssociadosDetalhe">Carregando...</p>
+              <!-- Detalhe de dias de atraso -->
+              <div id="cardAssocDiasDetalhe" class="hidden space-y-0.5 pt-1 border-t border-teal-100">
+                <p id="cardAssocDias10" class="text-[11px] text-rose-600 font-bold hidden"></p>
+                <p id="cardAssocDias20" class="text-[11px] text-rose-800 font-extrabold hidden"></p>
+              </div>
+            </div>
+            <a href="/financas" class="mt-2 text-[11px] font-bold text-teal-700 hover:text-teal-900 hover:underline flex items-center gap-1 min-h-[28px]">
+              <span>Gerenciar associados</span> <span>→</span>
+            </a>
           </div>
-          <a
-            href="/financas?aba=caixa"
-            class="mt-2 text-[11px] font-bold text-amber-800 hover:text-amber-950 hover:underline flex items-center gap-1 min-h-[28px]"
-          >
-            <span>Ver fluxo de caixa</span> <span>→</span>
-          </a>
+
+          <!-- Card 3: Caixa da ONG -->
+          <div class="p-3.5 bg-gradient-to-br from-amber-50/60 via-white to-amber-50/30 rounded-xl border border-amber-100/90 flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
+                <span>💰</span> Caixa ONG
+              </span>
+              <span class="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md">Saldo Geral</span>
+            </div>
+            <div class="space-y-0.5 my-1">
+              <span class="text-2xl font-black text-gray-900 block truncate" id="cardSaldoCaixa">--</span>
+              <p class="text-xs text-gray-500 font-medium truncate" id="cardCaixaDetalhe">Carregando caixa...</p>
+            </div>
+            <a href="/financas?aba=caixa" class="mt-2 text-[11px] font-bold text-amber-800 hover:text-amber-950 hover:underline flex items-center gap-1 min-h-[28px]">
+              <span>Ver fluxo de caixa</span> <span>→</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -1822,19 +1871,51 @@ import { VERSAO_ATUAL } from '../data/novidades';
       placarPublico?.classList.add('hidden');
       painelExecutivo?.classList.remove('hidden');
 
-      // Card 1: Animais & Abrigo
-      const noAbrigo = animais.filter(a => a.localizacao === 'Abrigo Takanil' && a.status !== 'Adotado').length;
-      const urgencias = animais.filter(a => a.situacao_urgencia && a.situacao_urgencia !== 'Nenhuma' && a.status !== 'Adotado').length;
+      // --- Animais Cadastrados ---
+      const totalCadastrados = animais.filter(a => a.status !== 'Adotado').length;
+      const disponiveisAdocao = animais.filter(a => a.status === 'Disponível' && a.status_moderacao === 'aprovado').length;
+      const comUrgencia = animais.filter(a => a.situacao_urgencia && a.situacao_urgencia !== 'Nenhuma' && a.status !== 'Adotado').length;
+
+      // Barra compacta
+      const resumoAnimaisCadEl = document.getElementById('resumoAnimaisCad');
+      const resumoAnimaisUrgEl = document.getElementById('resumoAnimaisUrg');
+      if (resumoAnimaisCadEl) resumoAnimaisCadEl.textContent = String(totalCadastrados);
+      if (resumoAnimaisUrgEl) {
+        if (comUrgencia > 0) {
+          resumoAnimaisUrgEl.textContent = `⚠️ ${comUrgencia} urgência${comUrgencia > 1 ? 's' : ''}`;
+          resumoAnimaisUrgEl.classList.remove('hidden');
+        } else {
+          resumoAnimaisUrgEl.classList.add('hidden');
+        }
+      }
+
+      // Cards expandidos
       const cardQtdAnimais = document.getElementById('cardQtdAnimais');
       const cardAnimaisDetalhe = document.getElementById('cardAnimaisDetalhe');
-      const badgeRacaoAbrigo = document.getElementById('badgeRacaoAbrigo');
-      if (cardQtdAnimais) cardQtdAnimais.textContent = String(noAbrigo);
-      if (cardAnimaisDetalhe) cardAnimaisDetalhe.textContent = urgencias > 0 ? `${urgencias} com urgência cadastrada` : 'Nenhuma urgência ativa';
-      if (badgeRacaoAbrigo) badgeRacaoAbrigo.textContent = `~${Math.round(totalRacao)} kg ração/mês`;
+      const cardAnimaisDisponiveis = document.getElementById('cardAnimaisDisponiveis');
+      const cardAnimaisUrgenciaEl = document.getElementById('cardAnimaisUrgencia');
+      if (cardQtdAnimais) cardQtdAnimais.textContent = String(totalCadastrados);
+      if (cardAnimaisDisponiveis) cardAnimaisDisponiveis.textContent = `${disponiveisAdocao} para adoção`;
+      if (cardAnimaisUrgenciaEl) {
+        if (comUrgencia > 0) {
+          cardAnimaisUrgenciaEl.textContent = `⚠️ ${comUrgencia} c/ urgência`;
+          cardAnimaisUrgenciaEl.classList.remove('hidden');
+        } else {
+          cardAnimaisUrgenciaEl.classList.add('hidden');
+        }
+      }
+      if (cardAnimaisDetalhe) {
+        const semUrgencia = disponiveisAdocao - comUrgencia;
+        cardAnimaisDetalhe.textContent = semUrgencia > 0
+          ? `${semUrgencia} sem urgência cadastrada`
+          : comUrgencia > 0 ? 'Todos têm urgência cadastrada' : 'Nenhum animal disponível';
+      }
 
-      // Card 2: Associados & Apoios
+      // --- Associados & Apoios ---
       let totalAssociadosAtivos = 0;
       let associadosPendentes = 0;
+      let pendentes10Dias = 0;
+      let pendentes20Dias = 0;
       try {
         const { data: assocData } = await supabase
           .from('associados')
@@ -1848,6 +1929,8 @@ import { VERSAO_ATUAL } from '../data/novidades';
             const st = calcularStatusAssociado(assoc, hoje);
             if (st.status === 'atrasado' || st.status === 'vence_hoje') {
               associadosPendentes++;
+              if (st.diasDiferenca >= 20) pendentes20Dias++;
+              else if (st.diasDiferenca >= 10) pendentes10Dias++;
             }
           });
         }
@@ -1855,18 +1938,64 @@ import { VERSAO_ATUAL } from '../data/novidades';
         console.warn('Erro ao verificar associados:', errAssoc);
       }
 
+      // Barra compacta — Associados
+      const resumoAssocTotalEl = document.getElementById('resumoAssocTotal');
+      const resumoAssocPendEl = document.getElementById('resumoAssocPend');
+      const resumoAssocDiasEl = document.getElementById('resumoAssocDias');
+      if (resumoAssocTotalEl) resumoAssocTotalEl.textContent = String(totalAssociadosAtivos);
+      if (resumoAssocPendEl) {
+        if (associadosPendentes > 0) {
+          resumoAssocPendEl.textContent = `❗ ${associadosPendentes} pendente${associadosPendentes > 1 ? 's' : ''}`;
+          resumoAssocPendEl.classList.remove('hidden');
+        } else {
+          resumoAssocPendEl.classList.add('hidden');
+        }
+      }
+      if (resumoAssocDiasEl && associadosPendentes > 0) {
+        const linhas: string[] = [];
+        if (pendentes20Dias > 0) linhas.push(`<span class="text-[10px] font-extrabold text-rose-700 whitespace-nowrap leading-tight">🔴 ${pendentes20Dias} há +20 dias</span>`);
+        if (pendentes10Dias > 0) linhas.push(`<span class="text-[10px] font-bold text-rose-500 whitespace-nowrap leading-tight">⚠️ ${pendentes10Dias} há +10 dias</span>`);
+        if (linhas.length > 0) {
+          resumoAssocDiasEl.innerHTML = linhas.join('');
+          resumoAssocDiasEl.classList.remove('hidden');
+        } else {
+          resumoAssocDiasEl.classList.add('hidden');
+        }
+      } else if (resumoAssocDiasEl) {
+        resumoAssocDiasEl.classList.add('hidden');
+      }
+
+
+      // Cards expandidos — Associados
       const cardQtdAssociados = document.getElementById('cardQtdAssociados');
       const cardAssociadosDetalhe = document.getElementById('cardAssociadosDetalhe');
       const badgeStatusAssociados = document.getElementById('badgeStatusAssociados');
+      const cardAssocDiasDetalhe = document.getElementById('cardAssocDiasDetalhe');
+      const cardAssocDias10El = document.getElementById('cardAssocDias10');
+      const cardAssocDias20El = document.getElementById('cardAssocDias20');
+
       if (cardQtdAssociados) cardQtdAssociados.textContent = String(totalAssociadosAtivos);
       if (cardAssociadosDetalhe) {
-        cardAssociadosDetalhe.textContent = associadosPendentes > 0 ? `${associadosPendentes} cobrança(s) pendente(s)` : 'Todas mensalidades em dia';
+        cardAssociadosDetalhe.textContent = associadosPendentes > 0
+          ? `${associadosPendentes} pendente${associadosPendentes > 1 ? 's' : ''} de pagamento`
+          : 'Todas mensalidades em dia ✓';
       }
       if (badgeStatusAssociados) {
         badgeStatusAssociados.textContent = associadosPendentes > 0 ? `${associadosPendentes} pendentes` : '100% em dia';
       }
+      if (cardAssocDiasDetalhe && (pendentes10Dias > 0 || pendentes20Dias > 0)) {
+        cardAssocDiasDetalhe.classList.remove('hidden');
+        if (cardAssocDias10El && pendentes10Dias > 0) {
+          cardAssocDias10El.textContent = `⚠️ ${pendentes10Dias} há mais de 10 dias`;
+          cardAssocDias10El.classList.remove('hidden');
+        }
+        if (cardAssocDias20El && pendentes20Dias > 0) {
+          cardAssocDias20El.textContent = `🔴 ${pendentes20Dias} há mais de 20 dias`;
+          cardAssocDias20El.classList.remove('hidden');
+        }
+      }
 
-      // Card 3: Caixa da ONG
+      // --- Card 3: Caixa da ONG ---
       try {
         const { data: financasData } = await supabase
           .from('financas')
@@ -1894,6 +2023,13 @@ import { VERSAO_ATUAL } from '../data/novidades';
           });
         }
 
+        // Barra compacta — Caixa
+        const resumoCaixaSaldoEl = document.getElementById('resumoCaixaSaldo');
+        const resumoCaixaMesEl = document.getElementById('resumoCaixaMes');
+        if (resumoCaixaSaldoEl) resumoCaixaSaldoEl.textContent = formatarMoeda(saldo);
+        if (resumoCaixaMesEl) resumoCaixaMesEl.textContent = `+${formatarMoeda(entradasMes)} este mês`;
+
+        // Cards expandidos — Caixa
         const cardSaldoCaixa = document.getElementById('cardSaldoCaixa');
         const cardCaixaDetalhe = document.getElementById('cardCaixaDetalhe');
         if (cardSaldoCaixa) cardSaldoCaixa.textContent = formatarMoeda(saldo);
@@ -1948,4 +2084,63 @@ import { VERSAO_ATUAL } from '../data/novidades';
   // Iniciar
   sincronizarUIModoVisualizacao();
   carregarDados();
+
+  // --- Toggle do Painel Executivo (Acordeão) ---
+  const painelGestaoHeader = document.getElementById('painelGestaoHeader');
+  const painelGestaoGrid = document.getElementById('painelGestaoGrid');
+  const painelCardsExpandido = document.getElementById('painelCardsExpandido');
+  const btnToggle = document.getElementById('btnTogglePainelGestao');
+  const toggleIcone = document.getElementById('togglePainelIcone');
+
+  function setPainelExpandido(expandido: boolean, salvar = true) {
+    if (!painelCardsExpandido || !painelGestaoHeader) return;
+    if (expandido) {
+      painelCardsExpandido.classList.remove('hidden');
+      if (toggleIcone) toggleIcone.textContent = '▲';
+      painelGestaoHeader.setAttribute('aria-expanded', 'true');
+    } else {
+      painelCardsExpandido.classList.add('hidden');
+      if (toggleIcone) toggleIcone.textContent = '▼';
+      painelGestaoHeader.setAttribute('aria-expanded', 'false');
+    }
+    if (salvar) {
+      localStorage.setItem('takanil_painel_expandido', expandido ? '1' : '0');
+    }
+  }
+
+  // Restaurar preferência salva (padrão: recolhido)
+  const preferenciaPainel = localStorage.getItem('takanil_painel_expandido');
+  setPainelExpandido(preferenciaPainel === '1', false);
+
+  // Helper para alternar estado
+  function togglePainel() {
+    const expandido = painelCardsExpandido?.classList.contains('hidden');
+    setPainelExpandido(!!expandido);
+  }
+
+  // Linha 1 (título) — clicável para expandir/recolher
+  painelGestaoHeader?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) return;
+    togglePainel();
+  });
+  painelGestaoHeader?.addEventListener('keydown', (e) => {
+    if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+      e.preventDefault();
+      togglePainel();
+    }
+  });
+
+  // Linha 2 (grid de métricas) — também expande/recolhe ao toque
+  painelGestaoGrid?.addEventListener('click', () => togglePainel());
+
+  // Strip de dias (Linha 3) — também expande ao toque
+  document.getElementById('resumoAssocDias')?.addEventListener('click', () => togglePainel());
+
+  // Botão toggle (stopPropagation para evitar disparo duplo com o header)
+  btnToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePainel();
+  });
+
+
 </script>
