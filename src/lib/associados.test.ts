@@ -36,7 +36,12 @@ describe('associados - utilitários de telefone e instagram', () => {
     expect(formatarInstagram('   @@mariasilva  ')).toBe('@mariasilva');
     expect(formatarInstagram('https://www.instagram.com/mariasilva/')).toBe('@mariasilva');
     expect(formatarInstagram('https://instagram.com/mariasilva?igshid=123')).toBe('@mariasilva');
+    expect(formatarInstagram('https://m.instagram.com/mariasilva/')).toBe('@mariasilva');
+    expect(formatarInstagram('instagram.com/mariasilva')).toBe('@mariasilva');
+    expect(formatarInstagram('https://www.instagram.com/_u/mariasilva?igsh=abc')).toBe('@mariasilva');
+    expect(formatarInstagram('Perfil no Insta: https://instagram.com/mariasilva')).toBe('@mariasilva');
     expect(formatarInstagram('')).toBe('');
+    expect(formatarInstagram(null)).toBe('');
   });
 });
 

@@ -515,7 +515,7 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
       if (inputValor) inputValor.value = String(associado.valor_mensalidade);
       if (inputDia) inputDia.value = String(associado.dia_vencimento);
       if (inputZap) inputZap.value = formatarTelefone(associado.whatsapp);
-      if (inputInsta) inputInsta.value = associado.instagram || '';
+      if (inputInsta) inputInsta.value = formatarInstagram(associado.instagram);
       if (inputUltimoPago) inputUltimoPago.value = associado.ultimo_pagamento || '';
       if (inputObs) inputObs.value = associado.observacoes || '';
       if (inputAtivo) inputAtivo.checked = associado.ativo !== false;
@@ -564,14 +564,39 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
   });
 
   const inputInstaForm = document.getElementById('associadoInstagram') as HTMLInputElement | null;
-  inputInstaForm?.addEventListener('input', () => {
-    if (inputInstaForm.value.includes('instagram.com')) {
+  const sanitizarInstaAoColar = () => {
+    if (inputInstaForm && inputInstaForm.value) {
       inputInstaForm.value = formatarInstagram(inputInstaForm.value);
     }
+  };
+
+  inputInstaForm?.addEventListener('paste', (e) => {
+    const textoColado = e.clipboardData?.getData('text');
+    if (
+      textoColado &&
+      (textoColado.includes('instagram') ||
+        textoColado.includes('instagr.am') ||
+        textoColado.includes('http') ||
+        textoColado.includes('/'))
+    ) {
+      e.preventDefault();
+      inputInstaForm.value = formatarInstagram(textoColado);
+      inputInstaForm.dispatchEvent(new Event('input', { bubbles: true }));
+    } else {
+      setTimeout(sanitizarInstaAoColar, 0);
+    }
   });
-  inputInstaForm?.addEventListener('blur', () => {
-    if (inputInstaForm.value) {
-      inputInstaForm.value = formatarInstagram(inputInstaForm.value);
+  inputInstaForm?.addEventListener('change', sanitizarInstaAoColar);
+  inputInstaForm?.addEventListener('blur', sanitizarInstaAoColar);
+  inputInstaForm?.addEventListener('input', () => {
+    if (
+      inputInstaForm.value.includes('/') ||
+      inputInstaForm.value.includes('http') ||
+      inputInstaForm.value.includes('www.') ||
+      inputInstaForm.value.includes('instagram.com') ||
+      inputInstaForm.value.includes('instagr.am')
+    ) {
+      sanitizarInstaAoColar();
     }
   });
 

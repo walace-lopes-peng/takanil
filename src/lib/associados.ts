@@ -89,10 +89,25 @@ export function validarTelefone(telefone?: string | null): boolean {
 export function formatarInstagram(instagram?: string | null): string {
   if (!instagram) return '';
   let limpo = instagram.trim();
-  // Se for URL completa (ex: https://www.instagram.com/usuario/ ou instagram.com/usuario)
-  limpo = limpo.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '');
-  // Remove parâmetros de busca, barras finais e arrobas
-  limpo = limpo.split('?')[0].split('#')[0].replace(/\/+$/, '').replace(/^@+/, '').trim();
+
+  // Detecta URLs do Instagram em formatos variados (desktop, mobile m., l., deep-link _u/, stories)
+  const regexUrl = /(?:https?:\/\/)?(?:www\.|m\.|l\.)?(?:instagram\.com|instagr\.am)\/(?:_u\/)?(?:stories\/)?([a-zA-Z0-9._]+)/i;
+  const match = limpo.match(regexUrl);
+
+  if (match && match[1]) {
+    const handleCapturado = match[1];
+    // Se não for uma rota reservada do Instagram (ex: reels, explore, p)
+    const rotasReservadas = ['p', 'reel', 'reels', 'explore', 'direct', 'accounts'];
+    if (!rotasReservadas.includes(handleCapturado.toLowerCase())) {
+      limpo = handleCapturado;
+    }
+  } else {
+    // Se não bateu na regex de URL, remove query params, fragmentos e barras finais
+    limpo = limpo.split('?')[0].split('#')[0].replace(/\/+$/, '');
+  }
+
+  // Remove arrobas redundantes, barras e espaços
+  limpo = limpo.replace(/^[/@]+/, '').replace(/\/+$/, '').trim();
   return limpo ? `@${limpo}` : '';
 }
 
