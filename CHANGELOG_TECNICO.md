@@ -46,8 +46,11 @@ Toda nova entrega de versão ou build de patch deve registrar:
   5. **Baixa Integrada:** Ao confirmar o pagamento, executa transação atualizando `ultimo_pagamento` do associado e inserindo uma Entrada em `financas` com a categoria `"Doação / Associado"`.
 
 - **Validação & Testes:**
-  - `npm run test`: 41 testes unitários passando (13 novos testes em `associados.test.ts`).
+  - `npm run test`: 45 testes unitários passando (17 testes em `associados.test.ts` cobrindo regras de vencimento, datas distantes e status).
   - `npm run build`: `astro check` com 0 erros, 0 warnings; build estático de 7 páginas gerado com sucesso.
+  - Correção no script inline de Finanças: remoção de token TypeScript (`as any`), registro global de `window.carregarDadosCaixa` e `window.selecionarAtalhoTodoPeriodo`, e botão de acesso ao histórico completo no empty state.
+  - Otimização do seletor de ordenação e modo de exibição em 375px sem amontoar ou quebrar de forma desordenada.
+  - Adição de card de destaque no `ModalNovidades.astro` com redirecionamento direto para cadastro do primeiro associado.
 
 ---
 

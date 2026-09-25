@@ -128,6 +128,23 @@ largura** (iPhone SE / Android pequeno). Breakpoints `sm:` e maiores são
   ou card para acomodar o conteúdo com espaço é correto. Espremer conteúdo
   em uma linha estreita para "economizar espaço" é errado.
 
+## ⚡ Prevenção de Falhas em Toggles e Listeners de UI (Zero Latência)
+
+Alternadores de abas, toggles, accordions e botões interativos são críticos para as voluntárias.
+Para evitar que botões e alternadores fiquem mudos ou inertes:
+
+- **Zero Latência para Listeners de UI**: Event listeners de abas, toggles e modais **NUNCA**
+  devem ser vinculados após chamadas assíncronas `await` (como `await supabase.auth.getSession()`
+  ou consultas de dados) nem no final de scripts longos. Devem ser registrados
+  **sincronamente no carregamento do DOM** (via `<script is:inline>` ou no topo imediato
+  do script), para que o app responda ao toque instantaneamente, sem travar por latência de rede.
+- **Proibição Absoluta de IDs e Componentes Duplicados**: Ao mover ou reordenar seções ou
+  componentes, certifique-se de **remover a versão anterior**. Ter dois elementos com o mesmo
+  `id` no DOM corrompe `document.getElementById()` e causa falhas silenciosas em toggles e listas.
+- **Sincronização Imediata por URL**: Para visões que aceitam parâmetros (ex: `?aba=caixa`),
+  a leitura da URL e a ativação das classes visuais deve rodar de imediato no carregamento
+  inicial, garantindo consistência ao recarregar ou abrir links diretos.
+
 
 ## Stack (fixa — não trocar nem sugerir alternativa sem perguntar)
 

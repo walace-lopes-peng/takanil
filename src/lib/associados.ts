@@ -27,6 +27,7 @@ export interface InfoStatusAssociado {
   mesReferencia: string;
   classeBadge: string;
   tipoMensagemSugerida: 'lembrete' | 'hoje' | 'atraso' | 'agradecimento';
+  jaPagoEsteMes: boolean;
 }
 
 export const CHAVE_PIX_OFICIAL = '35998687395';
@@ -121,13 +122,12 @@ export function gerarLinkInstagram(instagram?: string | null): string {
   return handle ? `https://instagram.com/${handle}` : '';
 }
 
-
 /**
  * Calcula o status de pagamento do associado com base no dia de vencimento,
  * na data do último pagamento e na data de referência (hoje por padrão).
  */
 export function calcularStatusAssociado(
-  associado: Pick<Associado, 'dia_vencimento' | 'ultimo_pagamento' | 'ativo'>,
+  associado: Pick<Associado, 'dia_vencimento' | 'ultimo_pagamento' | 'ativo'> & { criado_em?: string },
   dataAtual: Date = new Date()
 ): InfoStatusAssociado {
   const anoAtual = dataAtual.getFullYear();
@@ -144,33 +144,78 @@ export function calcularStatusAssociado(
       mesReferencia,
       classeBadge: 'bg-gray-100 text-gray-700 border-gray-300',
       tipoMensagemSugerida: 'lembrete',
+      jaPagoEsteMes: false,
     };
   }
 
-  // Verifica se já pagou no mês/ano atual
+  const diaVenc = Math.min(31, Math.max(1, Number(associado.dia_vencimento) || 1));
+
+  // 1. Verifica histórico de pagamento
+  let diffMeses = Infinity;
+  let jaPagoEsteMes = false;
+
   if (associado.ultimo_pagamento) {
     const partes = associado.ultimo_pagamento.split('-');
     if (partes.length >= 2) {
       const anoPago = parseInt(partes[0], 10);
       const mesPago = parseInt(partes[1], 10) - 1; // 0-indexed
+      diffMeses = (anoAtual - anoPago) * 12 + (mesAtual - mesPago);
+      if (diffMeses <= 0) {
+        jaPagoEsteMes = true;
+      }
+    }
+  }
 
-      // Se pagou no mesmo mês e ano corrente (ou posterior): está Em dia!
-      if (anoPago > anoAtual || (anoPago === anoAtual && mesPago >= mesAtual)) {
+  // Se já pagou no mês atual ou adiantado: 100% Em dia!
+  if (jaPagoEsteMes) {
+    return {
+      status: 'em_dia',
+      rotulo: 'Em dia',
+      diasDiferenca: 0,
+      mesReferencia,
+      classeBadge: 'bg-emerald-50 text-emerald-700 border-emerald-300',
+      tipoMensagemSugerida: 'agradecimento',
+      jaPagoEsteMes: true,
+    };
+  }
+
+  // 2. Se nunca pagou, verifica quando foi cadastrado
+  if (!associado.ultimo_pagamento && associado.criado_em) {
+    const dataCriacao = new Date(associado.criado_em);
+    if (!isNaN(dataCriacao.getTime())) {
+      const anoCriacao = dataCriacao.getFullYear();
+      const mesCriacao = dataCriacao.getMonth();
+      const diffMesesCriacao = (anoAtual - anoCriacao) * 12 + (mesAtual - mesCriacao);
+      if (diffMesesCriacao > 0) {
+        // Cadastrado em mês anterior sem pagamento registrado -> atrasado
         return {
-          status: 'em_dia',
-          rotulo: 'Em dia',
-          diasDiferenca: 0,
+          status: 'atrasado',
+          rotulo: 'Atrasado',
+          diasDiferenca: diffMesesCriacao * 30,
           mesReferencia,
-          classeBadge: 'bg-emerald-50 text-emerald-700 border-emerald-300',
-          tipoMensagemSugerida: 'agradecimento',
+          classeBadge: 'bg-rose-50 text-rose-700 border-rose-300 font-semibold',
+          tipoMensagemSugerida: 'atraso',
+          jaPagoEsteMes: false,
         };
       }
     }
   }
 
-  // Se ainda não pagou no mês atual, compara com o dia de vencimento
-  const diaVenc = associado.dia_vencimento;
+  // 3. Se o último pagamento foi há mais de 1 mês atrás (diffMeses > 1) -> atrasado
+  if (diffMeses > 1 && diffMeses !== Infinity) {
+    return {
+      status: 'atrasado',
+      rotulo: `Atrasado (${diffMeses} meses)`,
+      diasDiferenca: diffMeses * 30,
+      mesReferencia,
+      classeBadge: 'bg-rose-50 text-rose-700 border-rose-300 font-semibold',
+      tipoMensagemSugerida: 'atraso',
+      jaPagoEsteMes: false,
+    };
+  }
 
+  // 4. Pagou o mês passado ou é novo cadastrado no mês atual:
+  // Compara com o dia de vencimento deste mês:
   if (diaAtual === diaVenc) {
     return {
       status: 'vence_hoje',
@@ -179,12 +224,14 @@ export function calcularStatusAssociado(
       mesReferencia,
       classeBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold animate-pulse',
       tipoMensagemSugerida: 'hoje',
+      jaPagoEsteMes: false,
     };
   }
 
   if (diaAtual < diaVenc) {
     const diasRestantes = diaVenc - diaAtual;
     if (diasRestantes <= 3) {
+      // Vencimento iminente (1 a 3 dias) -> Alerta de cobrança
       return {
         status: 'a_vencer',
         rotulo: `Vence em ${diasRestantes} dia${diasRestantes > 1 ? 's' : ''}`,
@@ -192,20 +239,23 @@ export function calcularStatusAssociado(
         mesReferencia,
         classeBadge: 'bg-blue-50 text-blue-700 border-blue-200',
         tipoMensagemSugerida: 'lembrete',
+        jaPagoEsteMes: false,
       };
     }
 
+    // Vencimento ainda distante (> 3 dias) e sem dívidas anteriores -> Regular / Em dia
     return {
-      status: 'a_vencer',
+      status: 'em_dia',
       rotulo: `Vence dia ${diaVenc}`,
       diasDiferenca: diasRestantes,
       mesReferencia,
-      classeBadge: 'bg-slate-100 text-slate-700 border-slate-200',
+      classeBadge: 'bg-emerald-50 text-emerald-800 border-emerald-200',
       tipoMensagemSugerida: 'lembrete',
+      jaPagoEsteMes: false,
     };
   }
 
-  // Se diaAtual > diaVenc: atrasado
+  // diaAtual > diaVenc (já passou o dia neste mês e ainda não pagou) -> Atrasado
   const diasAtraso = diaAtual - diaVenc;
   return {
     status: 'atrasado',
@@ -214,7 +264,59 @@ export function calcularStatusAssociado(
     mesReferencia,
     classeBadge: 'bg-rose-50 text-rose-700 border-rose-300 font-semibold',
     tipoMensagemSugerida: 'atraso',
+    jaPagoEsteMes: false,
   };
+}
+
+/**
+ * Calcula a data real de vencimento (timestamp) no calendário para fins de ordenação.
+ * - Quem tem o próximo vencimento mais distante no futuro recebe maior timestamp.
+ * - Quem vence hoje ou nos próximos dias recebe timestamp próximo.
+ * - Quem está atrasado recebe timestamp no passado (menor valor, indo para o fim da lista).
+ */
+export function calcularDataProximoVencimento(
+  associado: Pick<Associado, 'dia_vencimento' | 'ultimo_pagamento' | 'ativo'> & { criado_em?: string },
+  dataHoje: Date = new Date()
+): number {
+  const anoAtual = dataHoje.getFullYear();
+  const mesAtual = dataHoje.getMonth();
+  const diaVenc = Math.min(31, Math.max(1, Number(associado.dia_vencimento) || 1));
+
+  const st = calcularStatusAssociado(associado, dataHoje);
+
+  if (st.jaPagoEsteMes) {
+    // Já pagou este mês: próximo vencimento é no mês seguinte
+    const proximoMes = mesAtual + 1;
+    const ultimoDiaDoProximoMes = new Date(anoAtual, proximoMes + 1, 0).getDate();
+    const diaReal = Math.min(diaVenc, ultimoDiaDoProximoMes);
+    return new Date(anoAtual, proximoMes, diaReal, 23, 59, 59).getTime();
+  }
+
+  if (st.status === 'atrasado') {
+    // Vencimento em atraso (no passado)
+    if (associado.ultimo_pagamento) {
+      const partes = associado.ultimo_pagamento.split('-');
+      if (partes.length >= 2) {
+        const anoPago = parseInt(partes[0], 10);
+        const mesPago = parseInt(partes[1], 10) - 1;
+        const diffMeses = (anoAtual - anoPago) * 12 + (mesAtual - mesPago);
+        if (diffMeses > 1) {
+          const mesDevido = mesPago + 1;
+          const ultimoDiaDevido = new Date(anoPago, mesDevido + 1, 0).getDate();
+          const diaReal = Math.min(diaVenc, ultimoDiaDevido);
+          return new Date(anoPago, mesDevido, diaReal, 23, 59, 59).getTime();
+        }
+      }
+    }
+    const ultimoDiaDesteMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+    const diaReal = Math.min(diaVenc, ultimoDiaDesteMes);
+    return new Date(anoAtual, mesAtual, diaReal, 23, 59, 59).getTime();
+  }
+
+  // Status vence_hoje, a_vencer ou em_dia aguardando data do mês corrente
+  const ultimoDiaDesteMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+  const diaReal = Math.min(diaVenc, ultimoDiaDesteMes);
+  return new Date(anoAtual, mesAtual, diaReal, 23, 59, 59).getTime();
 }
 
 /**

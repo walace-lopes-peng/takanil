@@ -10,19 +10,82 @@ import PainelAssociados from '../../components/associados/PainelAssociados.astro
       <button
         id="subtabAssociados"
         type="button"
-        class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all bg-white text-taka-green-800 shadow-2xs min-h-[44px]"
+        class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all bg-white text-taka-green-800 shadow-2xs min-h-[44px] cursor-pointer"
       >
         <span>🤝</span> Associados
       </button>
       <button
         id="subtabCaixa"
         type="button"
-        class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-gray-900 min-h-[44px]"
+        class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-gray-900 min-h-[44px] cursor-pointer"
       >
         <span>💰</span> Caixa & Despesas
       </button>
     </div>
   </div>
+
+  <script is:inline>
+    // Controle síncrono e imediato das abas (Zero Latência)
+    (function() {
+      function setupAbasGestao() {
+        var btnCaixa = document.getElementById('subtabCaixa');
+        var btnAssoc = document.getElementById('subtabAssociados');
+        var secCaixa = document.getElementById('secaoCaixa');
+        var secAssoc = document.getElementById('secaoAssociados');
+        var barraRapida = document.getElementById('barraLancamentoRapido');
+
+        function ativarSubAba(aba) {
+          if (aba === 'caixa') {
+            btnCaixa?.classList.add('bg-white', 'text-taka-green-800', 'shadow-2xs');
+            btnCaixa?.classList.remove('text-gray-500');
+            btnAssoc?.classList.remove('bg-white', 'text-taka-green-800', 'shadow-2xs');
+            btnAssoc?.classList.add('text-gray-500');
+
+            secCaixa?.classList.remove('hidden');
+            secAssoc?.classList.add('hidden');
+            if (barraRapida) barraRapida.style.display = 'flex';
+            window.history.replaceState(null, '', '/financas?aba=caixa');
+
+            if (typeof window.carregarDadosCaixa === 'function') {
+              window.carregarDadosCaixa();
+            }
+          } else {
+            btnAssoc?.classList.add('bg-white', 'text-taka-green-800', 'shadow-2xs');
+            btnAssoc?.classList.remove('text-gray-500');
+            btnCaixa?.classList.remove('bg-white', 'text-taka-green-800', 'shadow-2xs');
+            btnCaixa?.classList.add('text-gray-500');
+
+            secAssoc?.classList.remove('hidden');
+            secCaixa?.classList.add('hidden');
+            if (barraRapida) barraRapida.style.display = 'none';
+            window.history.replaceState(null, '', '/financas');
+
+            if (typeof window.recarregarAssociados === 'function') {
+              window.recarregarAssociados();
+            }
+          }
+        }
+
+        window.ativarSubAbaGestao = ativarSubAba;
+
+        btnCaixa?.addEventListener('click', function() { ativarSubAba('caixa'); });
+        btnAssoc?.addEventListener('click', function() { ativarSubAba('associados'); });
+
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('aba') === 'caixa' || window.location.hash === '#caixa') {
+          ativarSubAba('caixa');
+        } else {
+          ativarSubAba('associados');
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupAbasGestao);
+      } else {
+        setupAbasGestao();
+      }
+    })();
+  </script>
 
   <!-- Seção 1: Associados (Padrinhos e Mensalistas - Padrão) -->
   <div id="secaoAssociados" class="transition-opacity duration-200">
@@ -339,28 +402,33 @@ import PainelAssociados from '../../components/associados/PainelAssociados.astro
     </div>
   </div>
   </div>
-
-  <!-- Seção 2: Associados (Padrinhos e Mensalistas) -->
-  <div id="secaoAssociados" class="hidden transition-opacity duration-200">
-    <PainelAssociados />
-  </div>
 </Layout>
 
 <script>
   import { supabase, getUserRole } from '../../lib/supabaseClient';
-
-  const { data: authData } = await supabase.auth.getSession();
-  if (!authData.session) {
-    window.location.replace('/login');
-  } else {
-    const role = await getUserRole();
-    if (role !== 'adm' && role !== 'dev') {
-      window.location.replace('/');
-    }
-  }
   import { obterIntervaloPorAtalho, type TipoAtalhoData } from '../../lib/filtrosData';
   import { calcularEvolucaoSaldo, gerarSvgCurvaSaldo, agruparPorCategorias, gerarHtmlCategorias } from '../../lib/agrupamentoFinancas';
   import * as XLSX from 'xlsx';
+
+  // Verificação de autenticação assíncrona (não bloqueia registro de listeners nem UI)
+  async function checkAuth() {
+    try {
+      const { data: authData } = await supabase.auth.getSession();
+      if (!authData?.session) {
+        window.location.replace('/login');
+        return false;
+      }
+      const role = await getUserRole();
+      if (role !== 'adm' && role !== 'dev') {
+        window.location.replace('/');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.warn('Erro ao checar autenticação em finanças:', err);
+      return true;
+    }
+  }
 
   // Elementos do Formulário
   const btnCancelar = document.getElementById('btnCancelar');
@@ -986,8 +1054,18 @@ import PainelAssociados from '../../components/associados/PainelAssociados.astro
     if (!lancamentos || lancamentos.length === 0) {
       if (listaLancamentos) {
         listaLancamentos.innerHTML = `
-          <div class="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-xl border border-gray-100 shadow-sm text-sm">
-            Nenhum lançamento encontrado para este período.
+          <div class="col-span-full text-center py-8 px-4 text-gray-500 bg-gray-50 rounded-2xl border border-gray-100 shadow-2xs text-sm space-y-3">
+            <p class="font-medium text-gray-600">Nenhum lançamento encontrado para este período.</p>
+            <p class="text-xs text-gray-400">Você pode alternar o filtro ou visualizar todo o histórico da ONG.</p>
+            <div>
+              <button
+                type="button"
+                onclick="window.selecionarAtalhoTodoPeriodo?.()"
+                class="px-4 py-2.5 bg-white hover:bg-gray-100 text-taka-green-700 font-bold text-xs rounded-xl border border-taka-green-200 shadow-2xs transition-all active:scale-95 inline-flex items-center gap-1.5 cursor-pointer min-h-[44px]"
+              >
+                <span>📅</span> <span>Ver Histórico Completo</span>
+              </button>
+            </div>
           </div>`;
       }
       
@@ -1065,55 +1143,21 @@ import PainelAssociados from '../../components/associados/PainelAssociados.astro
     XLSX.writeFile(wb, 'Takanil-Financeiro.xlsx');
   });
 
-  // Alternador de Sub-abas: Caixa vs Associados
-  const subtabCaixa = document.getElementById('subtabCaixa');
-  const subtabAssociados = document.getElementById('subtabAssociados');
-  const secaoCaixa = document.getElementById('secaoCaixa');
-  const secaoAssociados = document.getElementById('secaoAssociados');
 
-  function ativarSubAba(aba: 'caixa' | 'associados') {
-    if (aba === 'caixa') {
-      subtabCaixa?.classList.add('bg-white', 'text-taka-green-800', 'shadow-2xs');
-      subtabCaixa?.classList.remove('text-gray-500');
-      subtabAssociados?.classList.remove('bg-white', 'text-taka-green-800', 'shadow-2xs');
-      subtabAssociados?.classList.add('text-gray-500');
 
-      secaoCaixa?.classList.remove('hidden');
-      secaoAssociados?.classList.add('hidden');
-      if (barraLancamentoRapido) barraLancamentoRapido.style.display = 'flex';
-      window.history.replaceState(null, '', '/financas?aba=caixa');
-    } else {
-      subtabAssociados?.classList.add('bg-white', 'text-taka-green-800', 'shadow-2xs');
-      subtabAssociados?.classList.remove('text-gray-500');
-      subtabCaixa?.classList.remove('bg-white', 'text-taka-green-800', 'shadow-2xs');
-      subtabCaixa?.classList.add('text-gray-500');
-
-      secaoAssociados?.classList.remove('hidden');
-      secaoCaixa?.classList.add('hidden');
-      if (barraLancamentoRapido) barraLancamentoRapido.style.display = 'none';
-      window.history.replaceState(null, '', '/financas');
-
-      if (typeof (window as any).recarregarAssociados === 'function') {
-        (window as any).recarregarAssociados();
-      }
-    }
-  }
-
-  subtabCaixa?.addEventListener('click', () => ativarSubAba('caixa'));
-  subtabAssociados?.addEventListener('click', () => ativarSubAba('associados'));
-
-  // Verificar query param ou hash (Padrão: associados)
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('aba') === 'caixa' || window.location.hash === '#caixa') {
-    ativarSubAba('caixa');
-  } else {
-    ativarSubAba('associados');
-  }
-
-  // Expor recarga de transações para o modal de pagamento de associados
+  // Expor recarga de transações para o modal de pagamento de associados e abas de gestão
   (window as any).carregarTransacoes = carregarDados;
+  (window as any).carregarDadosCaixa = carregarDados;
+  (window as any).selecionarAtalhoTodoPeriodo = () => {
+    atalhoAtivo = 'todo_periodo';
+    periodoAtual = obterIntervaloPorAtalho('todo_periodo');
+    atualizarBotoesAtalho();
+    carregarDados();
+  };
 
   // Inicialização
   atualizarBotoesAtalho();
   carregarDados();
+  atualizarSaldoTotal();
+  checkAuth();
 </script>

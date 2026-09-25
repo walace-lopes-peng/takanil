@@ -71,7 +71,7 @@ import ModalImportarLote from './ModalImportarLote.astro';
           class="px-3.5 sm:px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 active:scale-95 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center gap-1.5 min-h-[44px]"
           title="Importar vários associados de uma planilha"
         >
-          <span>📥</span> <span>Importar em Lote</span>
+          <span>📥</span> <span>Importar</span>
         </button>
 
         <button
@@ -84,60 +84,86 @@ import ModalImportarLote from './ModalImportarLote.astro';
       </div>
     </div>
 
-    <!-- Barra de Filtros e Alternador de Modo de Visualização -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-      <!-- Toggles Rápidos de Filtro por Status -->
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none" id="filtrosStatusAssociados">
-        <button
-          type="button"
-          data-filtro="todos"
-          class="filtro-associado-btn px-3.5 py-2 rounded-xl border transition-all bg-taka-green-700 text-white border-taka-green-700 shadow-2xs whitespace-nowrap min-h-[40px]"
-        >
-          Todos (<span id="contFiltroTodos">0</span>)
-        </button>
-        <button
-          type="button"
-          data-filtro="atrasados"
-          class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
-        >
-          ⚠️ Atrasados (<span id="contFiltroAtrasados">0</span>)
-        </button>
-        <button
-          type="button"
-          data-filtro="vencendo"
-          class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
-        >
-          ⏳ Vencendo (<span id="contFiltroVencendo">0</span>)
-        </button>
-        <button
-          type="button"
-          data-filtro="em_dia"
-          class="filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]"
-        >
-          ✅ Em dia (<span id="contFiltroEmDia">0</span>)
-        </button>
+    <!-- Barra de Filtros por Status -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none" id="filtrosStatusAssociados">
+      <button
+        type="button"
+        data-filtro="todos"
+        class="filtro-associado-btn px-3.5 py-2.5 rounded-xl border transition-all bg-taka-green-700 text-white border-taka-green-700 shadow-2xs whitespace-nowrap min-h-[44px]"
+      >
+        Todos (<span id="contFiltroTodos">0</span>)
+      </button>
+      <button
+        type="button"
+        data-filtro="atrasados"
+        class="filtro-associado-btn px-3.5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[44px]"
+      >
+        ⚠️ Atrasados (<span id="contFiltroAtrasados">0</span>)
+      </button>
+      <button
+        type="button"
+        data-filtro="vencendo"
+        class="filtro-associado-btn px-3.5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[44px]"
+      >
+        ⏳ Vencendo (<span id="contFiltroVencendo">0</span>)
+      </button>
+      <button
+        type="button"
+        data-filtro="em_dia"
+        class="filtro-associado-btn px-3.5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[44px]"
+      >
+        ✅ Em dia (<span id="contFiltroEmDia">0</span>)
+      </button>
+    </div>
+
+    <!-- Barra de Controles: Ordenação e Modo de Visualização (Perfeito em 375px sem amontoar) -->
+    <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-gray-100">
+      <!-- Seletor de Ordenação -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider hidden sm:inline">Ordem:</span>
+        <div class="flex items-center p-1 bg-gray-100 rounded-xl border border-gray-200" role="group" aria-label="Critério de ordenação dos associados">
+          <button
+            type="button"
+            id="btnOrdemCadastro"
+            title="Ordenar por data de cadastro (mais recentes no topo)"
+            class="h-9 px-2.5 sm:px-3 flex items-center gap-1 sm:gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer min-h-[38px]"
+          >
+            <span>✨</span> <span>Recentes</span>
+          </button>
+          <button
+            type="button"
+            id="btnOrdemVencimento"
+            title="Ordenar por vencimento mais distante (quem tem mais dias até vencer no topo)"
+            class="h-9 px-2.5 sm:px-3 flex items-center gap-1 sm:gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer min-h-[38px]"
+          >
+            <span>📅</span> <span>Vencimento</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Alternador de Visualização (Cards vs Linhas) -->
-      <div class="flex items-center p-1 bg-gray-100 rounded-xl border border-gray-200 shrink-0 self-end sm:self-auto" role="group" aria-label="Modo de visualização dos associados">
-        <button
-          type="button"
-          id="btnModoCardsAssoc"
-          aria-label="Visualizar em cartões"
-          title="Visualização em Cartões"
-          class="h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs"
-        >
-          <span>🗂️</span> <span>Cards</span>
-        </button>
-        <button
-          type="button"
-          id="btnModoLinhasAssoc"
-          aria-label="Visualizar em linhas compactas"
-          title="Visualização em Linhas Compactas"
-          class="h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900"
-        >
-          <span>📋</span> <span>Linhas</span>
-        </button>
+      <!-- Seletor de Visualização (Cards vs Linhas) -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider hidden sm:inline">Modo:</span>
+        <div class="flex items-center p-1 bg-gray-100 rounded-xl border border-gray-200" role="group" aria-label="Modo de visualização dos associados">
+          <button
+            type="button"
+            id="btnModoCardsAssoc"
+            aria-label="Visualizar em cartões"
+            title="Visualização em Cartões"
+            class="h-9 px-2.5 sm:px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer min-h-[38px]"
+          >
+            <span>🗂️</span> <span class="hidden sm:inline">Cards</span>
+          </button>
+          <button
+            type="button"
+            id="btnModoLinhasAssoc"
+            aria-label="Visualizar em linhas compactas"
+            title="Visualização em Linhas Compactas"
+            class="h-9 px-2.5 sm:px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer min-h-[38px]"
+          >
+            <span>📋</span> <span class="hidden sm:inline">Linhas</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -179,6 +205,7 @@ import ModalImportarLote from './ModalImportarLote.astro';
   import {
     type Associado,
     calcularStatusAssociado,
+    calcularDataProximoVencimento,
     formatarMoeda,
     formatarTelefone,
     limparTelefone,
@@ -224,16 +251,21 @@ import ModalImportarLote from './ModalImportarLote.astro';
   const btnModoCards = document.getElementById('btnModoCardsAssoc');
   const btnModoLinhas = document.getElementById('btnModoLinhasAssoc');
 
+  // Alternador de Ordenação (Cadastro/Recentes vs Vencimento mais distante)
+  let modoOrdemAssoc: 'cadastro' | 'vencimento' = (localStorage.getItem('takanil_assoc_sort') as any) || 'cadastro';
+  const btnOrdemCadastro = document.getElementById('btnOrdemCadastro');
+  const btnOrdemVencimento = document.getElementById('btnOrdemVencimento');
+
   function atualizarModoVisualizacao(modo: 'cards' | 'linhas') {
     modoVisualizacaoAssoc = modo;
     localStorage.setItem('takanil_assoc_view', modo);
     if (btnModoCards && btnModoLinhas) {
       if (modo === 'cards') {
-        btnModoCards.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer';
-        btnModoLinhas.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer';
+        btnModoCards.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer min-h-[36px]';
+        btnModoLinhas.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer min-h-[36px]';
       } else {
-        btnModoCards.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer';
-        btnModoLinhas.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer';
+        btnModoCards.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer min-h-[36px]';
+        btnModoLinhas.className = 'h-9 px-3 flex items-center gap-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer min-h-[36px]';
       }
     }
     if (container) {
@@ -246,8 +278,25 @@ import ModalImportarLote from './ModalImportarLote.astro';
     renderizarCards();
   }
 
+  function atualizarModoOrdem(ordem: 'cadastro' | 'vencimento') {
+    modoOrdemAssoc = ordem;
+    localStorage.setItem('takanil_assoc_sort', ordem);
+    if (btnOrdemCadastro && btnOrdemVencimento) {
+      if (ordem === 'cadastro') {
+        btnOrdemCadastro.className = 'h-9 px-2.5 sm:px-3 flex items-center gap-1 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer min-h-[36px]';
+        btnOrdemVencimento.className = 'h-9 px-2.5 sm:px-3 flex items-center gap-1 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer min-h-[36px]';
+      } else {
+        btnOrdemCadastro.className = 'h-9 px-2.5 sm:px-3 flex items-center gap-1 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-900 cursor-pointer min-h-[36px]';
+        btnOrdemVencimento.className = 'h-9 px-2.5 sm:px-3 flex items-center gap-1 rounded-lg text-xs font-bold transition-all bg-white text-gray-900 shadow-xs cursor-pointer min-h-[36px]';
+      }
+    }
+    renderizarCards();
+  }
+
   btnModoCards?.addEventListener('click', () => atualizarModoVisualizacao('cards'));
   btnModoLinhas?.addEventListener('click', () => atualizarModoVisualizacao('linhas'));
+  btnOrdemCadastro?.addEventListener('click', () => atualizarModoOrdem('cadastro'));
+  btnOrdemVencimento?.addEventListener('click', () => atualizarModoOrdem('vencimento'));
 
   // Inicialização
   async function carregarAssociados() {
@@ -255,7 +304,7 @@ import ModalImportarLote from './ModalImportarLote.astro';
       const { data, error } = await supabase
         .from('associados')
         .select('*')
-        .order('nome', { ascending: true });
+        .order('criado_em', { ascending: false });
 
       if (error) {
         console.error('Erro ao buscar associados:', error);
@@ -292,13 +341,18 @@ import ModalImportarLote from './ModalImportarLote.astro';
     let totalVencendo = 0;
     let totalEmDia = 0;
 
-    ativos.forEach((a) => {
+    listaAssociados.forEach((a) => {
       const valor = Number(a.valor_mensalidade) || 0;
-      somaPrevisao += valor;
+      if (a.ativo !== false) {
+        somaPrevisao += valor;
+      }
 
       const st = calcularStatusAssociado(a, dataHoje);
-      if (st.status === 'em_dia') {
+      if (st.jaPagoEsteMes && a.ativo !== false) {
         somaRecebido += valor;
+      }
+
+      if (st.status === 'em_dia') {
         totalEmDia++;
       } else if (st.status === 'atrasado') {
         totalAtrasados++;
@@ -349,6 +403,26 @@ import ModalImportarLote from './ModalImportarLote.astro';
       return true;
     });
 
+    // Ordenação dos associados
+    filtrados.sort((a, b) => {
+      if (modoOrdemAssoc === 'vencimento') {
+        // Vencimento mais distante no topo (quem tem mais dias até vencer)
+        const vencA = calcularDataProximoVencimento(a, dataHoje);
+        const vencB = calcularDataProximoVencimento(b, dataHoje);
+        if (vencB !== vencA) return vencB - vencA;
+        // Desempate por cadastro mais recente
+        const dataA = a.criado_em ? new Date(a.criado_em).getTime() : 0;
+        const dataB = b.criado_em ? new Date(b.criado_em).getTime() : 0;
+        return dataB - dataA;
+      } else {
+        // Padrão: Data de cadastro (mais recentes primeiro)
+        const dataA = a.criado_em ? new Date(a.criado_em).getTime() : 0;
+        const dataB = b.criado_em ? new Date(b.criado_em).getTime() : 0;
+        if (dataB !== dataA) return dataB - dataA;
+        return a.nome.localeCompare(b.nome);
+      }
+    });
+
     if (filtrados.length === 0) {
       container.innerHTML = '';
       if (emptyState) emptyState.classList.remove('hidden');
@@ -365,7 +439,7 @@ import ModalImportarLote from './ModalImportarLote.astro';
         const telLimpo = limparTelefone(a.whatsapp);
         const instaFormatado = formatarInstagram(a.instagram);
 
-        let ultimoPagoTexto = 'Nenhum registro';
+        let ultimoPagoTexto = 'Nenhum';
         if (a.ultimo_pagamento) {
           const partes = a.ultimo_pagamento.split('-');
           if (partes.length === 3) {
@@ -388,13 +462,15 @@ import ModalImportarLote from './ModalImportarLote.astro';
                   <span>Vence dia <strong>${a.dia_vencimento}</strong></span>
                   <span>•</span>
                   <span class="font-extrabold text-gray-900">${valorFormatado}</span>
+                  <span>•</span>
+                  <span class="text-gray-600">🗓️ Último: <strong class="text-gray-800">${ultimoPagoTexto}</strong></span>
                   ${telLimpo ? `<span>•</span><span class="text-gray-700">📱 ${telFormatado}</span>` : ''}
                   ${instaFormatado ? `<span>•</span><a href="${gerarLinkInstagram(a.instagram)}" target="_blank" rel="noopener noreferrer" class="text-pink-600 font-bold hover:underline">📸 ${instaFormatado}</a>` : ''}
                 </div>
               </div>
 
               <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-50 w-full sm:w-auto justify-end">
-                ${st.status === 'em_dia' ? `
+                ${st.jaPagoEsteMes ? `
                   <button
                     type="button"
                     data-acao-lembrete="${a.id}"
@@ -434,7 +510,7 @@ import ModalImportarLote from './ModalImportarLote.astro';
           `;
         }
 
-        const btnAcaoPrincipal = st.status === 'em_dia'
+        const btnAcaoPrincipal = st.jaPagoEsteMes
           ? `
             <button
               type="button"
@@ -1115,9 +1191,9 @@ import ModalImportarLote from './ModalImportarLote.astro';
 
       botoesFiltro.forEach((other) => {
         if (other === btn) {
-          other.className = 'filtro-associado-btn px-3.5 py-2 rounded-xl border transition-all bg-taka-green-700 text-white border-taka-green-700 shadow-2xs whitespace-nowrap min-h-[40px]';
+          other.className = 'filtro-associado-btn px-3.5 py-2.5 rounded-xl border transition-all bg-taka-green-700 text-white border-taka-green-700 shadow-2xs whitespace-nowrap min-h-[44px]';
         } else {
-          other.className = 'filtro-associado-btn px-3.5 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[40px]';
+          other.className = 'filtro-associado-btn px-3.5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap min-h-[44px]';
         }
       });
 
@@ -1138,7 +1214,16 @@ import ModalImportarLote from './ModalImportarLote.astro';
   // Inicializar dados e modo de exibição ao carregar a página
   function inicializarPainelAssociados() {
     atualizarModoVisualizacao(modoVisualizacaoAssoc);
+    atualizarModoOrdem(modoOrdemAssoc);
     carregarAssociados();
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('novo') === 'true') {
+      setTimeout(() => {
+        abrirModalAssociado();
+        window.history.replaceState(null, '', '/financas?aba=associados');
+      }, 350);
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -1147,6 +1232,7 @@ import ModalImportarLote from './ModalImportarLote.astro';
     inicializarPainelAssociados();
   }
 
-  // Exportar função para recarregar se necessário externamente
+  // Exportar funções para controle externo
+  (window as any).abrirModalAssociado = () => abrirModalAssociado();
   (window as any).recarregarAssociados = carregarAssociados;
 </script>
