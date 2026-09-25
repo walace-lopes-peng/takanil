@@ -111,6 +111,16 @@ export function formatarInstagram(instagram?: string | null): string {
   return limpo ? `@${limpo}` : '';
 }
 
+/**
+ * Gera uma URL completa para o perfil do Instagram (ex: https://instagram.com/usuario)
+ * a partir de qualquer handle ou URL informada.
+ */
+export function gerarLinkInstagram(instagram?: string | null): string {
+  if (!instagram) return '';
+  const handle = formatarInstagram(instagram).replace(/^@+/, '');
+  return handle ? `https://instagram.com/${handle}` : '';
+}
+
 
 /**
  * Calcula o status de pagamento do associado com base no dia de vencimento,

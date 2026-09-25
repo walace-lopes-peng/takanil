@@ -145,6 +145,7 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
     formatarTelefone,
     limparTelefone,
     formatarInstagram,
+    gerarLinkInstagram,
     gerarMensagemAssociado,
     gerarLinkWhatsApp,
     CHAVE_PIX_OFICIAL,
@@ -295,7 +296,6 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
         const telFormatado = formatarTelefone(a.whatsapp);
         const telLimpo = limparTelefone(a.whatsapp);
         const instaFormatado = formatarInstagram(a.instagram);
-        const instaPuro = instaFormatado.replace(/^@/, '');
 
         let ultimoPagoTexto = 'Nenhum registro';
         if (a.ultimo_pagamento) {
@@ -396,15 +396,16 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
                   </div>
                 ` : ''}
 
-                ${instaPuro ? `
+                ${instaFormatado ? `
                   <div class="flex items-center justify-between gap-2 bg-gray-50 px-2.5 py-1.5 rounded-xl border border-gray-100">
                     <a
-                      href="https://instagram.com/${instaPuro}"
+                      href="${gerarLinkInstagram(a.instagram)}"
                       target="_blank"
                       rel="noopener noreferrer"
                       class="text-pink-600 hover:text-pink-800 hover:underline font-bold truncate flex items-center gap-1.5 min-h-[36px]"
+                      title="Abrir perfil ${instaFormatado} no Instagram"
                     >
-                      <span>📸</span> ${instaFormatado}
+                      <span>📸</span> ${instaFormatado} <span class="text-[10px] text-pink-400">↗</span>
                     </a>
                     <button
                       type="button"
@@ -529,6 +530,8 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
       if (inputAtivo) inputAtivo.checked = true;
     }
 
+    sanitizarInstaAoColar();
+
     modalAssociado.classList.remove('hidden');
     requestAnimationFrame(() => {
       modalAssociado.classList.remove('opacity-0');
@@ -564,9 +567,21 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
   });
 
   const inputInstaForm = document.getElementById('associadoInstagram') as HTMLInputElement | null;
+  const linkPreviewInsta = document.getElementById('linkPreviewInstagram') as HTMLAnchorElement | null;
   const sanitizarInstaAoColar = () => {
-    if (inputInstaForm && inputInstaForm.value) {
-      inputInstaForm.value = formatarInstagram(inputInstaForm.value);
+    if (inputInstaForm) {
+      if (inputInstaForm.value) {
+        inputInstaForm.value = formatarInstagram(inputInstaForm.value);
+      }
+      const link = gerarLinkInstagram(inputInstaForm.value);
+      if (link && linkPreviewInsta) {
+        linkPreviewInsta.href = link;
+        linkPreviewInsta.classList.remove('hidden');
+        linkPreviewInsta.classList.add('inline-flex');
+      } else if (linkPreviewInsta) {
+        linkPreviewInsta.classList.add('hidden');
+        linkPreviewInsta.classList.remove('inline-flex');
+      }
     }
   };
 
@@ -581,6 +596,7 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
     ) {
       e.preventDefault();
       inputInstaForm.value = formatarInstagram(textoColado);
+      sanitizarInstaAoColar();
       inputInstaForm.dispatchEvent(new Event('input', { bubbles: true }));
     } else {
       setTimeout(sanitizarInstaAoColar, 0);
@@ -594,9 +610,20 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
       inputInstaForm.value.includes('http') ||
       inputInstaForm.value.includes('www.') ||
       inputInstaForm.value.includes('instagram.com') ||
-      inputInstaForm.value.includes('instagr.am')
+      inputInstaForm.value.includes('instagr.am') ||
+      inputInstaForm.value.startsWith('@http')
     ) {
       sanitizarInstaAoColar();
+    } else {
+      const link = gerarLinkInstagram(inputInstaForm.value);
+      if (link && linkPreviewInsta) {
+        linkPreviewInsta.href = link;
+        linkPreviewInsta.classList.remove('hidden');
+        linkPreviewInsta.classList.add('inline-flex');
+      } else if (linkPreviewInsta) {
+        linkPreviewInsta.classList.add('hidden');
+        linkPreviewInsta.classList.remove('inline-flex');
+      }
     }
   });
 
@@ -702,7 +729,9 @@ import ModalConfirmarPagamento from './ModalConfirmarPagamento.astro';
         badges.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100/90 text-emerald-900 rounded-lg text-xs font-semibold whitespace-nowrap shadow-2xs">📱 ${formatarTelefone(associado.whatsapp)}</span>`);
       }
       if (associado.instagram) {
-        badges.push(`<span class="inline-flex items-center gap-1 px-2.5 py-1 bg-pink-100/90 text-pink-900 rounded-lg text-xs font-semibold whitespace-nowrap shadow-2xs">📸 ${formatarInstagram(associado.instagram)}</span>`);
+        const link = gerarLinkInstagram(associado.instagram);
+        const handle = formatarInstagram(associado.instagram);
+        badges.push(`<a href="${link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 bg-pink-100 hover:bg-pink-200 text-pink-900 rounded-lg text-xs font-semibold whitespace-nowrap shadow-2xs transition-colors" title="Abrir perfil no Instagram">📸 ${handle} <span class="text-[10px] opacity-75">↗</span></a>`);
       }
       contatosBadges.innerHTML = badges.join('');
     }

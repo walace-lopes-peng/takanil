@@ -4,6 +4,7 @@ import {
   formatarTelefone,
   validarTelefone,
   formatarInstagram,
+  gerarLinkInstagram,
   calcularStatusAssociado,
   gerarMensagemAssociado,
   gerarLinkWhatsApp,
@@ -39,9 +40,19 @@ describe('associados - utilitários de telefone e instagram', () => {
     expect(formatarInstagram('https://m.instagram.com/mariasilva/')).toBe('@mariasilva');
     expect(formatarInstagram('instagram.com/mariasilva')).toBe('@mariasilva');
     expect(formatarInstagram('https://www.instagram.com/_u/mariasilva?igsh=abc')).toBe('@mariasilva');
+    expect(formatarInstagram('@https://www.instagram.com/lauandamariela')).toBe('@lauandamariela');
     expect(formatarInstagram('Perfil no Insta: https://instagram.com/mariasilva')).toBe('@mariasilva');
     expect(formatarInstagram('')).toBe('');
     expect(formatarInstagram(null)).toBe('');
+  });
+
+  it('gera link clicável correto para o perfil do Instagram', () => {
+    expect(gerarLinkInstagram('@mariasilva')).toBe('https://instagram.com/mariasilva');
+    expect(gerarLinkInstagram('mariasilva')).toBe('https://instagram.com/mariasilva');
+    expect(gerarLinkInstagram('https://www.instagram.com/mariasilva/')).toBe('https://instagram.com/mariasilva');
+    expect(gerarLinkInstagram('@https://www.instagram.com/lauandamariela')).toBe('https://instagram.com/lauandamariela');
+    expect(gerarLinkInstagram('')).toBe('');
+    expect(gerarLinkInstagram(null)).toBe('');
   });
 });
 
