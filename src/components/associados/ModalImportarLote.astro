@@ -1,0 +1,345 @@
+---
+// Modal para importação em lote de associados via cópia e cola (Excel / Sheets / WhatsApp)
+---
+
+<div
+  id="modalImportarLote"
+  class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs hidden opacity-0 transition-opacity duration-300"
+  role="dialog"
+  aria-labelledby="modalImportarTitulo"
+  aria-modal="true"
+>
+  <div
+    id="modalImportarCard"
+    class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-gray-100 overflow-hidden transform scale-95 transition-transform duration-300"
+  >
+    <!-- Cabeçalho -->
+    <div class="px-6 py-4.5 flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-emerald-50/70 via-white to-taka-green-50/50">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">📥</span>
+        <div>
+          <h3 id="modalImportarTitulo" class="text-lg font-bold text-gray-900 leading-tight">
+            Importar Associados em Lote
+          </h3>
+          <p class="text-xs text-gray-500 font-medium">
+            Cole as linhas copiadas do seu Excel, Google Sheets ou lista de texto
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="btnFecharModalImportar"
+        class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+        aria-label="Fechar modal"
+      >
+        <span class="text-xl leading-none">✕</span>
+      </button>
+    </div>
+
+    <!-- Conteúdo Rolável -->
+    <div class="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+      <!-- Instruções de Formato -->
+      <div class="p-3.5 bg-emerald-50/60 rounded-2xl border border-emerald-200/60 text-xs text-emerald-950 space-y-1.5">
+        <span class="font-bold flex items-center gap-1.5 text-emerald-800">
+          <span>💡</span> Como preparar sua lista:
+        </span>
+        <p class="text-emerald-900/90 leading-relaxed">
+          Copie as linhas da sua planilha (ou digite uma por linha) na ordem:
+          <br />
+          <code class="bg-white/80 px-2 py-0.5 rounded-md font-mono text-[11px] font-bold text-emerald-900 border border-emerald-200">Nome | Valor | Dia | WhatsApp | Instagram (opcional)</code>
+        </p>
+        <p class="text-[11px] text-emerald-800/80">
+          Aceita separação por <strong>Tabulação (copiado direto do Excel)</strong>, <strong>vírgula</strong> ou <strong>ponto e vírgula</strong>.
+        </p>
+      </div>
+
+      <!-- Textarea para Colar -->
+      <div>
+        <label for="textareaLote" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5 flex items-center justify-between">
+          <span>Cole suas linhas aqui</span>
+          <button
+            type="button"
+            id="btnCarregarExemploImportar"
+            class="text-[11px] font-bold text-taka-green-700 hover:underline lowercase"
+          >
+            carregar exemplo
+          </button>
+        </label>
+        <textarea
+          id="textareaLote"
+          rows="6"
+          placeholder="Maria Silva&#9;50&#9;10&#9;(35) 99812-3456&#9;@mariasilva&#10;Carlos Souza&#9;30&#9;5&#9;35999887766&#10;Ana Paula Mendes&#9;100&#9;20"
+          class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-xs font-mono transition-all resize-y leading-relaxed"
+        ></textarea>
+      </div>
+
+      <!-- Área de Pré-Visualização Dinâmica -->
+      <div id="secaoPreviewImportacao" class="hidden space-y-2 pt-2 border-t border-gray-100">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-700 uppercase tracking-wider">
+            Pré-visualização (<span id="contagemImportados" class="text-emerald-700 font-extrabold">0</span> detectados)
+          </span>
+          <span id="badgeErrosImportacao" class="hidden text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+            0 linha(s) ignoradas
+          </span>
+        </div>
+
+        <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold uppercase text-[10px] tracking-wider sticky top-0">
+              <tr>
+                <th class="p-2.5">Nome</th>
+                <th class="p-2.5">Valor</th>
+                <th class="p-2.5">Dia</th>
+                <th class="p-2.5">WhatsApp</th>
+                <th class="p-2.5">Instagram</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaPreviewImportacao" class="divide-y divide-gray-100 font-medium text-gray-800">
+              <!-- Injetado dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé de Ações -->
+    <div class="p-4 sm:p-5 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between gap-3">
+      <button
+        type="button"
+        id="btnCancelarModalImportar"
+        class="px-5 py-3 text-gray-600 hover:bg-gray-100 active:scale-95 font-semibold text-sm rounded-xl transition-all min-h-[44px]"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        id="btnConfirmarImportacaoLote"
+        disabled
+        class="px-6 py-3 bg-taka-green-600 hover:bg-taka-green-700 disabled:opacity-50 disabled:pointer-events-none active:scale-95 text-white font-bold text-sm rounded-xl shadow-xs transition-all min-h-[44px] flex items-center justify-center gap-2"
+      >
+        <span id="btnConfirmarImportarTexto">Cadastrar Associados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { supabase } from '../../lib/supabaseClient';
+  import {
+    formatarMoeda,
+    formatarTelefone,
+    formatarInstagram,
+    limparTelefone,
+  } from '../../lib/associados';
+
+  const modalImportar = document.getElementById('modalImportarLote');
+  const cardImportar = document.getElementById('modalImportarCard');
+  const btnAbrir = document.getElementById('btnAbrirImportarLote');
+  const btnFechar = document.getElementById('btnFecharModalImportar');
+  const btnCancelar = document.getElementById('btnCancelarModalImportar');
+  const btnExemplo = document.getElementById('btnCarregarExemploImportar');
+  const textarea = document.getElementById('textareaLote') as HTMLTextAreaElement | null;
+  const secaoPreview = document.getElementById('secaoPreviewImportacao');
+  const contagemEl = document.getElementById('contagemImportados');
+  const badgeErros = document.getElementById('badgeErrosImportacao');
+  const tabelaPreview = document.getElementById('tabelaPreviewImportacao');
+  const btnConfirmar = document.getElementById('btnConfirmarImportacaoLote') as HTMLButtonElement | null;
+  const btnTexto = document.getElementById('btnConfirmarImportarTexto');
+
+  interface LinhaImportada {
+    nome: string;
+    valor_mensalidade: number;
+    dia_vencimento: number;
+    whatsapp: string | null;
+    instagram: string | null;
+    ativo: boolean;
+  }
+
+  let itensParaImportar: LinhaImportada[] = [];
+
+  function abrirModal() {
+    if (!modalImportar) return;
+    modalImportar.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modalImportar.classList.remove('opacity-0');
+      modalImportar.classList.add('opacity-100');
+      cardImportar?.classList.remove('scale-95');
+      cardImportar?.classList.add('scale-100');
+    });
+    textarea?.focus();
+  }
+
+  function fecharModal() {
+    if (!modalImportar) return;
+    modalImportar.classList.remove('opacity-100');
+    modalImportar.classList.add('opacity-0');
+    cardImportar?.classList.remove('scale-100');
+    cardImportar?.classList.add('scale-95');
+    setTimeout(() => {
+      modalImportar.classList.add('hidden');
+    }, 250);
+  }
+
+  btnAbrir?.addEventListener('click', abrirModal);
+  btnFechar?.addEventListener('click', fecharModal);
+  btnCancelar?.addEventListener('click', fecharModal);
+
+  // Exemplo demonstrativo
+  btnExemplo?.addEventListener('click', () => {
+    if (!textarea) return;
+    textarea.value =
+      'Maria Silva\t50\t10\t(35) 99812-3456\t@mariasilva\n' +
+      'Carlos Eduardo Souza\t35\t5\t35999887766\t\n' +
+      'Ana Paula Mendes\t100\t20\t\t@anapaula.mendes\n' +
+      'Renato Silveira\t40\t15\t35988776655\t';
+    processarTexto();
+  });
+
+  function processarTexto() {
+    if (!textarea) return;
+    const linhas = textarea.value.split('\n');
+    itensParaImportar = [];
+    let linhasIgnoradas = 0;
+
+    for (const linhaBruta of linhas) {
+      const linha = linhaBruta.trim();
+      if (!linha) continue;
+
+      // Delimitadores aceitos: \t (tab do Excel), ;, ou vírgula
+      let cols: string[] = [];
+      if (linha.includes('\t')) {
+        cols = linha.split('\t');
+      } else if (linha.includes(';')) {
+        cols = linha.split(';');
+      } else if (linha.includes(',')) {
+        cols = linha.split(',');
+      } else {
+        cols = [linha];
+      }
+
+      const nome = cols[0]?.trim();
+      if (!nome) {
+        linhasIgnoradas++;
+        continue;
+      }
+
+      // Tratar valor da mensalidade (limpar R$, pontos e trocar vírgula por ponto)
+      let valorNum = 0;
+      if (cols[1]) {
+        const vLimpo = cols[1].replace(/[^\d.,]/g, '').replace(/\.(?=\d{3})/g, '').replace(',', '.');
+        valorNum = parseFloat(vLimpo);
+      }
+      if (isNaN(valorNum) || valorNum <= 0) {
+        valorNum = 30; // valor padrão razoável se omitido
+      }
+
+      // Tratar dia de vencimento (1 a 31)
+      let diaNum = 10;
+      if (cols[2]) {
+        const dLimpo = parseInt(cols[2].replace(/[^\d]/g, ''), 10);
+        if (!isNaN(dLimpo) && dLimpo >= 1 && dLimpo <= 31) {
+          diaNum = dLimpo;
+        }
+      }
+
+      // WhatsApp e Instagram
+      const zap = cols[3] ? limparTelefone(cols[3].trim()) : null;
+      const insta = cols[4] ? formatarInstagram(cols[4].trim()) : null;
+
+      itensParaImportar.push({
+        nome,
+        valor_mensalidade: valorNum,
+        dia_vencimento: diaNum,
+        whatsapp: zap || null,
+        instagram: insta || null,
+        ativo: true,
+      });
+    }
+
+    renderizarPreview(linhasIgnoradas);
+  }
+
+  function renderizarPreview(linhasIgnoradas: number) {
+    if (!secaoPreview || !tabelaPreview || !contagemEl || !btnConfirmar) return;
+
+    if (itensParaImportar.length === 0) {
+      secaoPreview.classList.add('hidden');
+      btnConfirmar.disabled = true;
+      if (btnTexto) btnTexto.textContent = 'Cadastrar Associados';
+      return;
+    }
+
+    secaoPreview.classList.remove('hidden');
+    contagemEl.textContent = String(itensParaImportar.length);
+
+    if (badgeErros) {
+      if (linhasIgnoradas > 0) {
+        badgeErros.textContent = `${linhasIgnoradas} linha(s) em branco ou inválidas`;
+        badgeErros.classList.remove('hidden');
+      } else {
+        badgeErros.classList.add('hidden');
+      }
+    }
+
+    tabelaPreview.innerHTML = itensParaImportar
+      .map(
+        (it) => `
+        <tr class="hover:bg-gray-50/80 transition-colors">
+          <td class="p-2.5 font-bold text-gray-900 truncate max-w-[140px]">${it.nome}</td>
+          <td class="p-2.5 text-emerald-700 font-extrabold">${formatarMoeda(it.valor_mensalidade)}</td>
+          <td class="p-2.5 text-gray-600">Dia ${it.dia_vencimento}</td>
+          <td class="p-2.5 text-gray-600 font-mono text-[11px]">${it.whatsapp ? formatarTelefone(it.whatsapp) : '<span class="text-gray-300">-</span>'}</td>
+          <td class="p-2.5 text-pink-600 font-medium">${it.instagram ? it.instagram : '<span class="text-gray-300">-</span>'}</td>
+        </tr>
+      `
+      )
+      .join('');
+
+    btnConfirmar.disabled = false;
+    if (btnTexto) {
+      btnTexto.textContent = `Cadastrar ${itensParaImportar.length} Associado${itensParaImportar.length > 1 ? 's' : ''}`;
+    }
+  }
+
+  textarea?.addEventListener('input', processarTexto);
+
+  // Enviar para o banco de dados
+  btnConfirmar?.addEventListener('click', async () => {
+    if (itensParaImportar.length === 0) return;
+
+    btnConfirmar.disabled = true;
+    if (btnTexto) btnTexto.textContent = 'Cadastrando...';
+
+    try {
+      const { error } = await supabase.from('associados').insert(itensParaImportar);
+      if (error) throw error;
+
+      (window as any).mostrarToast?.(
+        `🎉 ${itensParaImportar.length} associados importados com sucesso!`,
+        'sucesso'
+      );
+
+      // Limpar formulário e fechar
+      if (textarea) textarea.value = '';
+      itensParaImportar = [];
+      renderizarPreview(0);
+      fecharModal();
+
+      // Recarregar listagem principal
+      if (typeof (window as any).recarregarAssociados === 'function') {
+        await (window as any).recarregarAssociados();
+      }
+    } catch (err: any) {
+      console.error('Erro na importação em lote:', err);
+      (window as any).mostrarToast?.(
+        `Erro ao cadastrar associados: ${err.message || err}`,
+        'erro'
+      );
+    } finally {
+      btnConfirmar.disabled = false;
+      if (btnTexto) btnTexto.textContent = 'Cadastrar Associados';
+    }
+  });
+</script>

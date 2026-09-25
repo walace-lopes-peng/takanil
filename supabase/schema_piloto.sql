@@ -44,6 +44,12 @@ CREATE TABLE IF NOT EXISTS piloto.animais (
     status TEXT NOT NULL DEFAULT 'Disponível' CHECK (status IN ('Disponível', 'Adotado')),
     criado_por UUID REFERENCES piloto.perfis(id),
     status_moderacao TEXT NOT NULL DEFAULT 'pendente' CHECK (status_moderacao IN ('pendente', 'aprovado', 'rejeitado')),
+    situacao_urgencia TEXT DEFAULT 'Nenhuma',
+    quantidade INTEGER DEFAULT 1,
+    castrado TEXT DEFAULT 'Não sei',
+    vacinado TEXT DEFAULT 'Não sei',
+    temperamento TEXT DEFAULT 'Não informado',
+    sexo TEXT DEFAULT 'Não sei',
     instagram_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -59,17 +65,32 @@ DROP POLICY IF EXISTS "Leitura autenticada total" ON piloto.animais;
 CREATE POLICY "Leitura autenticada total" ON piloto.animais
     FOR SELECT USING (auth.role() = 'authenticated');
 
+-- Inserção pública (anônima): somente como pendente
 DROP POLICY IF EXISTS "Permitir inserção de animais" ON piloto.animais;
-CREATE POLICY "Permitir inserção de animais" ON piloto.animais
-    FOR INSERT WITH CHECK (status_moderacao = 'pendente');
+DROP POLICY IF EXISTS "Insercao publica (apenas pendente)" ON piloto.animais;
+CREATE POLICY "Insercao publica (apenas pendente)" ON piloto.animais
+    FOR INSERT 
+    TO anon
+    WITH CHECK (status_moderacao = 'pendente');
+
+-- Inserção autenticada: administradoras/devs podem salvar direto como aprovado
+DROP POLICY IF EXISTS "Insercao autenticada" ON piloto.animais;
+CREATE POLICY "Insercao autenticada" ON piloto.animais
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (status_moderacao IN ('pendente', 'aprovado', 'rejeitado'));
 
 DROP POLICY IF EXISTS "Permitir atualização de animais" ON piloto.animais;
 CREATE POLICY "Permitir atualização de animais" ON piloto.animais
-    FOR UPDATE USING (true);
+    FOR UPDATE 
+    TO authenticated
+    USING (true);
 
 DROP POLICY IF EXISTS "Permitir exclusão de animais" ON piloto.animais;
 CREATE POLICY "Permitir exclusão de animais" ON piloto.animais
-    FOR DELETE USING (auth.role() = 'authenticated');
+    FOR DELETE 
+    TO authenticated
+    USING (auth.role() = 'authenticated');
 
 -- 5. Tabela: financas
 CREATE TABLE IF NOT EXISTS piloto.financas (
@@ -100,3 +121,28 @@ CREATE POLICY "Permitir atualização de finanças" ON piloto.financas
 DROP POLICY IF EXISTS "Permitir exclusão de finanças" ON piloto.financas;
 CREATE POLICY "Permitir exclusão de finanças" ON piloto.financas
     FOR DELETE USING (true);
+
+-- 6. Tabela: associados (Controle de Mensalistas e Apoiadores)
+CREATE TABLE IF NOT EXISTS piloto.associados (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nome TEXT NOT NULL,
+    valor_mensalidade NUMERIC(10, 2) NOT NULL CHECK (valor_mensalidade > 0),
+    dia_vencimento INTEGER NOT NULL CHECK (dia_vencimento BETWEEN 1 AND 31),
+    whatsapp TEXT,
+    instagram TEXT,
+    ultimo_pagamento DATE,
+    ativo BOOLEAN NOT NULL DEFAULT true,
+    observacoes TEXT,
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE piloto.associados ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Acesso total associados autenticados" ON piloto.associados;
+CREATE POLICY "Acesso total associados autenticados" ON piloto.associados
+    FOR ALL
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
+

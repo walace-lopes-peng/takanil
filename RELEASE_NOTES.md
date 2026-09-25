@@ -2,6 +2,19 @@
 
 Histórico de melhorias, novidades e correções entregues em cada versão do Hub Takanil.
 
+## 🚀 Versão 0.13.0 — Controle de Associados & Lembretes Mensais via WhatsApp (25/09/2026)
+
+### ✨ Novas Funcionalidades
+
+- **🤝 `[Gestão]` Controle de Associados & Padrinhos:** Novo submódulo na aba Gestão para cadastrar apoiadores mensais com nome, valor da contribuição, dia de vencimento, WhatsApp e Instagram. Permite acompanhar visualmente quem está em dia, com vencimento próximo ou em atraso.
+- **💬 `[Gestão]` Lembretes Humanizados com Chave PIX e WhatsApp:** Botão de lembrete com revisão prévia antes do envio. Permite alternar entre modelos (Vencimento, Atraso ou Agradecimento), incluindo a Chave PIX oficial da ONG (35998687395), com disparo direto no WhatsApp ou cópia para envio no Instagram Direct.
+- **💵 `[Gestão]` Baixa Rápida com Integração Automática no Caixa:** Ao confirmar o pagamento de uma mensalidade, o sistema atualiza o associado para `[✅ Em dia]` e lança automaticamente a entrada no Caixa de Finanças na categoria "Doação / Associado", eliminando retrabalho manual.
+
+### ⚡ Melhorias e Refinamentos
+
+- **📊 Sub-abas Integradas de Gestão:** Organização da aba Gestão em duas sub-abas no topo (`[ 💰 Caixa & Despesas ]` e `[ 🤝 Associados ]`), preservando a navegação mobile de 3 botões com toques confortáveis de 44px a 48px.
+- **📋 Cópia Rápida de Número de WhatsApp e @ do Instagram:** Botão individual de cópia rápida do número puro nos cards dos apoiadores, facilitando salvar na agenda do celular ou realizar buscas.
+
 ---
 
 ## 🚀 Versão 0.12.0 — Ficha Detalhada, Gestão Ágil de Status & WhatsApp Contextual (22/09/2026)

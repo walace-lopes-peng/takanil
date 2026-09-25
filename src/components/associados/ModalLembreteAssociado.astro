@@ -1,0 +1,139 @@
+---
+import { CHAVE_PIX_OFICIAL } from '../../lib/associados';
+---
+
+<div
+  id="modalLembrete"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden opacity-0 transition-opacity duration-300"
+  role="dialog"
+  aria-labelledby="modalLembreteTitulo"
+  aria-modal="true"
+>
+  <div
+    id="modalLembreteCard"
+    class="bg-white rounded-3xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl border border-gray-100 overflow-hidden transform scale-95 transition-transform duration-300"
+  >
+    <!-- Cabeçalho -->
+    <div class="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-emerald-50/70 via-white to-taka-green-50/50">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">💬</span>
+        <div>
+          <h3 id="modalLembreteTitulo" class="text-lg font-bold text-gray-900 leading-tight">
+            Mensagem para Associado
+          </h3>
+          <p id="modalLembreteSubtitulo" class="text-xs text-gray-500 font-medium">
+            Revise e envie com carinho e transparência
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="btnFecharModalLembrete"
+        class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+        aria-label="Fechar modal"
+      >
+        <span class="text-xl leading-none">✕</span>
+      </button>
+    </div>
+
+    <!-- Conteúdo do Modal (Rolável) -->
+    <div class="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+      <!-- Identificação do Destinatário -->
+      <div class="p-3.5 bg-gray-50 rounded-2xl border border-gray-200/60 space-y-2">
+        <span class="text-[11px] text-gray-400 uppercase font-bold tracking-wider block">Destinatário(a)</span>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <span id="lembreteNomeAssociado" class="text-base font-bold text-gray-900 leading-tight">--</span>
+          <div id="lembreteContatosBadges" class="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
+            <!-- Injetado dinamicamente: 📱 WhatsApp / 📸 Instagram -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Toggles de Modelo de Mensagem -->
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
+          Escolha o Modelo
+        </label>
+        <div class="grid grid-cols-3 gap-1.5 p-1 bg-gray-100 rounded-xl border border-gray-200/60 text-xs font-bold">
+          <button
+            type="button"
+            data-tipo-modelo="lembrete"
+            class="btn-modelo-lembrete py-2.5 px-2 rounded-lg text-center transition-all bg-white text-taka-green-800 shadow-2xs"
+          >
+            📅 Vencimento
+          </button>
+          <button
+            type="button"
+            data-tipo-modelo="atraso"
+            class="btn-modelo-lembrete py-2.5 px-2 rounded-lg text-center transition-all text-gray-600 hover:text-gray-900"
+          >
+            ⚠️ Atrasado
+          </button>
+          <button
+            type="button"
+            data-tipo-modelo="agradecimento"
+            class="btn-modelo-lembrete py-2.5 px-2 rounded-lg text-center transition-all text-gray-600 hover:text-gray-900"
+          >
+            ❤️ Agradecer
+          </button>
+        </div>
+      </div>
+
+      <!-- Caixa de Texto da Mensagem (Editável) -->
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label for="textoMensagemLembrete" class="text-xs font-bold uppercase tracking-wider text-gray-700">
+            Texto da Mensagem
+          </label>
+          <span class="text-[11px] text-gray-400">Você pode ajustar antes de enviar</span>
+        </div>
+        <textarea
+          id="textoMensagemLembrete"
+          rows="6"
+          class="w-full p-3.5 rounded-2xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm leading-relaxed font-sans transition-all resize-none bg-white shadow-2xs"
+        ></textarea>
+      </div>
+
+      <!-- Chave PIX em destaque com botão de cópia rápida -->
+      <div class="p-3 bg-emerald-50/80 rounded-2xl border border-emerald-200/70 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-xl">🔑</span>
+          <div class="min-w-0">
+            <span class="text-[11px] font-bold text-emerald-800 uppercase block">Chave PIX Oficial (WhatsApp)</span>
+            <span class="text-sm font-extrabold text-emerald-950 font-mono tracking-wide">{CHAVE_PIX_OFICIAL}</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          id="btnCopiarPixLembrete"
+          data-pix={CHAVE_PIX_OFICIAL}
+          class="shrink-0 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-2xs min-h-[44px] flex items-center gap-1.5"
+        >
+          <span>📋</span> Copiar PIX
+        </button>
+      </div>
+    </div>
+
+    <!-- Rodapé de Ações Principais -->
+    <div class="p-4 sm:p-5 bg-gray-50/90 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+      <!-- Botão Copiar Mensagem Completa -->
+      <button
+        type="button"
+        id="btnCopiarMensagemCompleta"
+        class="w-full sm:w-auto px-4 py-3 bg-white hover:bg-gray-100 active:scale-95 text-gray-700 font-bold text-sm rounded-xl border border-gray-200 shadow-2xs transition-all min-h-[44px] flex items-center justify-center gap-2"
+        title="Copiar texto para enviar no Instagram Direct ou colar em outro canal"
+      >
+        <span>📋</span> Copiar Mensagem Completa
+      </button>
+
+      <!-- Botão Enviar no WhatsApp -->
+      <button
+        type="button"
+        id="btnAbrirWhatsAppLembrete"
+        class="w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-md transition-all min-h-[44px] flex items-center justify-center gap-2"
+      >
+        <span>💬</span> Abrir no WhatsApp
+      </button>
+    </div>
+  </div>
+</div>

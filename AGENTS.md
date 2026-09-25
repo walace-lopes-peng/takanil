@@ -103,6 +103,49 @@ PWA para a ONG Takanil (proteção animal, Passa Quatro/MG) cadastrar animais e
 controlar finanças. Usuárias finais são voluntárias sem experiência técnica.
 Prioridade absoluta: **simplicidade e telas com poucos toques**, não recursos.
 
+## 📱 Mobile-First — Diretriz Obrigatória
+
+O app Takanil é usado **exclusivamente em celular**. Todo componente, banner,
+card, modal ou layout deve ser desenvolvido e validado primeiro em **375px de
+largura** (iPhone SE / Android pequeno). Breakpoints `sm:` e maiores são
+*melhorias opcionais*, nunca a referência principal.
+
+**Regras práticas que o agente deve seguir sem exceção:**
+
+- **Nunca use `hidden` em mobile** para esconder informação essencial.
+  Se a informação é importante no desktop, ela é importante no mobile também.
+- **Evite `flex` com muitos filhos em linha** em viewports estreitos.
+  Prefira `grid grid-cols-N` (colunas iguais, sem overflow) ou `flex-col`.
+- **Textos não podem sobrepor** outros elementos. Se um layout começa a
+  empilhar ou cortar texto no mobile, refaça — não use `truncate` como
+  solução padrão para conteúdo crítico.
+- **Altura mínima de toque: 44px** em todos os elementos interativos
+  (botões, links, cards clicáveis). Usar `min-h-[44px]` ou `py-3`.
+- **Validação obrigatória**: antes de declarar qualquer UI como pronta,
+  inspecionar mentalmente (ou via browser) em 375px. Se não couber ou
+  estiver ilegível, o trabalho não está concluído.
+- **Crescer na vertical é aceitável** — aumentar a altura de um banner
+  ou card para acomodar o conteúdo com espaço é correto. Espremer conteúdo
+  em uma linha estreita para "economizar espaço" é errado.
+
+## ⚡ Prevenção de Falhas em Toggles e Listeners de UI (Zero Latência)
+
+Alternadores de abas, toggles, accordions e botões interativos são críticos para as voluntárias.
+Para evitar que botões e alternadores fiquem mudos ou inertes:
+
+- **Zero Latência para Listeners de UI**: Event listeners de abas, toggles e modais **NUNCA**
+  devem ser vinculados após chamadas assíncronas `await` (como `await supabase.auth.getSession()`
+  ou consultas de dados) nem no final de scripts longos. Devem ser registrados
+  **sincronamente no carregamento do DOM** (via `<script is:inline>` ou no topo imediato
+  do script), para que o app responda ao toque instantaneamente, sem travar por latência de rede.
+- **Proibição Absoluta de IDs e Componentes Duplicados**: Ao mover ou reordenar seções ou
+  componentes, certifique-se de **remover a versão anterior**. Ter dois elementos com o mesmo
+  `id` no DOM corrompe `document.getElementById()` e causa falhas silenciosas em toggles e listas.
+- **Sincronização Imediata por URL**: Para visões que aceitam parâmetros (ex: `?aba=caixa`),
+  a leitura da URL e a ativação das classes visuais deve rodar de imediato no carregamento
+  inicial, garantindo consistência ao recarregar ou abrir links diretos.
+
+
 ## Stack (fixa — não trocar nem sugerir alternativa sem perguntar)
 
 - Astro (não usar React/Vue/Svelte para novos componentes)

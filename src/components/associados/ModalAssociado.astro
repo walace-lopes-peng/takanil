@@ -1,0 +1,222 @@
+---
+// Modal para Cadastro e Edição de Associado
+---
+
+<div
+  id="modalAssociado"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden opacity-0 transition-opacity duration-300"
+  role="dialog"
+  aria-labelledby="modalAssociadoTitulo"
+  aria-modal="true"
+>
+  <div
+    id="modalAssociadoCard"
+    class="bg-white rounded-3xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl border border-gray-100 overflow-hidden transform scale-95 transition-transform duration-300"
+  >
+    <!-- Cabeçalho -->
+    <div class="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-taka-green-50/60 via-white to-emerald-50/40">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl" id="modalAssociadoIcone">🤝</span>
+        <div>
+          <h3 id="modalAssociadoTitulo" class="text-lg font-bold text-gray-900 leading-tight">
+            Novo Associado
+          </h3>
+          <p class="text-xs text-gray-500 font-medium">
+            Padrinhos e apoiadores mensais da Takanil
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="btnFecharModalAssociado"
+        class="text-gray-400 hover:text-gray-600 p-2 rounded-xl hover:bg-gray-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+        aria-label="Fechar formulário"
+      >
+        <span class="text-xl leading-none">✕</span>
+      </button>
+    </div>
+
+    <!-- Formulário (Rolável) -->
+    <form id="formAssociado" class="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+      <input type="hidden" id="associadoId" value="" />
+
+      <!-- Nome -->
+      <div>
+        <label for="associadoNome" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+          Nome Completo <span class="text-rose-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="associadoNome"
+          required
+          placeholder="Ex: Maria Silva"
+          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all"
+        />
+      </div>
+
+      <!-- Grade: Valor da Mensalidade + Dia de Vencimento -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="associadoValor" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+            Valor Mensal (R$) <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">R$</span>
+            <input
+              type="number"
+              id="associadoValor"
+              required
+              min="1"
+              step="0.01"
+              placeholder="50,00"
+              class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="associadoDiaVencimento" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+            Dia do Vencimento <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <input
+              type="number"
+              id="associadoDiaVencimento"
+              required
+              min="1"
+              max="31"
+              placeholder="Ex: 10"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all"
+            />
+            <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold">de cada mês</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grade de Contatos: WhatsApp + Instagram -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="associadoWhatsapp" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5 flex items-center justify-between">
+            <span>📱 WhatsApp (com DDD)</span>
+            <span class="text-[10px] text-gray-400 font-normal lowercase">8 ou 9 dígitos</span>
+          </label>
+          <div class="relative">
+            <input
+              type="tel"
+              id="associadoWhatsapp"
+              placeholder="(35) 99812-3456"
+              maxlength="16"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all"
+            />
+          </div>
+          <span class="text-[11px] text-gray-400 mt-1 block">Para abertura direta de conversa</span>
+        </div>
+
+        <div>
+          <label for="associadoInstagram" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5 flex items-center justify-between">
+            <span>📸 Instagram</span>
+            <span class="text-[10px] text-gray-400 font-normal lowercase">opcional</span>
+          </label>
+          <div class="relative">
+            <input
+              type="text"
+              id="associadoInstagram"
+              placeholder="@mariasilva ou colar link"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all"
+            />
+          </div>
+          <div class="flex items-center justify-between mt-1 text-[11px] gap-2">
+            <span class="text-gray-400 truncate">Digitar @usuário ou colar link</span>
+            <a
+              id="linkPreviewInstagram"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hidden text-pink-600 hover:text-pink-800 font-bold hover:underline items-center gap-1 shrink-0 min-h-[24px]"
+              title="Abrir perfil no Instagram"
+            >
+              <span>Ver perfil ↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Último Pagamento Registrado -->
+      <div>
+        <label for="associadoUltimoPagamento" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+          🗓️ Data do Último Pagamento Registrado
+        </label>
+        <input
+          type="date"
+          id="associadoUltimoPagamento"
+          class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all"
+        />
+        <span class="text-[11px] text-gray-400 mt-1 block">Se já tiver pago este mês, preencha para atualizar o status para "Em dia".</span>
+      </div>
+
+      <!-- Observações -->
+      <div>
+        <label for="associadoObservacoes" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+          📝 Observações (Opcional)
+        </label>
+        <textarea
+          id="associadoObservacoes"
+          rows="2"
+          placeholder="Ex: Prefere pagar no início do mês via PIX; madrinha do cão Thor..."
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-taka-green-500 focus:ring-2 focus:ring-taka-green-200 outline-none text-gray-800 text-sm font-medium transition-all resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Toggle: Ativo / Inativo -->
+      <div class="flex items-center justify-between p-3.5 bg-gray-50 rounded-2xl border border-gray-200/60">
+        <div>
+          <span class="text-sm font-bold text-gray-800 block">Associado Ativo</span>
+          <span class="text-xs text-gray-500">Se desmarcado, não entra na contagem de lembretes nem na previsão mensal.</span>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="associadoAtivo" class="sr-only peer" checked />
+          <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-taka-green-600"></div>
+        </label>
+      </div>
+    </form>
+
+    <!-- Rodapé de Ações -->
+    <div class="p-3.5 sm:p-5 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between gap-2">
+      <button
+        type="button"
+        id="btnExcluirAssociado"
+        class="hidden px-3.5 py-2.5 sm:px-4 sm:py-3 text-rose-600 hover:bg-rose-50 active:scale-95 font-bold text-xs sm:text-sm rounded-xl border border-rose-200 transition-all min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap"
+      >
+        <span>🗑️</span> <span>Excluir</span>
+      </button>
+
+      <div class="flex items-center gap-2 sm:gap-2.5 ml-auto">
+        <button
+          type="button"
+          id="btnCancelarModalAssociado"
+          class="px-3.5 py-2.5 sm:px-5 sm:py-3 text-gray-600 hover:bg-gray-100 active:scale-95 font-semibold text-xs sm:text-sm rounded-xl transition-all min-h-[44px] shrink-0 whitespace-nowrap"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          id="btnSalvarENovoAssociado"
+          class="hidden px-3 py-2.5 sm:px-4 sm:py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 active:scale-95 font-bold text-xs sm:text-sm rounded-xl transition-all min-h-[44px] items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
+          title="Salvar e continuar cadastrando o próximo associado"
+        >
+          <span>➕</span> <span>Salvar e Novo</span>
+        </button>
+
+        <button
+          type="submit"
+          form="formAssociado"
+          id="btnSalvarAssociado"
+          class="px-4 py-2.5 sm:px-6 sm:py-3 bg-taka-green-600 hover:bg-taka-green-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all min-h-[44px] flex items-center justify-center gap-2 shrink-0 whitespace-nowrap"
+        >
+          <span id="btnSalvarAssociadoTexto">Salvar Associado</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

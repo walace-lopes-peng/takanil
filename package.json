@@ -1,9 +1,9 @@
 {
   "name": "hub-takanil",
   "type": "module",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "scripts": {
-    "dev": "astro dev --host",
+    "dev": "astro dev --host --port 4325",
     "start": "astro dev",
     "build": "astro check && astro build",
     "test": "vitest run",
