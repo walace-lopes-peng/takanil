@@ -39,6 +39,30 @@ import { VERSAO_ATUAL, NOVIDADES_VERSAO } from '../data/novidades';
 
     <!-- Lista de Novidades (Rolável) -->
     <div class="p-5 sm:p-6 overflow-y-auto space-y-3.5 flex-1 divide-y divide-gray-50">
+      <!-- Card Destaque da Versão: Chamada Direta para Cadastrar Primeiro Associado -->
+      <div class="pb-3.5 border-b border-gray-100">
+        <div class="bg-gradient-to-br from-emerald-600 to-taka-green-800 rounded-2xl p-4 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider text-emerald-100">
+              <span>🚀</span> <span>Destaque da Versão</span>
+            </div>
+            <h4 class="font-bold text-sm sm:text-base text-white leading-tight">
+              Cadastre o primeiro associado da ONG
+            </h4>
+            <p class="text-xs text-emerald-100/90 leading-relaxed font-medium">
+              Registre padrinhos com valor e dia de vencimento para automatizar lembretes e recebimentos no Caixa.
+            </p>
+          </div>
+          <button
+            type="button"
+            id="btnIrCadastrarAssociadoModal"
+            class="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-emerald-50 active:scale-95 text-taka-green-900 font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer min-h-[44px]"
+          >
+            <span>➕</span> <span>Cadastrar Associado</span>
+          </button>
+        </div>
+      </div>
+
       {NOVIDADES_VERSAO.map((item) => (
         <div class="pt-3.5 first:pt-0 flex items-start gap-3.5">
           <div class="w-10 h-10 rounded-2xl bg-taka-green-50 border border-taka-green-200/60 flex items-center justify-center text-xl shrink-0 shadow-2xs">
@@ -145,5 +169,24 @@ import { VERSAO_ATUAL, NOVIDADES_VERSAO } from '../data/novidades';
         (window as any).abrirModalNovidades();
       }, 600);
     }
+
+    // Ação do Botão de Cadastro Direto de Associado
+    const btnIrCadastrar = document.getElementById('btnIrCadastrarAssociadoModal');
+    btnIrCadastrar?.addEventListener('click', () => {
+      (window as any).fecharModalNovidades?.();
+
+      if (window.location.pathname.includes('/financas')) {
+        if (typeof (window as any).ativarSubAbaGestao === 'function') {
+          (window as any).ativarSubAbaGestao('associados');
+        }
+        setTimeout(() => {
+          if (typeof (window as any).abrirModalAssociado === 'function') {
+            (window as any).abrirModalAssociado();
+          }
+        }, 300);
+      } else {
+        window.location.href = '/financas?aba=associados&novo=true';
+      }
+    });
   });
 </script>

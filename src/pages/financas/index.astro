@@ -1,9 +1,103 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PainelAssociados from '../../components/associados/PainelAssociados.astro';
 ---
 
-<Layout title="Finanças - Hub Takanil">
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<Layout title="Gestão - Hub Takanil">
+  <!-- Alternador de Sub-abas da Gestão: Associados primeiro, depois Caixa -->
+  <div class="mb-6 flex justify-center">
+    <div class="inline-flex p-1.5 bg-gray-100 rounded-2xl border border-gray-200/80 w-full max-w-md shadow-2xs">
+      <button
+        id="subtabAssociados"
+        type="button"
+        class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all bg-white text-taka-green-800 shadow-2xs min-h-[44px] cursor-pointer"
+      >
+        <span>🤝</span> Associados
+      </button>
+      <button
+        id="subtabCaixa"
+        type="button"
+        class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-gray-900 min-h-[44px] cursor-pointer"
+      >
+        <span>💰</span> Caixa & Despesas
+      </button>
+    </div>
+  </div>
+
+  <script is:inline>
+    // Controle síncrono e imediato das abas (Zero Latência)
+    (function() {
+      function ativarSubAba(aba) {
+        var btnCaixa = document.getElementById('subtabCaixa');
+        var btnAssoc = document.getElementById('subtabAssociados');
+        var secCaixa = document.getElementById('secaoCaixa');
+        var secAssoc = document.getElementById('secaoAssociados');
+        var barraRapida = document.getElementById('barraLancamentoRapido');
+
+        if (aba === 'caixa') {
+          btnCaixa?.classList.add('bg-white', 'text-taka-green-800', 'shadow-2xs');
+          btnCaixa?.classList.remove('text-gray-500');
+          btnAssoc?.classList.remove('bg-white', 'text-taka-green-800', 'shadow-2xs');
+          btnAssoc?.classList.add('text-gray-500');
+
+          secCaixa?.classList.remove('hidden');
+          secAssoc?.classList.add('hidden');
+          if (barraRapida) barraRapida.style.display = 'flex';
+          window.history.replaceState(null, '', '/financas?aba=caixa');
+
+          if (typeof window.carregarDadosCaixa === 'function') {
+            window.carregarDadosCaixa();
+          }
+        } else {
+          btnAssoc?.classList.add('bg-white', 'text-taka-green-800', 'shadow-2xs');
+          btnAssoc?.classList.remove('text-gray-500');
+          btnCaixa?.classList.remove('bg-white', 'text-taka-green-800', 'shadow-2xs');
+          btnCaixa?.classList.add('text-gray-500');
+
+          secAssoc?.classList.remove('hidden');
+          secCaixa?.classList.add('hidden');
+          if (barraRapida) barraRapida.style.display = 'none';
+          window.history.replaceState(null, '', '/financas');
+
+          if (typeof window.recarregarAssociados === 'function') {
+            window.recarregarAssociados();
+          }
+        }
+      }
+
+      window.ativarSubAbaGestao = ativarSubAba;
+
+      function bindEvents() {
+        var btnCaixa = document.getElementById('subtabCaixa');
+        var btnAssoc = document.getElementById('subtabAssociados');
+
+        btnCaixa?.addEventListener('click', function() { ativarSubAba('caixa'); });
+        btnAssoc?.addEventListener('click', function() { ativarSubAba('associados'); });
+
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('aba') === 'caixa' || window.location.hash === '#caixa') {
+          ativarSubAba('caixa');
+        } else {
+          ativarSubAba('associados');
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindEvents);
+      } else {
+        bindEvents();
+      }
+    })();
+  </script>
+
+  <!-- Seção 1: Associados (Padrinhos e Mensalistas - Padrão) -->
+  <div id="secaoAssociados" class="transition-opacity duration-200">
+    <PainelAssociados />
+  </div>
+
+  <!-- Seção 2: Caixa & Despesas -->
+  <div id="secaoCaixa" class="hidden transition-opacity duration-200">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
     
     <!-- Coluna Esquerda: Saldo Total + Formulário de Transação (lg:col-span-5 xl:col-span-4) -->
     <div class="lg:col-span-5 xl:col-span-4 space-y-6">
@@ -310,23 +404,33 @@ import Layout from '../../layouts/Layout.astro';
       </button>
     </div>
   </div>
+  </div>
 </Layout>
 
 <script>
   import { supabase, getUserRole } from '../../lib/supabaseClient';
-
-  const { data: authData } = await supabase.auth.getSession();
-  if (!authData.session) {
-    window.location.replace('/login');
-  } else {
-    const role = await getUserRole();
-    if (role !== 'adm' && role !== 'dev') {
-      window.location.replace('/');
-    }
-  }
   import { obterIntervaloPorAtalho, type TipoAtalhoData } from '../../lib/filtrosData';
   import { calcularEvolucaoSaldo, gerarSvgCurvaSaldo, agruparPorCategorias, gerarHtmlCategorias } from '../../lib/agrupamentoFinancas';
-  import * as XLSX from 'xlsx';
+
+  // Verificação de autenticação assíncrona (não bloqueia registro de listeners nem UI)
+  async function checkAuth() {
+    try {
+      const { data: authData } = await supabase.auth.getSession();
+      if (!authData?.session) {
+        window.location.replace('/login');
+        return false;
+      }
+      const role = await getUserRole();
+      if (role !== 'adm' && role !== 'dev') {
+        window.location.replace('/');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.warn('Erro ao checar autenticação em finanças:', err);
+      return true;
+    }
+  }
 
   // Elementos do Formulário
   const btnCancelar = document.getElementById('btnCancelar');
@@ -916,122 +1020,163 @@ import Layout from '../../layouts/Layout.astro';
 
   // Carregar dados filtrados do Supabase
   async function carregarDados() {
-    if (loadingState) {
-      loadingState.style.display = 'block';
-    }
-
-    let query = supabase
-      .from('financas')
-      .select('*');
-
-    if (atalhoAtivo !== 'todo_periodo') {
-      if (periodoAtual.inicio) query = query.gte('data', periodoAtual.inicio);
-      if (periodoAtual.fim) query = query.lte('data', periodoAtual.fim);
-    }
-
-    const { data: lancamentos, error } = await query
-      .order('data', { ascending: false })
-      .order('created_at', { ascending: false });
-
-    if (loadingState) loadingState.style.display = 'none';
-
-    lancamentosAtuais = lancamentos || [];
-
-    if (error) {
-      console.error(error);
-      if (listaLancamentos) {
-        listaLancamentos.innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Erro ao carregar os lançamentos.</div>';
+    try {
+      if (loadingState) {
+        loadingState.style.display = 'block';
       }
-      return;
-    }
 
-    if (totalRegistrosEl) {
-      totalRegistrosEl.textContent = (lancamentos?.length || 0).toString();
-    }
+      let query = supabase
+        .from('financas')
+        .select('*');
 
-    if (!lancamentos || lancamentos.length === 0) {
-      if (listaLancamentos) {
-        listaLancamentos.innerHTML = `
-          <div class="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-xl border border-gray-100 shadow-sm text-sm">
-            Nenhum lançamento encontrado para este período.
-          </div>`;
+      if (atalhoAtivo !== 'todo_periodo') {
+        if (periodoAtual.inicio) query = query.gte('data', periodoAtual.inicio);
+        if (periodoAtual.fim) query = query.lte('data', periodoAtual.fim);
       }
-      
-      if (graficoSvgContainer) graficoSvgContainer.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">Sem dados para exibir no período.</div>';
-      atualizarSaldoTotal();
-      return;
-    }
 
-    let html = '';
-    let totalEntradas = 0;
-    let totalSaidas = 0;
+      const { data: lancamentos, error } = await query
+        .order('data', { ascending: false })
+        .order('created_at', { ascending: false });
 
-    lancamentos.forEach((l) => {
-      const isEntrada = l.tipo === 'Entrada';
-      const colorText = isEntrada ? 'text-green-600' : 'text-red-600';
-      const sinal = isEntrada ? '+' : '-';
-      
-      if (isEntrada) totalEntradas += l.valor;
-      else totalSaidas += l.valor;
+      if (loadingState) loadingState.style.display = 'none';
 
-      const catLabel = obterNomeCategoria(l.categoria);
-      const temDescricao = temDescricaoPersonalizada(l.descricao, l.categoria);
+      lancamentosAtuais = lancamentos || [];
 
-      html += `
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-start">
-          <div class="flex-1 pr-3">
-            <h4 class="font-bold text-gray-800 text-sm sm:text-base leading-tight">${catLabel}</h4>
-            ${temDescricao ? `
-              <p class="text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed break-words" title="${escapeHtml(l.descricao)}">
-                ${escapeHtml(l.descricao)}
-              </p>
-            ` : ''}
-            <p class="text-[11px] text-gray-400 mt-1">${formatarDataBR(l.data)}</p>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <p class="font-bold text-sm sm:text-base ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
-            <div class="flex justify-end gap-3 mt-2">
-              <button onclick="window.editarLancamento('${l.id}')" class="text-xs font-medium text-taka-green-600 hover:text-taka-green-800 py-1 hover:underline">Editar</button>
-              <button onclick="window.deletarLancamento('${l.id}')" class="text-xs font-medium text-red-600 hover:text-red-800 py-1 hover:underline">Excluir</button>
+      if (error) {
+        console.error(error);
+        if (listaLancamentos) {
+          listaLancamentos.innerHTML = '<div class="col-span-full text-center py-8 px-4 text-red-500 text-sm bg-red-50 rounded-2xl border border-red-100">Erro ao carregar os lançamentos.</div>';
+        }
+        return;
+      }
+
+      if (totalRegistrosEl) {
+        totalRegistrosEl.textContent = (lancamentos?.length || 0).toString();
+      }
+
+      if (!lancamentos || lancamentos.length === 0) {
+        if (listaLancamentos) {
+          listaLancamentos.innerHTML = `
+            <div class="col-span-full text-center py-8 px-4 text-gray-500 bg-gray-50 rounded-2xl border border-gray-100 shadow-2xs text-sm space-y-3">
+              <p class="font-medium text-gray-600">Nenhum lançamento encontrado para este período.</p>
+              <p class="text-xs text-gray-400">Você pode alternar o filtro ou visualizar todo o histórico da ONG.</p>
+              <div>
+                <button
+                  type="button"
+                  onclick="window.selecionarAtalhoTodoPeriodo?.()"
+                  class="px-4 py-2.5 bg-white hover:bg-gray-100 text-taka-green-700 font-bold text-xs rounded-xl border border-taka-green-200 shadow-2xs transition-all active:scale-95 inline-flex items-center gap-1.5 cursor-pointer min-h-[44px]"
+                >
+                  <span>📅</span> <span>Ver Histórico Completo</span>
+                </button>
+              </div>
+            </div>`;
+        }
+        
+        if (graficoSvgContainer) graficoSvgContainer.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">Sem dados para exibir no período.</div>';
+        atualizarSaldoTotal();
+        return;
+      }
+
+      let html = '';
+      let totalEntradas = 0;
+      let totalSaidas = 0;
+
+      lancamentos.forEach((l) => {
+        const isEntrada = l.tipo === 'Entrada';
+        const colorText = isEntrada ? 'text-green-600' : 'text-red-600';
+        const sinal = isEntrada ? '+' : '-';
+        
+        if (isEntrada) totalEntradas += l.valor;
+        else totalSaidas += l.valor;
+
+        const catLabel = obterNomeCategoria(l.categoria);
+        const temDescricao = temDescricaoPersonalizada(l.descricao, l.categoria);
+
+        html += `
+          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-start">
+            <div class="flex-1 pr-3">
+              <h4 class="font-bold text-gray-800 text-sm sm:text-base leading-tight">${catLabel}</h4>
+              ${temDescricao ? `
+                <p class="text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed break-words" title="${escapeHtml(l.descricao)}">
+                  ${escapeHtml(l.descricao)}
+                </p>
+              ` : ''}
+              <p class="text-[11px] text-gray-400 mt-1">${formatarDataBR(l.data)}</p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="font-bold text-sm sm:text-base ${colorText}">${sinal} ${formatarMoeda(l.valor)}</p>
+              <div class="flex justify-end gap-3 mt-2">
+                <button onclick="window.editarLancamento('${l.id}')" class="text-xs font-medium text-taka-green-600 hover:text-taka-green-800 py-1 hover:underline">Editar</button>
+                <button onclick="window.deletarLancamento('${l.id}')" class="text-xs font-medium text-red-600 hover:text-red-800 py-1 hover:underline">Excluir</button>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-    });
+        `;
+      });
 
-    if (listaLancamentos) listaLancamentos.innerHTML = html;
+      if (listaLancamentos) listaLancamentos.innerHTML = html;
 
-    // Atualizar Visão Gráfica (Evolução ou Categorias)
-    renderizarVisaoGrafica();
+      // Atualizar Visão Gráfica (Evolução ou Categorias)
+      renderizarVisaoGrafica();
 
-    // Atualizar Saldo Total em Caixa (sempre reflete a conta real da ONG)
-    atualizarSaldoTotal();
+      // Atualizar Saldo Total em Caixa (sempre reflete a conta real da ONG)
+      atualizarSaldoTotal();
+    } catch (err: any) {
+      console.error('Erro ao carregar dados de finanças:', err);
+      if (loadingState) loadingState.style.display = 'none';
+      if (listaLancamentos) {
+        listaLancamentos.innerHTML = `
+          <div class="col-span-full text-center py-8 px-4 text-red-500 bg-red-50 rounded-2xl border border-red-100 text-sm">
+            Erro ao carregar os lançamentos. Verifique sua conexão com o servidor.
+          </div>`;
+      }
+    }
   }
 
-  // Exportar Excel
+  // Exportar Excel (Dynamic Import para carregamento instantâneo)
   const btnExportar = document.getElementById('btnExportar');
-  btnExportar?.addEventListener('click', () => {
+  btnExportar?.addEventListener('click', async () => {
     if (lancamentosAtuais.length === 0) {
       (window as any).mostrarToast('Nenhum dado para exportar neste período.', 'aviso');
       return;
     }
 
-    const linhas = lancamentosAtuais.map(l => ({
-      Data: formatarDataBR(l.data),
-      Tipo: l.tipo,
-      Categoria: obterNomeCategoria(l.categoria),
-      Descrição: temDescricaoPersonalizada(l.descricao, l.categoria) ? l.descricao : 'Sem descrição adicional',
-      Valor: formatarMoeda(l.valor)
-    }));
+    try {
+      const XLSX = await import('xlsx');
+      const linhas = lancamentosAtuais.map(l => ({
+        Data: formatarDataBR(l.data),
+        Tipo: l.tipo,
+        Categoria: obterNomeCategoria(l.categoria),
+        Descrição: temDescricaoPersonalizada(l.descricao, l.categoria) ? l.descricao : 'Sem descrição adicional',
+        Valor: formatarMoeda(l.valor)
+      }));
 
-    const ws = XLSX.utils.json_to_sheet(linhas);
-    ws['!cols'] = [{wch: 12}, {wch: 10}, {wch: 15}, {wch: 30}, {wch: 15}];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Financeiro');
-    XLSX.writeFile(wb, 'Takanil-Financeiro.xlsx');
+      const ws = XLSX.utils.json_to_sheet(linhas);
+      ws['!cols'] = [{wch: 12}, {wch: 10}, {wch: 15}, {wch: 30}, {wch: 15}];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Financeiro');
+      XLSX.writeFile(wb, 'Takanil-Financeiro.xlsx');
+    } catch (err) {
+      console.error('Erro ao exportar planilha:', err);
+      (window as any).mostrarToast('Erro ao exportar planilha.', 'erro');
+    }
   });
+
+
+
+  // Expor recarga de transações para o modal de pagamento de associados e abas de gestão
+  (window as any).carregarTransacoes = carregarDados;
+  (window as any).carregarDadosCaixa = carregarDados;
+  (window as any).selecionarAtalhoTodoPeriodo = () => {
+    atalhoAtivo = 'todo_periodo';
+    periodoAtual = obterIntervaloPorAtalho('todo_periodo');
+    atualizarBotoesAtalho();
+    carregarDados();
+  };
 
   // Inicialização
   atualizarBotoesAtalho();
   carregarDados();
+  atualizarSaldoTotal();
+  checkAuth();
 </script>

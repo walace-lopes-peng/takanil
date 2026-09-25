@@ -17,6 +17,44 @@ Toda nova entrega de versão ou build de patch deve registrar:
 
 ---
 
+## [0.13.0] — 25/09/2026 (Módulo de Associados & Lembretes Mensais via WhatsApp)
+
+- **Tipo:** Minor Release (Nova Funcionalidade e Integração Financeira)
+- **Branch:** `feat/137-modulo-associados-lembretes` | **PR:** *(a ser aberto)* | **Issue Fechada:** #137
+- **Arquivos Modificados / Criados:**
+  - `src/lib/associados.ts` (regras de negócio, tipos, cálculo de status de vencimento, sanitização de contatos, geração de links e mensagens)
+  - `src/lib/associados.test.ts` (testes unitários com Vitest cobrindo 13 casos de teste)
+  - `src/components/associados/PainelAssociados.astro` (painel principal com KPIs, busca, filtros rápidos e cards responsivos)
+  - `src/components/associados/ModalAssociado.astro` (modal para cadastro e edição de apoiadores)
+  - `src/components/associados/ModalLembreteAssociado.astro` (revisão de mensagens com chave PIX e opções WhatsApp/Instagram)
+  - `src/components/associados/ModalConfirmarPagamento.astro` (baixa rápida com criação de Entrada no Caixa em Finanças)
+  - `src/pages/financas/index.astro` (incorporação de sub-abas [Caixa & Despesas] vs [Associados] com sincronização de query param)
+  - `src/layouts/Layout.astro` (atualização do rótulo de navegação de "Finanças" para "Gestão")
+  - `supabase/migration_20260925_criar_tabela_associados.sql` (migration DDL com paridade para `public` e `piloto` com RLS)
+  - `supabase/schema.sql` e `supabase/schema_piloto.sql` (paridade da tabela `associados` nos schemas do repositório)
+  - `src/data/novidades.ts`, `RELEASE_NOTES.md` e `package.json` (sincronização de versão para `0.13.0` com tag `[Gestão]`)
+
+- **Causa Raiz & Contexto:**
+  - A ONG Takanil dependia de controle manual em cadernos ou planilhas para acompanhar quem eram seus padrinhos e associados, quando venciam suas contribuições e quando enviar lembretes.
+  - Havia perda de receita recorrente por esquecimento e retrabalho de lançar manualmente cada PIX recebido no módulo de Finanças.
+
+- **Solução Técnica Implementada:**
+  1. **Schema & Paridade:** Criada tabela `associados` em paridade obrigatória (`public` e `piloto`), com RLS habilitado apenas para `authenticated`.
+  2. **Domain Logic:** Funções puras em `src/lib/associados.ts` determinam o status do apoiador (`em_dia`, `vence_hoje`, `a_vencer`, `atrasado`) considerando o mês/ano corrente e a data do último pagamento registrado.
+  3. **Sub-abas sem Fragmentação de Rotas:** Mantida a rota `/financas` (com label "Gestão") e inseridas sub-abas tipo pílula no topo com preservação de estado via query parameter (`?aba=associados`).
+  4. **Fluxo de Lembrete Não-Intrusivo:** O lembrete não é disparado automaticamente; abre um modal com revisão do texto, chave PIX e atalhos para WhatsApp Web/App (`wa.me`) ou cópia para Instagram.
+  5. **Baixa Integrada:** Ao confirmar o pagamento, executa transação atualizando `ultimo_pagamento` do associado e inserindo uma Entrada em `financas` com a categoria `"Doação / Associado"`.
+
+- **Validação & Testes:**
+  - `npm run test`: 45 testes unitários passando (17 testes em `associados.test.ts` cobrindo regras de vencimento, datas distantes e status).
+  - `npm run build`: `astro check` com 0 erros, 0 warnings; build estático de 7 páginas gerado com sucesso.
+  - Correção no script inline de Finanças: remoção de token TypeScript (`as any`), busca dinâmica dos elementos nas abas, registro global de `window.carregarDadosCaixa` e botão de histórico completo no empty state.
+  - Causa raiz do congelamento em "Carregando dados...": O Vite dev server retornava HTTP 504 em `/node_modules/.vite/deps/xlsx.js` devido ao import estático no topo; corrigido migrando o `xlsx` para dynamic import sob demanda ao clicar em "Exportar", destravando o boot do módulo.
+  - Otimização do seletor de ordenação e modo de exibição em 375px sem amontoar ou quebrar de forma desordenada.
+  - Adição de card de destaque no `ModalNovidades.astro` com redirecionamento direto para cadastro do primeiro associado.
+
+---
+
 ## [0.12.1] — 24/09/2026 (Hotfix: RLS piloto.animais + Porta Dev Fixada)
 
 - **Tipo:** Patch / Hotfix de Infraestrutura
